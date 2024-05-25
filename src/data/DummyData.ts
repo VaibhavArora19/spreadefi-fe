@@ -1,7 +1,7 @@
-import { TokenAPYInfo } from "@/types/dataTable";
+import { TLendingBorrowingTableItem } from "@/types/dataTable";
 import { TProtocolName } from "@/types/protocol";
 
-export const DummyData: TokenAPYInfo[] = [
+export const LendingBorrowingDummyData: TLendingBorrowingTableItem[] = [
     {
       id: "0",
       asset: "WETH",
@@ -46,6 +46,36 @@ export const DummyData: TokenAPYInfo[] = [
       totalAPY: "6.8% - 9.3%",
       chains: ["8453", "42161", "10"],
       protocols: [TProtocolName.AAVE,TProtocolName.COMPOUND, TProtocolName.Balancer],
+    },
+  ];
+  
+export const ValultDummyData: TLendingBorrowingTableItem[] = [
+    {
+      id: "0",
+      asset: "WETH",
+      baseAPY: "9.5% - 13.5%",
+      boostedAPY: "2.2% - 4.2%",
+      totalAPY: "6.8% - 9.3%",
+      chains: ["42161", "10"],
+      protocols: [TProtocolName.AAVE],
+    },
+    {
+      id: "2",
+      asset: "ETH",
+      baseAPY: "1.5% - 3.5%",
+      boostedAPY: "2.2% - 4.2%",
+      totalAPY: "6.8% - 9.3%",
+      chains: ["42161"],
+      protocols: [TProtocolName.AAVE, TProtocolName.Balancer, TProtocolName.COMPOUND],
+    },
+    {
+      id: "3",
+      asset: "WETH",
+      baseAPY: "9.5% - 13.5%",
+      boostedAPY: "2.2% - 4.2%",
+      totalAPY: "6.8% - 9.3%",
+      chains: ["42161", "10"],
+      protocols: [TProtocolName.AAVE],
     },
   ];
   

@@ -17,7 +17,7 @@ export default function RootLayout({
       <body className='bg-[#090909] font-poppins text-white'>
         <Navbar />
 
-        <div className='py-20 w-[85%] mx-auto'>{children}</div>
+        <div className='pt-20 w-[85%] mx-auto'>{children}</div>
       </body>
     </html>
   );
