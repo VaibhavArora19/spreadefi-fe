@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
   ColumnFiltersState,
@@ -9,25 +9,27 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
-} from "@tanstack/react-table";
-import { Table } from "@/components/ui/table";
-import LendingBorrowingColumn from "./LendingBorrowingColumn";
-import LendingBorrowingHeader from "./LendingBorrowingHeader";
-import LendingBorrowingTableBody from "./LendingBorrowingTableBody";
-import VaultTableColumn from "../VaultTable/VaultTableColumn";
-import { useState } from "react";
+} from '@tanstack/react-table';
+import { Table } from '@/components/ui/table';
+import LendingBorrowingColumn from './LendingBorrowingColumn';
+import LendingBorrowingHeader from './LendingBorrowingHeader';
+import LendingBorrowingTableBody from './LendingBorrowingTableBody';
+import VaultTableColumn from '../VaultTable/VaultTableColumn';
+import { useState } from 'react';
 
-import TableControls from "./TableControls";
-import ChainFilterDropdown from "./ChainFilterDropdown";
-import ProtocolFilterDropdown from "./ProtocolFilterDropdown";
-import { useFilterData } from "@/hooks/useFilterData";
+import TableControls from './TableControls';
+import ChainFilterDropdown from './ChainFilterDropdown';
+import ProtocolFilterDropdown from './ProtocolFilterDropdown';
+import { useFilterData } from '@/hooks/useFilterData';
+import { useFetchAssets } from '@/server/api/asset';
 
 const LendingBorrowingTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [tab, setTab] = useState<string>("lendBorrow");
+  const [tab, setTab] = useState<string>('lendBorrow');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const { data } = useFetchAssets();
 
   const {
     chainFilters,
@@ -41,7 +43,7 @@ const LendingBorrowingTable = () => {
 
   const table = useReactTable({
     data: filteredData,
-    columns: tab === "lendBorrow" ? LendingBorrowingColumn : VaultTableColumn,
+    columns: tab === 'lendBorrow' ? LendingBorrowingColumn : VaultTableColumn,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
