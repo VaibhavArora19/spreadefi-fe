@@ -1,4 +1,4 @@
-import { TLendingBorrowingTableItem } from "@/types/dataTable";
+import { TAssetTableItem, TLendingBorrowingTableItem } from "@/types/dataTable";
 import { TProtocolName } from "@/types/protocol";
 
 export const LendingBorrowingDummyData: TLendingBorrowingTableItem[] = [
@@ -79,3 +79,32 @@ export const ValultDummyData: TLendingBorrowingTableItem[] = [
     },
   ];
   
+export const AssetTableDummyData : TAssetTableItem[] = [
+  {
+    id: "0",
+    asset: "WETH",
+    totalAPY: "8%.9",
+    boostedAPY: "4.6%",
+    chains: [ "10"],
+    protocols: [TProtocolName.AAVE],
+    points: ["ezPoints", "LXP-L"]
+  },
+  {
+    id: "1",
+    asset: "WETH",
+    totalAPY: "6.8%",
+    chains: ["42161"],
+    protocols: [TProtocolName.Balancer],
+    points: ["ezPoints", "LXP-L"]
+  },
+  {
+    id: "2",
+    asset: "WETH",
+    totalAPY: "9.3%",
+    chains: ["10"],
+    boostedAPY: "1.3%",
+    protocols: [TProtocolName.COMPOUND],
+    points: ["ezPoints", "LXP-L", ]
+  },
+ 
+] 

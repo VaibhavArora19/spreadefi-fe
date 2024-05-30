@@ -18,5 +18,15 @@ export type TVaultTableItem = {
   chains: string[];
   protocols: TProtocolName[];
 };
+
+export type TAssetTableItem = {
+  id: string;
+  asset: string;
+  totalAPY: string;
+  boostedAPY?: string;
+  points: string[];
+  chains: string[];
+  protocols: TProtocolName[];
+}
   
-export type TableItem = TLendingBorrowingTableItem | TVaultTableItem;
+export type TableItem = TLendingBorrowingTableItem | TVaultTableItem | TAssetTableItem;

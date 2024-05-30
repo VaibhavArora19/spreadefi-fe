@@ -10,10 +10,10 @@ const nextConfig = {
         //   source: '/compass/:path*',
         //   destination: `${COMPASS_SERVER_URL}/:path*`,
         // },
-        {
-          source: '/scout/:path*',
-          destination: `${SCOUT_SERVER_URL}/:path*`,
-        },
+        // {
+        //   source: '/scout/:path*',
+        //   destination: `${SCOUT_SERVER_URL}/:path*`,
+        // },
       ],
     };
   },

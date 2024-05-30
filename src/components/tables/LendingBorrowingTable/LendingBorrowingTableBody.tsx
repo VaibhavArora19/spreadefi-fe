@@ -1,8 +1,8 @@
-import { TableBody, TableCell, TableRow } from "@/components/ui/table";
-import { flexRender, Table } from "@tanstack/react-table";
-import React from "react";
-import LendingBorrowingColumn from "./LendingBorrowingColumn";
-import { TableItem } from "@/types/dataTable";
+import { TableBody, TableCell, TableRow } from '@/components/ui/table';
+import { flexRender, Table } from '@tanstack/react-table';
+import React from 'react';
+import LendingBorrowingColumn from './LendingBorrowingColumn';
+import { TableItem } from '@/types/dataTable';
 
 type TLendingBorrowingBodyProps = {
   table: Table<TableItem>;
@@ -18,9 +18,11 @@ const LendingBorrowingTableBody: React.FC<TLendingBorrowingBodyProps> = ({
           <TableRow
             className="border-none cursor-pointer hover:bg-[#131313]"
             key={row.id}
-            data-state={row.getIsSelected() && "selected"}>
+            data-state={row.getIsSelected() && 'selected'}>
             {row.getVisibleCells().map((cell) => (
-              <TableCell className="py-4 font-light" key={cell.id}>
+              <TableCell
+                className="py-4 max-w-[150px] font-light"
+                key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
             ))}

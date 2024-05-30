@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { TableItem } from '@/types/dataTable';
+import { TableItem, TAssetTableItem } from '@/types/dataTable';
 import Image from 'next/image';
 import { tokenNameToImage } from '@/constants/tokenInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
@@ -12,18 +12,8 @@ import {
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
-import { Router } from 'next/router';
 
-import { useRouter } from 'next/router';
-
-const handleNavigation = () => {
-  const router = useRouter();
-  return (path: string) => {
-    router.push(path);
-  };
-};
-
-const LendingBorrowingColumn: ColumnDef<TableItem>[] = [
+const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
   {
     accessorKey: 'asset',
     header: 'Asset',
@@ -40,67 +30,49 @@ const LendingBorrowingColumn: ColumnDef<TableItem>[] = [
     ),
   },
   {
-    accessorKey: 'baseAPY',
-    header: ({ column }) => {
-      return (
-        <div
-          className="flex gap-1 items-center "
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Base APY
-          <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
-        </div>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase">{row.getValue('baseAPY')}</div>
-    ),
-  },
-  {
-    accessorKey: 'boostedAPY',
-    header: ({ column }) => {
-      return (
-        <div
-          className="flex gap-1 items-center"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Boosted APY
-          <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
-        </div>
-      );
-    },
-    cell: ({ row }) => (
-      <div className="lowercase bg-green-500/10 px-4 py-1 border-[1px] text-xs border-green-900 rounded-full w-fit text-green-500">
-        {row.getValue('boostedAPY')}
-      </div>
-    ),
-  },
-  {
     accessorKey: 'totalAPY',
     header: ({ column }) => {
       return (
         <div
           className="flex gap-1 items-center"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          Total APY
+          APY
           <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
         </div>
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase flex gap-2">
-        <p>{row.getValue('totalAPY')}</p>
+      <div className="lowercase flex gap-2 items-center">
+        <p>{row.getValue('totalAPY')} </p>
 
-        {row.original.asset === 'ezETH' ? (
-          <TooltipProvider>
+        {row.original.boostedAPY ? (
+          <p className="lowercase text-sm w-fit text-yellow-500">
+            + {row.original.boostedAPY}
+          </p>
+        ) : null}
+      </div>
+    ),
+  },
+  {
+    accessorKey: 'points',
+    header: 'Points',
+
+    cell: ({ row }) => (
+      <div className="flex gap-3 flex-wrap overflow-hidden text-ellipsis w-full">
+        {row.original.points.map((point, index) => (
+          <TooltipProvider key={index}>
             <Tooltip>
-              <TooltipTrigger>🐚</TooltipTrigger>
+              <TooltipTrigger>
+                <div className="px-4 py-1 bg-green-700/20 text-green-400 rounded-md text-xs ">
+                  {point}
+                </div>
+              </TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white capitalize">
-                  Points available
-                </p>
+                <p className="bg-[#1e1e1e] text-white">{point}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-        ) : null}
+        ))}
       </div>
     ),
   },
@@ -108,7 +80,7 @@ const LendingBorrowingColumn: ColumnDef<TableItem>[] = [
     accessorKey: 'chains',
     header: 'Chains',
     cell: ({ row }) => (
-      <div className="flex -space-x-1">
+      <div className="flex -space-x-1 ">
         {row.original.chains.map((chain, index) => (
           <TooltipProvider key={index}>
             <Tooltip>
@@ -163,13 +135,9 @@ const LendingBorrowingColumn: ColumnDef<TableItem>[] = [
     accessorKey: 'view',
     header: '',
     cell: ({ row }) => (
-      <Button
-        onClick={() => handleNavigation()(`/${row.original.asset}`)}
-        className="w-full bg-white text-black">
-        View
-      </Button>
+      <Button className="w-[80%] bg-white text-black">Supply</Button>
     ),
   },
 ];
 
-export default LendingBorrowingColumn;
+export default AssetTableColumn;
