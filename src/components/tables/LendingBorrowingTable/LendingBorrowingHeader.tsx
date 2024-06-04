@@ -1,7 +1,7 @@
-import { TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { TableItem } from "@/types/dataTable";
-import { flexRender, Table } from "@tanstack/react-table";
-import React from "react";
+import { TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { TableItem } from '@/types/dataTable';
+import { flexRender, Table } from '@tanstack/react-table';
+import React from 'react';
 
 type TLendingBorrowingHeaderProps = {
   table: Table<TableItem>;

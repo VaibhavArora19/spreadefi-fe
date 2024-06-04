@@ -1,5 +1,8 @@
 export enum TtokenName {
     WETH = "weth",
     ETH = "eth", 
-    EZETH = "ezeth" 
+    EZETH = "ezeth", 
+    RSETH = "rseth",
+    CBETH = "cbeth"
+
 }

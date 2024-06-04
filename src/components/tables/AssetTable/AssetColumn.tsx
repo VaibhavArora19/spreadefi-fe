@@ -79,12 +79,12 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
               </TooltipTrigger>
               <TooltipContent>
                 <p className="bg-[#1e1e1e] text-white">
-                  Points rewarded for supplying tokens in this particular asset pool
+                  Points rewarded for supplying tokens in this particular asset
+                  pool
                 </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
         </div>
       );
     },

@@ -8,6 +8,10 @@ export const tokenNameToImage = (name: TtokenName) => {
             return "/assets/icons/tokens/eth.png";
         case TtokenName.EZETH: 
             return "/assets/icons/tokens/ezeth.png";
+        case TtokenName.RSETH: 
+            return "/assets/icons/tokens/rseth.png";
+        case TtokenName.CBETH: 
+            return "/assets/icons/tokens/cbeth.png";
         default: 
             return "";
     }

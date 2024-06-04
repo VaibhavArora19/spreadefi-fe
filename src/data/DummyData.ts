@@ -134,3 +134,32 @@ export const AssetTableDummyData : TAssetTableItem[] = [
   },
  
 ] 
+
+export const EthDerivativesDummyData : TAssetTableItem[] = [
+  {
+    id: "0",
+    asset: "WETH",
+    totalAPY: "8%.9",
+    boostedAPY: "4.6%",
+    chains: [ "10"],
+    protocols: [TProtocolName.AAVE],
+    points: ["ezPoints", "LXP-L"]
+  },
+  {
+    id: "1",
+    asset: "cbETH",
+    totalAPY: "6.8%",
+    chains: ["42161"],
+    protocols: [TProtocolName.Balancer],
+    points: ["ezPoints", "LXP-L"]
+  },
+  {
+    id: "2",
+    asset: "rsETH",
+    totalAPY: "9.3%",
+    chains: ["10"],
+    boostedAPY: "1.3%",
+    protocols: [TProtocolName.COMPOUND],
+    points: ["ezPoints", "LXP-L", ]
+  },
+] 
