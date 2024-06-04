@@ -3,6 +3,10 @@ const SCOUT_SERVER_URL = process.env.SCOUT_SERVER_URL;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  webpack: (config) => {
+    config.externals.push('pino-pretty', 'lokijs', 'encoding');
+    return config;
+  },
   async rewrites() {
     return {
       fallback: [

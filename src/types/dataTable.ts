@@ -4,9 +4,9 @@ import { TProtocolName } from "./protocol";
 export type TLendingBorrowingTableItem = {
   id: string;
   asset: string;
-  baseAPY: string;
-  boostedAPY: string;
-  totalAPY: string;
+  baseAPY: number[];
+  boostedAPY: number[];
+  totalAPY: number[];
   chains: string[];
   protocols: TProtocolName[];
 };

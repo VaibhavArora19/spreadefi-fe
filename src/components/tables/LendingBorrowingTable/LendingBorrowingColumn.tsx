@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { TableItem } from '@/types/dataTable';
+import { TableItem, TLendingBorrowingTableItem } from '@/types/dataTable';
 import Image from 'next/image';
 import { tokenNameToImage } from '@/constants/tokenInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
@@ -17,7 +17,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 
 const LendingBorrowingColumn = (
   router?: AppRouterInstance,
-): ColumnDef<TableItem>[] => [
+): ColumnDef<TLendingBorrowingTableItem>[] => [
   {
     accessorKey: 'asset',
     header: 'Asset',
@@ -46,7 +46,10 @@ const LendingBorrowingColumn = (
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue('baseAPY')}</div>
+      <div className="lowercase">
+        {row.original.baseAPY[0]}% -{' '}
+        {row.original.baseAPY[row.original.baseAPY.length - 1]}%
+      </div>
     ),
   },
   {
@@ -63,7 +66,8 @@ const LendingBorrowingColumn = (
     },
     cell: ({ row }) => (
       <div className="lowercase bg-green-500/10 px-4 py-1 border-[1px] text-xs border-green-900 rounded-full w-fit text-green-500">
-        {row.getValue('boostedAPY')}
+        {row.original.boostedAPY[0]}% -{' '}
+        {row.original.boostedAPY[row.original.boostedAPY.length - 1]}%
       </div>
     ),
   },
@@ -81,7 +85,10 @@ const LendingBorrowingColumn = (
     },
     cell: ({ row }) => (
       <div className="lowercase flex gap-2">
-        <p>{row.getValue('totalAPY')}</p>
+        <p>
+          {row.original.totalAPY[0]}% -{' '}
+          {row.original.totalAPY[row.original.totalAPY.length - 1]}%
+        </p>
 
         {row.original.asset === 'ezETH' ? (
           <TooltipProvider>
