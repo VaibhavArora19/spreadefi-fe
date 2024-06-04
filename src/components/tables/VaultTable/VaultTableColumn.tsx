@@ -1,55 +1,56 @@
-import { ColumnDef } from "@tanstack/react-table";
-import {
-  TableItem,
-} from "@/types/dataTable";
-import Image from "next/image";
-import { tokenNameToImage } from "@/constants/tokenInfo";
-import { CaretSortIcon } from "@radix-ui/react-icons";
+import { ColumnDef } from '@tanstack/react-table';
+import { TableItem } from '@/types/dataTable';
+import Image from 'next/image';
+import { tokenNameToImage } from '@/constants/tokenInfo';
+import { CaretSortIcon } from '@radix-ui/react-icons';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { CHAIN_CONFIG } from "@/constants/chainInfo";
-import { protocolNameToImage } from "@/constants/prorocolInfo";
-import { Button } from "@/components/ui/button";
+} from '@/components/ui/tooltip';
+import { CHAIN_CONFIG } from '@/constants/chainInfo';
+import { protocolNameToImage } from '@/constants/prorocolInfo';
+import { Button } from '@/components/ui/button';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-const VaultTableColumn: ColumnDef<TableItem>[] = [
+const VaultTableColumn = (
+  router: AppRouterInstance,
+): ColumnDef<TableItem>[] => [
   {
-    accessorKey: "asset",
-    header: "Asset",
+    accessorKey: 'asset',
+    header: 'Asset',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={tokenNameToImage(row.getValue("asset"))}
+          src={tokenNameToImage(row.getValue('asset'))}
           height={25}
           width={25}
           alt="weth"
         />
-        <p>{row.getValue("asset")}</p>
+        <p>{row.getValue('asset')}</p>
       </div>
     ),
   },
   {
-    accessorKey: "baseAPY",
+    accessorKey: 'baseAPY',
     header: ({ column }) => {
       return (
         <div
           className="flex gap-1 items-center "
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}>
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
           Base APY
           <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
         </div>
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue("baseAPY")}</div>
+      <div className="lowercase">{row.getValue('baseAPY')}</div>
     ),
   },
   {
-    accessorKey: "chains",
-    header: "Chains",
+    accessorKey: 'chains',
+    header: 'Chains',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
         {row.original.chains.map((chain, index) => (
@@ -77,8 +78,8 @@ const VaultTableColumn: ColumnDef<TableItem>[] = [
     ),
   },
   {
-    accessorKey: "protocols",
-    header: "Protocols",
+    accessorKey: 'protocols',
+    header: 'Protocols',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
         {row.original.protocols.map((protocol, index) => (
@@ -103,8 +104,8 @@ const VaultTableColumn: ColumnDef<TableItem>[] = [
     ),
   },
   {
-    accessorKey: "view",
-    header: "",
+    accessorKey: 'view',
+    header: '',
     cell: ({ row }) => (
       <Button className="w-[50%] bg-white text-black">View</Button>
     ),

@@ -22,6 +22,7 @@ import ChainFilterDropdown from './ChainFilterDropdown';
 import ProtocolFilterDropdown from './ProtocolFilterDropdown';
 import { useFilterData } from '@/hooks/useFilterData';
 import { useFetchAssets } from '@/server/api/asset';
+import { useRouter } from 'next/navigation';
 
 const LendingBorrowingTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -30,6 +31,8 @@ const LendingBorrowingTable = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const { data } = useFetchAssets();
+
+  const router = useRouter();
 
   const {
     chainFilters,
@@ -41,9 +44,14 @@ const LendingBorrowingTable = () => {
     filteredData,
   } = useFilterData({ tab });
 
+  const columns =
+    tab === 'lendBorrow'
+      ? LendingBorrowingColumn(router)
+      : VaultTableColumn(router);
+
   const table = useReactTable({
     data: filteredData,
-    columns: tab === 'lendBorrow' ? LendingBorrowingColumn : VaultTableColumn,
+    columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

@@ -60,7 +60,7 @@ const AssetPage = () => {
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 justify-between">
         <Input
           placeholder="Search token by name"
           value={(table.getColumn('asset')?.getFilterValue() as string) ?? ''}

@@ -1,5 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { TableItem, TAssetTableItem } from '@/types/dataTable';
+import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
 import { tokenNameToImage } from '@/constants/tokenInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
@@ -37,6 +38,18 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
           className="flex gap-1 items-center"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
           APY
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <IoIosInformationCircle className="cursor-pointer" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="bg-[#1e1e1e] text-white">
+                  Base APY + Boosted APY of the asset to be supplied
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
         </div>
       );
@@ -55,7 +68,26 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
   },
   {
     accessorKey: 'points',
-    header: 'Points',
+    header: () => {
+      return (
+        <div className="flex gap-1 items-center">
+          Points
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <IoIosInformationCircle className="cursor-pointer" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="bg-[#1e1e1e] text-white">
+                  Points rewarded for supplying tokens in this particular asset pool
+                </p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
+        </div>
+      );
+    },
 
     cell: ({ row }) => (
       <div className="flex gap-3 flex-wrap overflow-hidden text-ellipsis w-full">

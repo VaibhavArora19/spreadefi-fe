@@ -106,5 +106,31 @@ export const AssetTableDummyData : TAssetTableItem[] = [
     protocols: [TProtocolName.COMPOUND],
     points: ["ezPoints", "LXP-L", ]
   },
+  {
+    id: "3",
+    asset: "WETH",
+    totalAPY: "8%.9",
+    boostedAPY: "4.6%",
+    chains: [ "10"],
+    protocols: [TProtocolName.AAVE],
+    points: ["ezPoints", "LXP-L"]
+  },
+  {
+    id: "4",
+    asset: "WETH",
+    totalAPY: "6.8%",
+    chains: ["42161"],
+    protocols: [TProtocolName.Balancer],
+    points: ["ezPoints", "LXP-L"]
+  },
+  {
+    id: "5",
+    asset: "WETH",
+    totalAPY: "9.3%",
+    chains: ["10"],
+    boostedAPY: "1.3%",
+    protocols: [TProtocolName.COMPOUND],
+    points: ["ezPoints", "LXP-L", ]
+  },
  
 ] 

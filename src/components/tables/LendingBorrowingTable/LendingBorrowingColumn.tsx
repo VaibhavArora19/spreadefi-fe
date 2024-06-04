@@ -12,18 +12,12 @@ import {
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
-import { Router } from 'next/router';
+import { NextRouter, Router } from 'next/router';
+import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-import { useRouter } from 'next/router';
-
-const handleNavigation = () => {
-  const router = useRouter();
-  return (path: string) => {
-    router.push(path);
-  };
-};
-
-const LendingBorrowingColumn: ColumnDef<TableItem>[] = [
+const LendingBorrowingColumn = (
+  router?: AppRouterInstance,
+): ColumnDef<TableItem>[] => [
   {
     accessorKey: 'asset',
     header: 'Asset',
@@ -164,7 +158,9 @@ const LendingBorrowingColumn: ColumnDef<TableItem>[] = [
     header: '',
     cell: ({ row }) => (
       <Button
-        onClick={() => handleNavigation()(`/${row.original.asset}`)}
+        onClick={() => {
+          router?.push(`/${row.original.asset}`);
+        }}
         className="w-full bg-white text-black">
         View
       </Button>

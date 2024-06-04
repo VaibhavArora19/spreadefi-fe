@@ -31,7 +31,7 @@ const LendingBorrowingTableBody: React.FC<TLendingBorrowingBodyProps> = ({
       ) : (
         <TableRow>
           <TableCell
-            colSpan={LendingBorrowingColumn.length}
+            colSpan={LendingBorrowingColumn().length}
             className="h-24 text-center">
             No results.
           </TableCell>
