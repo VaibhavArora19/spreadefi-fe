@@ -1,5 +1,5 @@
 import { ColumnDef } from '@tanstack/react-table';
-import { TableItem } from '@/types/dataTable';
+import { TableItem, TVaultTableItem } from '@/types/dataTable';
 import Image from 'next/image';
 import { tokenNameToImage } from '@/constants/tokenInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
@@ -16,7 +16,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 
 const VaultTableColumn = (
   router: AppRouterInstance,
-): ColumnDef<TableItem>[] => [
+): ColumnDef<TVaultTableItem>[] => [
   {
     accessorKey: 'asset',
     header: 'Asset',
@@ -45,7 +45,11 @@ const VaultTableColumn = (
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase">{row.getValue('baseAPY')}</div>
+      <div className="lowercase">
+        {' '}
+        {row.original.baseAPY[0]}% -{' '}
+        {row.original.baseAPY[row.original.baseAPY.length - 1]}%
+      </div>
     ),
   },
   {
