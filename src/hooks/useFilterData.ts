@@ -18,19 +18,19 @@ export type UseFilterDataReturn = {
   filteredData: any[]; 
 }
 
-export const useFilterData = ({ tab, lendingTableData, vaultTableData }: UseFilterDataProps): UseFilterDataReturn => {
+export const useFilterData = ({ tab, lendingTableData = [], vaultTableData = [] }: UseFilterDataProps): UseFilterDataReturn => {
   const [chainFilters, setChainFilters] = useState<string[]>([]);
   const [protocolFilters, setProtocolFilters] = useState<string[]>([]);
 
   const allChains = new Set([
-    ...lendingTableData.flatMap(item => item.chains),
-    ...vaultTableData.flatMap(item => item.chains),
+    ...lendingTableData.flatMap(item => item.chains || []),
+    ...vaultTableData.flatMap(item => item.chains || []),
   ]);
   const uniqueChains = Array.from(allChains);
 
   const allProtocols = new Set([
-    ...lendingTableData.flatMap(item => item.protocols),
-    ...vaultTableData.flatMap(item => item.protocols),
+    ...lendingTableData.flatMap(item => item.protocols || []) ,
+    ...vaultTableData.flatMap(item => item.protocols || []) ,
   ]);
   const uniqueProtocols = Array.from(allProtocols);
 
@@ -40,7 +40,7 @@ export const useFilterData = ({ tab, lendingTableData, vaultTableData }: UseFilt
       (chainFilters.length === 0 || item.chains.some(chain => chainFilters.includes(chain))) &&
       (protocolFilters.length === 0 || item.protocols.some(protocol => protocolFilters.includes(protocol)))
     );
-  }, [chainFilters, protocolFilters, tab]);
+  }, [chainFilters, protocolFilters, tab, lendingTableData, vaultTableData]);
 
   return {
     chainFilters,
