@@ -30,7 +30,7 @@ const LendingBorrowingTable = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const { data } = useFetchAssets();
+  const { data, isLoading, isError, error } = useFetchAssets();
 
   const router = useRouter();
 
@@ -42,7 +42,11 @@ const LendingBorrowingTable = () => {
     uniqueChains,
     uniqueProtocols,
     filteredData,
-  } = useFilterData({ tab });
+  } = useFilterData({
+    tab,
+    lendingTableData: data.lendingTableData,
+    vaultTableData: data.vaultTableData,
+  });
 
   const columns =
     tab === 'lendBorrow'
@@ -50,7 +54,7 @@ const LendingBorrowingTable = () => {
       : VaultTableColumn(router);
 
   const table = useReactTable({
-    data: filteredData,
+    data: filteredData || [],
     columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
@@ -67,6 +71,9 @@ const LendingBorrowingTable = () => {
       rowSelection,
     },
   });
+
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <div className="w-full">
