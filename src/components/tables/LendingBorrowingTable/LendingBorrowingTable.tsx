@@ -44,8 +44,8 @@ const LendingBorrowingTable = () => {
     filteredData,
   } = useFilterData({
     tab,
-    lendingTableData: data.lendingTableData || [],
-    vaultTableData: data.vaultTableData || [],
+    lendingTableData: data?.lendingTableData || [],
+    vaultTableData: data?.vaultTableData || [],
   });
 
   const columns =

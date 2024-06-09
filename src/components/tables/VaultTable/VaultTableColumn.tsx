@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { TableItem, TVaultTableItem } from '@/types/dataTable';
 import Image from 'next/image';
-import { tokenNameToImage } from '@/constants/tokenInfo';
+import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
 import {
   Tooltip,
@@ -23,7 +23,7 @@ const VaultTableColumn = (
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={tokenNameToImage(row.getValue('asset'))}
+          src={assetNameToImage(row.getValue('asset'))}
           height={25}
           width={25}
           alt="weth"
@@ -33,7 +33,7 @@ const VaultTableColumn = (
     ),
   },
   {
-    accessorKey: 'baseAPY',
+    accessorKey: 'assetSupplyApys',
     header: ({ column }) => {
       return (
         <div
@@ -47,8 +47,8 @@ const VaultTableColumn = (
     cell: ({ row }) => (
       <div className="lowercase">
         {' '}
-        {row.original.baseAPY[0]}% -{' '}
-        {row.original.baseAPY[row.original.baseAPY.length - 1]}%
+        {row.original.assetSupplyApys[0]}% -{' '}
+        {row.original.assetSupplyApys[row.original.assetSupplyApys.length - 1]}%
       </div>
     ),
   },

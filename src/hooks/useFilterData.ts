@@ -1,12 +1,13 @@
 import { useMemo, useState } from 'react';
 // import {  LendingBorrowingDummyData, ValultDummyData } from "@/data/DummyData";
 import { TLendingBorrowingTableItem, TVaultTableItem } from '@/types/dataTable';
+import { TAssetsResponse } from '@/types/asset';
 
 export type UseFilterDataProps = {
   tab: string;
-  lendingTableData: TLendingBorrowingTableItem[],
-  vaultTableData: TVaultTableItem[]
-}
+  lendingTableData: TAssetsResponse[];
+  vaultTableData: TAssetsResponse[];
+};
 
 export type UseFilterDataReturn = {
   chainFilters: string[];
@@ -15,30 +16,40 @@ export type UseFilterDataReturn = {
   setProtocolFilters: React.Dispatch<React.SetStateAction<string[]>>;
   uniqueChains: string[];
   uniqueProtocols: string[];
-  filteredData: any[]; 
-}
+  filteredData: any[];
+};
 
-export const useFilterData = ({ tab, lendingTableData = [], vaultTableData = [] }: UseFilterDataProps): UseFilterDataReturn => {
+export const useFilterData = ({
+  tab,
+  lendingTableData = [],
+  vaultTableData = [],
+}: UseFilterDataProps): UseFilterDataReturn => {
   const [chainFilters, setChainFilters] = useState<string[]>([]);
   const [protocolFilters, setProtocolFilters] = useState<string[]>([]);
 
   const allChains = new Set([
-    ...lendingTableData.flatMap(item => item.chains || []),
-    ...vaultTableData.flatMap(item => item.chains || []),
+    ...lendingTableData.flatMap((item) => item.chainIds || []),
+    ...vaultTableData.flatMap((item) => item.chainIds || []),
   ]);
   const uniqueChains = Array.from(allChains);
 
   const allProtocols = new Set([
-    ...lendingTableData.flatMap(item => item.protocols || []) ,
-    ...vaultTableData.flatMap(item => item.protocols || []) ,
+    ...lendingTableData.flatMap((item) => item.protocolNames || []),
+    ...vaultTableData.flatMap((item) => item.protocolNames || []),
   ]);
   const uniqueProtocols = Array.from(allProtocols);
 
   const filteredData = useMemo(() => {
-    const currentData = tab === 'lendBorrow' ? lendingTableData : vaultTableData;
-    return currentData.filter(item =>
-      (chainFilters.length === 0 || item.chains.some(chain => chainFilters.includes(chain))) &&
-      (protocolFilters.length === 0 || item.protocols.some(protocol => protocolFilters.includes(protocol)))
+    const currentData =
+      tab === 'lendBorrow' ? lendingTableData : vaultTableData;
+    return currentData.filter(
+      (item) =>
+        (chainFilters.length === 0 ||
+          item.chainIds.some((chain) => chainFilters.includes(chain))) &&
+        (protocolFilters.length === 0 ||
+          item.protocolNames.some((protocol) =>
+            protocolFilters.includes(protocol),
+          )),
     );
   }, [chainFilters, protocolFilters, tab, lendingTableData, vaultTableData]);
 

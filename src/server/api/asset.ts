@@ -1,16 +1,28 @@
 import { axiosScout } from '@/config/axios';
 import { ASSETS } from '@/constants/query';
+import { TApiResponse } from '@/types/api';
+import { TAssetsResponse } from '@/types/asset';
 import { useQuery } from '@tanstack/react-query';
 
 export const useFetchAssets = () => {
   const fetchAssets = async () => {
-    const { data } = await axiosScout.get('/asset');
+    const { data } = await axiosScout.get<TApiResponse<TAssetsResponse[]>>(
+      '/asset',
+    );
 
-    return data;
+    const lendingTableData = data.data.filter(
+      (asset) => asset.protocolType === 'Lending',
+    );
+
+    const vaultTableData = data.data.filter(
+      (asset) => asset.protocolType === 'Yield',
+    );
+
+    return { lendingTableData, vaultTableData };
   };
 
   return useQuery({
-    queryKey: [ASSETS],
+    queryKey: [ASSETS.FETCH],
     queryFn: fetchAssets,
     retry: 3,
   });

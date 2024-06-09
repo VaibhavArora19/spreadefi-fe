@@ -1,1 +1,3 @@
-export const ASSETS = 'ASSETS';
+export enum ASSETS {
+  FETCH = 'FETCH_ASSETS',
+}

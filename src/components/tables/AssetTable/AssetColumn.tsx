@@ -2,7 +2,7 @@ import { ColumnDef } from '@tanstack/react-table';
 import { TableItem, TAssetTableItem } from '@/types/dataTable';
 import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
-import { tokenNameToImage } from '@/constants/tokenInfo';
+import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
 import {
   Tooltip,
@@ -21,7 +21,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={tokenNameToImage(row.getValue('asset'))}
+          src={assetNameToImage(row.getValue('asset'))}
           height={25}
           width={25}
           alt="weth"
@@ -58,9 +58,9 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
       <div className="lowercase flex gap-2 items-center">
         <p>{row.getValue('totalAPY')} </p>
 
-        {row.original.boostedAPY ? (
+        {row.original.assetSupplyBoostedApys ? (
           <p className="lowercase text-sm w-fit text-yellow-500">
-            + {row.original.boostedAPY}
+            + {row.original.assetSupplyBoostedApys}
           </p>
         ) : null}
       </div>

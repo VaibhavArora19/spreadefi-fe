@@ -1,7 +1,7 @@
 import { ColumnDef } from '@tanstack/react-table';
 import { TableItem, TLendingBorrowingTableItem } from '@/types/dataTable';
 import Image from 'next/image';
-import { tokenNameToImage } from '@/constants/tokenInfo';
+import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
 import {
   Tooltip,
@@ -24,7 +24,7 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={tokenNameToImage(row.getValue('asset'))}
+          src={assetNameToImage(row.getValue('asset'))}
           height={25}
           width={25}
           alt="weth"
@@ -34,7 +34,7 @@ const LendingBorrowingColumn = (
     ),
   },
   {
-    accessorKey: 'baseAPY',
+    accessorKey: 'assetSupplyApys',
     header: ({ column }) => {
       return (
         <div
@@ -47,13 +47,13 @@ const LendingBorrowingColumn = (
     },
     cell: ({ row }) => (
       <div className="lowercase">
-        {row.original.baseAPY[0]}% -{' '}
-        {row.original.baseAPY[row.original.baseAPY.length - 1]}%
+        {row.original.assetSupplyApys[0]}% -{' '}
+        {row.original.assetSupplyApys[row.original.assetSupplyApys.length - 1]}%
       </div>
     ),
   },
   {
-    accessorKey: 'boostedAPY',
+    accessorKey: 'assetSupplyBoostedApys',
     header: ({ column }) => {
       return (
         <div
@@ -66,8 +66,13 @@ const LendingBorrowingColumn = (
     },
     cell: ({ row }) => (
       <div className="lowercase bg-green-500/10 px-4 py-1 border-[1px] text-xs border-green-900 rounded-full w-fit text-green-500">
-        {row.original.boostedAPY[0]}% -{' '}
-        {row.original.boostedAPY[row.original.boostedAPY.length - 1]}%
+        {row.original.assetSupplyBoostedApys[0]}% -{' '}
+        {
+          row.original.assetSupplyBoostedApys[
+            row.original.assetSupplyBoostedApys.length - 1
+          ]
+        }
+        %
       </div>
     ),
   },
