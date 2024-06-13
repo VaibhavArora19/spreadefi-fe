@@ -8,7 +8,7 @@ const Navbar = () => {
         <p>Logo</p>
         <Link href={'/'}>lend</Link>
         <Link href={'/'}>borrow</Link>
-        <Link href={'/'}>portfolio</Link>
+        <Link href={'/portfolio'}>portfolio</Link>
       </ul>
 
       <ul className="flex items-center gap-4">
