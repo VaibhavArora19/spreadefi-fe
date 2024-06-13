@@ -16,12 +16,12 @@ import { Button } from '@/components/ui/button';
 
 const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
   {
-    accessorKey: 'asset',
+    accessorKey: 'assetSymbol',
     header: 'Asset',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={assetNameToImage(row.getValue('asset'))}
+          src={assetNameToImage(row.getValue('assetSymbol'))}
           height={25}
           width={25}
           alt="weth"
@@ -31,7 +31,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     ),
   },
   {
-    accessorKey: 'totalAPY',
+    accessorKey: 'totalApys',
     header: ({ column }) => {
       return (
         <div
@@ -56,7 +56,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     },
     cell: ({ row }) => (
       <div className="lowercase flex gap-2 items-center">
-        <p>{row.getValue('totalAPY')} </p>
+        <p>{row.getValue('totalApys')} </p>
 
         {row.original.assetSupplyBoostedApys ? (
           <p className="lowercase text-sm w-fit text-yellow-500">
@@ -109,11 +109,11 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     ),
   },
   {
-    accessorKey: 'chains',
+    accessorKey: 'chainIds',
     header: 'Chains',
     cell: ({ row }) => (
       <div className="flex -space-x-1 ">
-        {row.original.chains.map((chain, index) => (
+        {row.original.chainIds.map((chain, index) => (
           <TooltipProvider key={index}>
             <Tooltip>
               <TooltipTrigger>

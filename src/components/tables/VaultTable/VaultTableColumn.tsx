@@ -18,12 +18,12 @@ const VaultTableColumn = (
   router: AppRouterInstance,
 ): ColumnDef<TVaultTableItem>[] => [
   {
-    accessorKey: 'asset',
+    accessorKey: 'assetSymbol',
     header: 'Asset',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={assetNameToImage(row.getValue('asset'))}
+          src={assetNameToImage(row.getValue('assetSymbol'))}
           height={25}
           width={25}
           alt="weth"
@@ -53,11 +53,11 @@ const VaultTableColumn = (
     ),
   },
   {
-    accessorKey: 'chains',
+    accessorKey: 'chainIds',
     header: 'Chains',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
-        {row.original.chains.map((chain, index) => (
+        {row.original.chainIds.map((chain, index) => (
           <TooltipProvider key={index}>
             <Tooltip>
               <TooltipTrigger>

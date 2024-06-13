@@ -19,17 +19,17 @@ const LendingBorrowingColumn = (
   router?: AppRouterInstance,
 ): ColumnDef<TLendingBorrowingTableItem>[] => [
   {
-    accessorKey: 'asset',
+    accessorKey: 'assetSymbol',
     header: 'Asset',
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={assetNameToImage(row.getValue('asset'))}
+          src={assetNameToImage(row.getValue('assetSymbol'))}
           height={25}
           width={25}
           alt="weth"
         />
-        <p>{row.getValue('asset')}</p>
+        <p>{row.getValue('assetSymbol')}</p>
       </div>
     ),
   },
@@ -47,8 +47,11 @@ const LendingBorrowingColumn = (
     },
     cell: ({ row }) => (
       <div className="lowercase">
-        {row.original.assetSupplyApys[0]}% -{' '}
-        {row.original.assetSupplyApys[row.original.assetSupplyApys.length - 1]}%
+        {row.original.assetSupplyApys[0].toFixed(2)}% -{' '}
+        {row.original.assetSupplyApys[
+          row.original.assetSupplyApys.length - 1
+        ].toFixed(2)}
+        %
       </div>
     ),
   },
@@ -77,7 +80,7 @@ const LendingBorrowingColumn = (
     ),
   },
   {
-    accessorKey: 'totalAPY',
+    accessorKey: 'totalApys',
     header: ({ column }) => {
       return (
         <div
@@ -91,8 +94,9 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <div className="lowercase flex gap-2">
         <p>
-          {row.original.totalAPY[0]}% -{' '}
-          {row.original.totalAPY[row.original.totalAPY.length - 1]}%
+          {row.original.totalApys[0].toFixed(2)}% -{' '}
+          {row.original.totalApys[row.original.totalApys.length - 1].toFixed(2)}
+          %
         </p>
 
         {row.original.asset === 'ezETH' ? (
@@ -111,11 +115,11 @@ const LendingBorrowingColumn = (
     ),
   },
   {
-    accessorKey: 'chains',
+    accessorKey: 'chainIds',
     header: 'Chains',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
-        {row.original.chains.map((chain, index) => (
+        {row.original.chainIds.map((chain, index) => (
           <TooltipProvider key={index}>
             <Tooltip>
               <TooltipTrigger>
@@ -140,11 +144,11 @@ const LendingBorrowingColumn = (
     ),
   },
   {
-    accessorKey: 'protocols',
+    accessorKey: 'protocolNames',
     header: 'Protocols',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
-        {row.original.protocols.map((protocol, index) => (
+        {row.original.protocolNames.map((protocol, index) => (
           <TooltipProvider key={index}>
             <Tooltip>
               <TooltipTrigger>

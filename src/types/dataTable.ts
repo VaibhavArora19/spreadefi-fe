@@ -5,26 +5,26 @@ export type TLendingBorrowingTableItem = {
   asset: string;
   assetSupplyApys: number[];
   assetSupplyBoostedApys: number[];
-  totalAPY: number[];
-  chains: string[];
-  protocols: TProtocolName[];
+  totalApys: number[];
+  chainIds: string[];
+  protocolNames: TProtocolName[];
 };
 
 export type TVaultTableItem = {
   id: string;
   asset: string;
   assetSupplyApys: string;
-  chains: string[];
+  chainIds: string[];
   protocols: TProtocolName[];
 };
 
 export type TAssetTableItem = {
   id: string;
   asset: string;
-  totalAPY: string;
+  totalApys: string;
   assetSupplyBoostedApys?: string;
   points: string[];
-  chains: string[];
+  chainIds: string[];
   protocols: TProtocolName[];
 };
 
