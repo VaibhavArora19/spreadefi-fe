@@ -5,6 +5,9 @@ export enum TAssetName {
   RSETH = 'rseth',
   CBETH = 'cbeth',
   USDC = 'usdc',
+  DAI = "dai",
+  USDT = "usdt",
+  WBTC = "wbtc"
 }
 
 export type TAssetsResponse = {
