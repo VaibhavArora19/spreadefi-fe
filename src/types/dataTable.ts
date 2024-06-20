@@ -2,7 +2,7 @@ import { TProtocolName } from './protocol';
 
 export type TLendingBorrowingTableItem = {
   id: string;
-  asset: string;
+  assetSymbol: string;
   assetSupplyApys: number[];
   assetSupplyBoostedApys: number[];
   totalApys: number[];
@@ -12,7 +12,7 @@ export type TLendingBorrowingTableItem = {
 
 export type TVaultTableItem = {
   id: string;
-  asset: string;
+  assetSymbol: string;
   assetSupplyApys: string;
   chainIds: string[];
   protocols: TProtocolName[];
@@ -20,7 +20,7 @@ export type TVaultTableItem = {
 
 export type TAssetTableItem = {
   id: string;
-  asset: string;
+  assetSymbol: string;
   totalApys: string;
   assetSupplyBoostedApys?: string;
   points: string[];

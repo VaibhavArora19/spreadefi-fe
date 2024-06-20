@@ -99,7 +99,7 @@ const LendingBorrowingColumn = (
           %
         </p>
 
-        {row.original.asset === 'ezETH' ? (
+        {row.original.assetSymbol === 'ezETH' ? (
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>🐚</TooltipTrigger>
@@ -175,7 +175,7 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <Button
         onClick={() => {
-          router?.push(`/${row.original.asset}`);
+          router?.push(`/${row.original.assetSymbol}`);
         }}
         className="w-full bg-white text-black">
         View

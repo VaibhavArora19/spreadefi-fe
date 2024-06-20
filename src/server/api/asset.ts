@@ -6,24 +6,45 @@ import { useQuery } from '@tanstack/react-query';
 
 export const useFetchAssets = () => {
   const fetchAssets = async () => {
-    const { data } = await axiosScout.get<TApiResponse<TAssetsResponse[]>>(
-      '/asset',
-    );
+    try {
+      const { data } = await axiosScout.get<TApiResponse<TAssetsResponse[]>>(
+        '/asset',
+      );
 
-    const lendingTableData = data.data.filter(
-      (asset) => asset.protocolType === 'Lending',
-    );
+      const lendingTableData = data.data.filter(
+        (asset) => asset.protocolType === 'Lending',
+      );
 
-    const vaultTableData = data.data.filter(
-      (asset) => asset.protocolType === 'Yield',
-    );
+      const vaultTableData = data.data.filter(
+        (asset) => asset.protocolType === 'Yield',
+      );
 
-    return { lendingTableData, vaultTableData };
+      return { lendingTableData, vaultTableData };
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
   };
 
   return useQuery({
     queryKey: [ASSETS.FETCH],
     queryFn: fetchAssets,
+  });
+};
+
+export const useFetchAssetBySymbol = (assetSymbol: string) => {
+  const fetchAssetsBySymbol = async () => {
+    try {
+      const { data } = await axiosScout.get(`/asset/symbol/${assetSymbol}`);
+
+      return data;
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
+  };
+
+  return useQuery({
+    queryKey: [ASSETS.FETCH_BY_SYMBOL, assetSymbol],
+    queryFn: fetchAssetsBySymbol,
     retry: 3,
   });
 };

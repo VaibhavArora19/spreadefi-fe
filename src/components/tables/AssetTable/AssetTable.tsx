@@ -8,6 +8,7 @@ import ProtocolFilterDropdown from '@/components/tables/LendingBorrowingTable/Pr
 import { Input } from '@/components/ui/input';
 import { Table } from '@/components/ui/table';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
+import { useFetchAssetBySymbol } from '@/server/api/asset';
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -18,6 +19,7 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
+import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 
 const AssetTable = () => {
@@ -25,6 +27,8 @@ const AssetTable = () => {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const pathname = usePathname();
+  const { data: assetData } = useFetchAssetBySymbol('WETH');
 
   const {
     chainFilters,
@@ -34,7 +38,7 @@ const AssetTable = () => {
     uniqueChains,
     uniqueProtocols,
     filteredData,
-  } = useFilterDataAssetTable();
+  } = useFilterDataAssetTable(assetData || []);
 
   const table = useReactTable({
     data: filteredData,
@@ -59,9 +63,11 @@ const AssetTable = () => {
       <div className="flex items-center py-4 justify-between">
         <Input
           placeholder="Search token by name"
-          value={(table.getColumn('asset')?.getFilterValue() as string) ?? ''}
+          value={
+            (table.getColumn('assetSymbol')?.getFilterValue() as string) ?? ''
+          }
           onChange={(event) =>
-            table.getColumn('asset')?.setFilterValue(event.target.value)
+            table.getColumn('assetSymbol')?.setFilterValue(event.target.value)
           }
           className="max-w-md py-4 bg-[#27272A] border-none text-white placeholder:text-[#84848A]"
         />

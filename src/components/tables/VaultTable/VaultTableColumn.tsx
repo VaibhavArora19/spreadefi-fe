@@ -28,7 +28,7 @@ const VaultTableColumn = (
           width={25}
           alt="weth"
         />
-        <p>{row.getValue('asset')}</p>
+        <p>{row.getValue('assetSymbol')}</p>
       </div>
     ),
   },

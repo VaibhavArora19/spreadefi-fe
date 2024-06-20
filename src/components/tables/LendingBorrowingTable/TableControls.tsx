@@ -1,7 +1,7 @@
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TableItem } from "@/types/dataTable";
-import { Table } from "@tanstack/react-table";
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TableItem } from '@/types/dataTable';
+import { Table } from '@tanstack/react-table';
 
 type TableControlsProps = {
   tab: string;
@@ -24,9 +24,11 @@ const TableControls: React.FC<TableControlsProps> = ({
       </Tabs>
       <Input
         placeholder="Search token by name"
-        value={(table.getColumn("asset")?.getFilterValue() as string) ?? ""}
+        value={
+          (table.getColumn('assetSymbol')?.getFilterValue() as string) ?? ''
+        }
         onChange={(event) =>
-          table.getColumn("asset")?.setFilterValue(event.target.value)
+          table.getColumn('asset')?.setFilterValue(event.target.value)
         }
         className="max-w-md py-4 bg-[#27272A] border-none text-white placeholder:text-[#84848A]"
       />

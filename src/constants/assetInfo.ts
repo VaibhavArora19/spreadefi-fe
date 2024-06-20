@@ -1,6 +1,7 @@
 import { TAssetName } from '@/types/asset';
 
 export const assetNameToImage = (name: TAssetName | string) => {
+  return '/assets/icons/tokens/wbtc.png';
   switch (name.toLowerCase()) {
     case TAssetName.WETH:
       return '/assets/icons/tokens/weth.png';
@@ -18,9 +19,9 @@ export const assetNameToImage = (name: TAssetName | string) => {
       return '/assets/icons/tokens/dai.png';
     case TAssetName.USDT:
       return '/assets/icons/tokens/usdt.png';
-    case TAssetName.WBTC: 
-      return "/assets/icons/tokens/wbtc.png"
+    case TAssetName.WBTC:
+      return '/assets/icons/tokens/wbtc.png';
     default:
-      return '';
+      return '/assets/icons/tokens/wbtc.png';
   }
 };
