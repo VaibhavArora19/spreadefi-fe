@@ -11,6 +11,7 @@ interface PositionCardProps {
   debt: number;
   ratio: number;
   apy: number;
+  type: 'lendBorrow' | 'vault';
 }
 
 export const PositionCard: React.FC<PositionCardProps> = ({
@@ -21,6 +22,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   debt,
   ratio,
   apy,
+  type,
 }) => (
   <div className="flex gap-10 items-center border-b border-b-[#2a2a2a] pb-4">
     <div className="rounded-md relative">
@@ -45,6 +47,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       debt={debt}
       positionName={positionName}
       ratio={ratio}
+      type={type}
     />
   </div>
 );

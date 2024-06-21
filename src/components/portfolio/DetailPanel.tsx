@@ -9,6 +9,7 @@ interface DetailPanelProps {
   debt: number;
   ratio: number;
   apy: number;
+  type: 'vault' | 'lendBorrow';
 }
 
 const DetailPanel: React.FC<DetailPanelProps> = ({
@@ -17,6 +18,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
   debt,
   ratio,
   apy,
+  type,
 }) => {
   const router = useRouter();
   return (
@@ -28,15 +30,19 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
           value={positionName}
         />
         <DetailSection label="Collateral" value={collateral} />
-        <DetailSection label="Debt" value={debt} />
+        {type === 'lendBorrow' ? (
+          <>
+            <DetailSection label="Debt" value={debt} />
+            <DetailSection label="LTV" value={`${12}%`} />
+          </>
+        ) : null}
         <DetailSection label="Ratio" value={`${ratio}%`} />
         <DetailSection label="APY" value={`${apy}%`} />
-        <DetailSection label="LTV" value={`${12}%`} />
       </div>
       <Button
         onClick={(e) => {
           e.stopPropagation();
-          router.push('/protocol');
+          router.push('/portfolio/compound/optimism');
         }}
         className="w-[150px] bg-inherit text-white border border-white  mr-2 py-5 flex gap-2 items-center hover:bg-white hover:text-black">
         View more

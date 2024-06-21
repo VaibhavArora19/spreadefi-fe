@@ -34,6 +34,7 @@ const Portfolio = () => {
             ratio={12}
             protocolName={TProtocolName.AAVE}
             chain="8453"
+            type="lendBorrow"
           />
           <PositionItem
             chain="10"
@@ -43,9 +44,33 @@ const Portfolio = () => {
             debt={1232}
             positionName="Compound V3 Position"
             ratio={12}
+            type="lendBorrow"
           />
         </div>
-      ) : null}
+      ) : (
+        <div className="flex flex-col gap-3">
+          <PositionItem
+            apy={12}
+            collateral={2312}
+            debt={1232}
+            positionName="Vault Position 1"
+            ratio={12}
+            protocolName={TProtocolName.Balancer}
+            chain="8453"
+            type={'vault'}
+          />
+          <PositionItem
+            chain="10"
+            protocolName={TProtocolName.COMPOUND}
+            apy={12}
+            collateral={2312}
+            debt={1232}
+            positionName="Vault Position 2"
+            ratio={12}
+            type={'vault'}
+          />
+        </div>
+      )}
     </div>
   );
 };

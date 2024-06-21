@@ -18,6 +18,7 @@ type PositionItemProps = {
   apy: number;
   chain: string;
   protocolName: TProtocolName;
+  type: 'vault' | 'lendBorrow';
 };
 
 const PositionItem: React.FC<PositionItemProps> = ({
@@ -28,6 +29,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
   apy,
   chain,
   protocolName,
+  type,
 }) => (
   <div className="w-full bg-[#181818] p-4 pb-3 rounded-md">
     <Collapsible>
@@ -40,6 +42,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
           debt={debt}
           ratio={ratio}
           apy={apy}
+          type={type}
         />
         <MdKeyboardArrowDown className="text-center text-white w-full mt-2 text-xl" />
       </CollapsibleTrigger>
@@ -62,17 +65,20 @@ const PositionItem: React.FC<PositionItemProps> = ({
             ]}
             type="Supplied"
           />
-          <TokenDetails
-            tokens={[
-              {
-                name: 'USDC',
-                amount: '2332 USDC',
-                usdValue: '$2332.12',
-                iconSrc: '/assets/icons/tokens/usdc.png',
-              },
-            ]}
-            type="Borrowed"
-          />
+
+          {type !== 'vault' ? (
+            <TokenDetails
+              tokens={[
+                {
+                  name: 'USDC',
+                  amount: '2332 USDC',
+                  usdValue: '$2332.12',
+                  iconSrc: '/assets/icons/tokens/usdc.png',
+                },
+              ]}
+              type="Borrowed"
+            />
+          ) : null}
         </div>
       </CollapsibleContent>
     </Collapsible>
