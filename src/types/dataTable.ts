@@ -24,8 +24,8 @@ export type TAssetTableItem = {
   totalApys: string;
   assetSupplyBoostedApys?: string;
   points: string[];
-  chainIds: string[];
-  protocols: TProtocolName[];
+  chainId: string;
+  protocolName: TProtocolName;
 };
 
 export type TableItem =

@@ -1,7 +1,7 @@
 import { TAssetName } from '@/types/asset';
 
 export const assetNameToImage = (name: TAssetName | string) => {
-  return '/assets/icons/tokens/wbtc.png';
+  // return '/assets/icons/tokens/wbtc.png';
   switch (name.toLowerCase()) {
     case TAssetName.WETH:
       return '/assets/icons/tokens/weth.png';

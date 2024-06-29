@@ -25,6 +25,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
           height={25}
           width={25}
           alt="weth"
+          className='rounded-full'
         />
         <p>{row.getValue('assetSymbol')}</p>
       </div>
@@ -35,7 +36,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     header: ({ column }) => {
       return (
         <div
-          className="flex gap-1 items-center"
+          className="flex gap-1 items-center w-[100px]"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
           APY
           <TooltipProvider>
@@ -55,7 +56,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="lowercase flex gap-2 items-center">
+      <div className="lowercase flex gap-2 items-center w-[100px]">
         <p>{row.getValue('totalApys')} </p>
 
         {row.original.assetSupplyBoostedApys ? (
@@ -113,27 +114,24 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     header: 'Chains',
     cell: ({ row }) => (
       <div className="flex -space-x-1 ">
-        {row.original.chainIds.map((chain, index) => (
-          <TooltipProvider key={index}>
-            <Tooltip>
-              <TooltipTrigger>
-                <Image
-                  className="hover:scale-110"
-                  key={index}
-                  src={CHAIN_CONFIG[chain].chainImageUrl}
-                  height={25}
-                  width={25}
-                  alt={CHAIN_CONFIG[chain].chainName}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">
-                  {CHAIN_CONFIG[chain].chainName}
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Image
+                className="hover:scale-110"
+                src={CHAIN_CONFIG[row.original.chainId].chainImageUrl}
+                height={25}
+                width={25}
+                alt={CHAIN_CONFIG[row.original.chainId].chainName}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="bg-[#1e1e1e] text-white">
+                {CHAIN_CONFIG[row.original.chainId].chainName}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     ),
   },
@@ -142,24 +140,24 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     header: 'Protocols',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
-        {row.original.protocols.map((protocol, index) => (
-          <TooltipProvider key={index}>
-            <Tooltip>
-              <TooltipTrigger>
-                <Image
-                  className="hover:scale-110"
-                  src={protocolNameToImage(protocol)}
-                  height={25}
-                  width={25}
-                  alt={protocol}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">{protocol}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        ))}
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger>
+              <Image
+                className="hover:scale-110"
+                src={protocolNameToImage(row.original.protocolName)}
+                height={25}
+                width={25}
+                alt={row.original.protocolName}
+              />
+            </TooltipTrigger>
+            <TooltipContent>
+              <p className="bg-[#1e1e1e] text-white">
+                {row.original.protocolName}
+              </p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
       </div>
     ),
   },

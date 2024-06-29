@@ -19,12 +19,12 @@ const AssetToSupplyItem: React.FC<AssetToSupplyItemProps> = ({
   );
 
   return (
-    <div
-      onClick={() => {
-        setShowAssetList(!showAssetList);
-      }}
-      className="p-4 rounded-md bg-[#1a1a1a] mb-2 cursor-pointer hover:bg-[#1e1e1e]">
-      <div className="flex justify-between items-center">
+    <div className="p-4 rounded-md bg-[#1a1a1a] mb-2 cursor-pointer hover:bg-[#1e1e1e]">
+      <div
+        onClick={() => {
+          setShowAssetList(!showAssetList);
+        }}
+        className="flex justify-between items-center">
         <p>{assetsType}</p>
 
         {showAssetList ? (

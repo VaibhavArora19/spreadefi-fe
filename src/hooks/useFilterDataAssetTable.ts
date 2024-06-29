@@ -8,26 +8,22 @@ export const useFilterDataAssetTable = (
   const [chainFilters, setChainFilters] = useState<string[]>([]);
   const [protocolFilters, setProtocolFilters] = useState<string[]>([]);
 
-  const allChains = new Set([
-    ...AssetTableDummyData.flatMap((item) => item.chainIds),
-  ]);
-  const uniqueChains = Array.from(allChains);
+  // Extract unique chainIds and protocolNames from your data
+  const uniqueChains = useMemo(() => {
+    const allChains = AssetTableDummyData.map((item) => item.chainId);
+    return Array.from(new Set(allChains));
+  }, []);
 
-  const allProtocols = new Set([
-    ...AssetTableDummyData.flatMap((item) => item.protocols),
-  ]);
-  const uniqueProtocols = Array.from(allProtocols);
+  const uniqueProtocols = useMemo(() => {
+    const allProtocols = AssetTableDummyData.map((item) => item.protocolName);
+    return Array.from(new Set(allProtocols));
+  }, []);
 
   const filteredData = useMemo(() => {
-    const currentData = AssetTableDummyData;
-    return currentData.filter(
+    return AssetTableDummyData.filter(
       (item) =>
-        (chainFilters.length === 0 ||
-          item.chainIds.some((chain) => chainFilters.includes(chain))) &&
-        (protocolFilters.length === 0 ||
-          item.protocols.some((protocol) =>
-            protocolFilters.includes(protocol),
-          )),
+        (chainFilters.length === 0 || chainFilters.includes(item.chainId)) &&
+        (protocolFilters.length === 0 || protocolFilters.includes(item.protocolName)),
     );
   }, [chainFilters, protocolFilters]);
 

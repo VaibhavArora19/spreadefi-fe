@@ -21,7 +21,7 @@ const LendingBorrowingTableBody: React.FC<TLendingBorrowingBodyProps> = ({
             data-state={row.getIsSelected() && 'selected'}>
             {row.getVisibleCells().map((cell) => (
               <TableCell
-                className="py-4 max-w-[150px] font-light"
+                className="py-4 max-w-[120px] font-light"
                 key={cell.id}>
                 {flexRender(cell.column.columnDef.cell, cell.getContext())}
               </TableCell>
