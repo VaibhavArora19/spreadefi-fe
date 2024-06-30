@@ -28,8 +28,7 @@ const AssetTable = () => {
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const pathname = usePathname();
-  const { data: assetData } = useFetchAssetBySymbol('WETH');
-
+  const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
   const {
     chainFilters,
     setChainFilters,
@@ -38,7 +37,7 @@ const AssetTable = () => {
     uniqueChains,
     uniqueProtocols,
     filteredData,
-  } = useFilterDataAssetTable(assetData || []);
+  } = useFilterDataAssetTable({ assetData: assetData?.data || [] });
 
   const table = useReactTable({
     data: filteredData,

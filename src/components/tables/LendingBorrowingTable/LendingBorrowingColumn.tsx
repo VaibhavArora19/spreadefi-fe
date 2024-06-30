@@ -94,8 +94,19 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <div className="lowercase flex gap-2">
         <p>
-          {row.original.totalApys[0].toFixed(2)}% -{' '}
-          {row.original.totalApys[row.original.totalApys.length - 1].toFixed(2)}
+          {(
+            row.original.assetSupplyApys[0] +
+            row.original.assetSupplyBoostedApys[0]
+          ).toFixed(2)}
+          % -{' '}
+          {(
+            row.original.assetSupplyApys[
+              row.original.assetSupplyApys.length - 1
+            ] +
+            row.original.assetSupplyBoostedApys[
+              row.original.assetSupplyBoostedApys.length - 1
+            ]
+          ).toFixed(2)}
           %
         </p>
 

@@ -1,31 +1,36 @@
 import { useMemo, useState } from 'react';
 import { AssetTableDummyData } from '@/data/DummyData';
 import { UseFilterDataReturn } from './useFilterData';
+import { TAssetTableItem } from '@/types/dataTable';
 
-export const useFilterDataAssetTable = (
-  assetData: any,
-): UseFilterDataReturn => {
+export type UseFilterDataAssetTableProps = {
+  assetData: TAssetTableItem[];
+};
+export const useFilterDataAssetTable = ({
+  assetData = [],
+}: UseFilterDataAssetTableProps): UseFilterDataReturn => {
   const [chainFilters, setChainFilters] = useState<string[]>([]);
   const [protocolFilters, setProtocolFilters] = useState<string[]>([]);
 
   // Extract unique chainIds and protocolNames from your data
   const uniqueChains = useMemo(() => {
-    const allChains = AssetTableDummyData.map((item) => item.chainId);
+    const allChains = assetData.map((item) => item.chainId);
     return Array.from(new Set(allChains));
-  }, []);
+  }, [assetData]);
 
   const uniqueProtocols = useMemo(() => {
-    const allProtocols = AssetTableDummyData.map((item) => item.protocolName);
+    const allProtocols = assetData.map((item) => item.protocolName);
     return Array.from(new Set(allProtocols));
-  }, []);
+  }, [assetData]);
 
   const filteredData = useMemo(() => {
-    return AssetTableDummyData.filter(
+    return assetData.filter(
       (item) =>
         (chainFilters.length === 0 || chainFilters.includes(item.chainId)) &&
-        (protocolFilters.length === 0 || protocolFilters.includes(item.protocolName)),
+        (protocolFilters.length === 0 ||
+          protocolFilters.includes(item.protocolName)),
     );
-  }, [chainFilters, protocolFilters]);
+  }, [chainFilters, protocolFilters, assetData]);
 
   return {
     chainFilters,

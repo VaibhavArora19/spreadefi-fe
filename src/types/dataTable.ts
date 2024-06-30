@@ -21,7 +21,7 @@ export type TVaultTableItem = {
 export type TAssetTableItem = {
   id: string;
   assetSymbol: string;
-  totalApys: string;
+  assetSupplyApy: string;
   assetSupplyBoostedApys?: string;
   points: string[];
   chainId: string;

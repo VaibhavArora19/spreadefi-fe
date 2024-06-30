@@ -25,14 +25,14 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
           height={25}
           width={25}
           alt="weth"
-          className='rounded-full'
+          className="rounded-full"
         />
         <p>{row.getValue('assetSymbol')}</p>
       </div>
     ),
   },
   {
-    accessorKey: 'totalApys',
+    accessorKey: 'assetSupplyApy',
     header: ({ column }) => {
       return (
         <div
@@ -57,7 +57,7 @@ const AssetTableColumn: ColumnDef<TAssetTableItem>[] = [
     },
     cell: ({ row }) => (
       <div className="lowercase flex gap-2 items-center w-[100px]">
-        <p>{row.getValue('totalApys')} </p>
+        <p>{parseFloat(row.getValue('assetSupplyApy')).toFixed(2)} </p>
 
         {row.original.assetSupplyBoostedApys ? (
           <p className="lowercase text-sm w-fit text-yellow-500">
