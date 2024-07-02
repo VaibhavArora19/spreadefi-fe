@@ -1,7 +1,10 @@
+import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 import Image from 'next/image';
-import React from 'react';
+import React, { useState } from 'react';
 
 const BorrowItem = () => {
+  const [showBorrowActionModal, setShowBorrowActionModal] = useState(false);
+
   return (
     <div className="flex items-center">
       <div className="flex gap-[6px] flex-[0.21]">
@@ -19,10 +22,22 @@ const BorrowItem = () => {
         <button className="bg-white text-black py-2 px-4 text-xs rounded-md hover:bg-gray-200">
           Repay
         </button>
-        <button className="bg-transparent text-white py-2 w-[120px] text-xs rounded-md border border-white hover:bg-white hover:text-black">
+        <button
+          onClick={() => {
+            setShowBorrowActionModal(true);
+          }}
+          className="bg-transparent text-white py-2 w-[120px] text-xs rounded-md border border-white hover:bg-white hover:text-black">
           Borrow & Action
         </button>
       </div>
+
+      {showBorrowActionModal ? (
+        <BorrowAndActionModal
+          onClose={() => {
+            setShowBorrowActionModal(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 };

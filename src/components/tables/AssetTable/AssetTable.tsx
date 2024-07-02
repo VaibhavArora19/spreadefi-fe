@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Table } from '@/components/ui/table';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
 import { useFetchAssetBySymbol } from '@/server/api/asset';
+import { TAssetTableItem } from '@/types/dataTable';
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -22,13 +23,19 @@ import {
 import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 
-const AssetTable = () => {
+const AssetTable = ({
+  assetData,
+  type,
+}: {
+  assetData: TAssetTableItem[];
+  type: 'supply' | 'migrate' | 'borrowAndAction';
+}) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const pathname = usePathname();
-  const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
+  // const pathname = usePathname();
+  // const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
   const {
     chainFilters,
     setChainFilters,
@@ -41,7 +48,7 @@ const AssetTable = () => {
 
   const table = useReactTable({
     data: filteredData,
-    columns: AssetTableColumn,
+    columns: AssetTableColumn(type),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
