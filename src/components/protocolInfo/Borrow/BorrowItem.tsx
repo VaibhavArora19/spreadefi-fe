@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import React from 'react';
 
-const BorrowItem = () => {
+const BorrowItem = ({ data }: any) => {
   return (
     <div className="flex items-center">
       <div className="flex gap-[6px] flex-[0.21]">
@@ -11,10 +11,10 @@ const BorrowItem = () => {
           width={25}
           alt="cbETH"
         />
-        <p>cbETH</p>
+        <p>{data.asset.assetSymbol}</p>
       </div>
-      <p className="flex-[0.21]">$23,234</p>
-      <p className="flex-[0.18]">12.3%</p>
+      <p className="flex-[0.21]">{data.currentVariableDebt.slice(0, 4)}</p>
+      <p className="flex-[0.18]">{data.asset.assetBorrowApy.toFixed(2)}%</p>
       <div className="flex gap-4 flex-[0.37]">
         <button className="bg-white text-black py-2 px-4 text-xs rounded-md hover:bg-gray-200">
           Repay

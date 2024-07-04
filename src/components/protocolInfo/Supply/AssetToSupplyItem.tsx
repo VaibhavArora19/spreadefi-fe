@@ -18,6 +18,8 @@ const AssetToSupplyItem: React.FC<AssetToSupplyItemProps> = ({
     assetsType === 'StableCoins' ? true : false,
   );
 
+  console.log(assetsList);
+
   return (
     <div className="p-4 rounded-md bg-[#1a1a1a] mb-2 cursor-pointer hover:bg-[#1e1e1e]">
       <div

@@ -2,7 +2,7 @@ import SupplyModal from '@/components/popups/SupplyModal/SupplyModal';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-const SupplyItem = () => {
+const SupplyItem = ({ data }: any) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   return (
     <>
@@ -14,10 +14,10 @@ const SupplyItem = () => {
             width={25}
             alt="ETH"
           />
-          <p>ETH</p>
+          <p>{data.asset.assetSymbol}</p>
         </div>
-        <p className="flex-[0.21]">$23,234</p>
-        <p className="flex-[0.21]">12.3%</p>
+        <p className="flex-[0.21]">{data.currentATokenBalance.slice(0, 4)}</p>
+        <p className="flex-[0.21]">{data.asset.assetSupplyApy.toFixed(2)}%</p>
         <div className="flex gap-4 flex-[0.35]">
           <button
             onClick={() => {

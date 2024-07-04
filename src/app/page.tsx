@@ -8,7 +8,11 @@ import { useAccount } from 'wagmi';
 
 const Home = () => {
   const { address } = useAccount();
-  const { data: portfolio } = useFetchWalletPortfolio(address as string);
+  // const { data: portfolio } = useFetchWalletPortfolio(address as string);
+  const { data: portfolio } = useFetchWalletPortfolio(
+    '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
+  );
+
   return (
     <div>
       <div className="mb-10 flex gap-6">
