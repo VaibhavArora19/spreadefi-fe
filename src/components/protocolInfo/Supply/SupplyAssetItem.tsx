@@ -1,10 +1,13 @@
 import SupplyModal from '@/components/popups/SupplyModal/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { TStableCoinData } from '@/data/AssetsData';
+import { TAsset } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-const SupplyAssetItem = ({
+type SupplyAssetItemProps = { asset: TAsset; itemType: 'borrow' | 'supply' };
+
+const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
   asset,
   itemType,
 }: {

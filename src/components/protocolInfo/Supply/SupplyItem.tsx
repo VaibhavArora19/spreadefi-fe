@@ -1,8 +1,13 @@
 import SupplyModal from '@/components/popups/SupplyModal/SupplyModal';
+import { TAsset } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-const SupplyItem = ({ data }: any) => {
+type SupplyItemProps = {
+  data: { asset: TAsset; currentATokenBalance: string };
+};
+
+const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   return (
     <>

@@ -1,7 +1,12 @@
+import { TAsset } from '@/types/asset';
 import Image from 'next/image';
 import React from 'react';
 
-const BorrowItem = ({ data }: any) => {
+type BorrowItemProps = {
+  data: { asset: TAsset; currentVariableDebt: string };
+};
+
+const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
   return (
     <div className="flex items-center">
       <div className="flex gap-[6px] flex-[0.21]">

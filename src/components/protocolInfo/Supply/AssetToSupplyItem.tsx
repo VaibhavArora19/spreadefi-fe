@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import SupplyAssetItem from './SupplyAssetItem';
-import { TStableCoinData } from '@/data/AssetsData';
+import { TAsset } from '@/types/asset';
 
 type AssetToSupplyItemProps = {
   assetsType: string;
-  assetsList: TStableCoinData[];
+  assetsList: TAsset[];
   itemType: 'borrow' | 'supply';
 };
 
