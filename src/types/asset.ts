@@ -1,3 +1,5 @@
+import { TProtocolName } from './protocol';
+
 export enum TAssetName {
   WETH = 'weth',
   ETH = 'eth',
@@ -9,6 +11,17 @@ export enum TAssetName {
   USDT = 'usdt',
   WBTC = 'wbtc',
 }
+
+export type TAsset = {
+  id: string;
+  assetSymbol: string;
+  assetSupplyApy: number;
+  assetSupplyBoostedApys?: number;
+  assetBorrowApy: number;
+  points: string[];
+  chainId: string;
+  protocolName: TProtocolName;
+};
 
 export type TAssetsResponse = {
   points: Array<Array<string>>;

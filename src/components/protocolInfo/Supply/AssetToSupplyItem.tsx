@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { IoIosArrowDown, IoIosArrowUp } from 'react-icons/io';
 import SupplyAssetItem from './SupplyAssetItem';
-import { TStableCoinData } from '@/data/AssetsData';
+import { TAsset } from '@/types/asset';
 
 type AssetToSupplyItemProps = {
   assetsType: string;
-  assetsList: TStableCoinData[];
+  assetsList: TAsset[];
   itemType: 'borrow' | 'supply';
 };
 
@@ -17,6 +17,8 @@ const AssetToSupplyItem: React.FC<AssetToSupplyItemProps> = ({
   const [showAssetList, setShowAssetList] = useState(
     assetsType === 'StableCoins' ? true : false,
   );
+
+  console.log(assetsList);
 
   return (
     <div className="p-4 rounded-md bg-[#1a1a1a] mb-2 cursor-pointer hover:bg-[#1e1e1e]">

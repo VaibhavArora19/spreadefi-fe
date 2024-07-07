@@ -1,7 +1,12 @@
 import React from 'react';
 import BorrowItem from './BorrowItem';
+import { TAsset } from '@/types/asset';
 
-const BorrowCard = () => {
+type BorrowCardProps = {
+  data: TAsset[];
+};
+
+const BorrowCard: React.FC<BorrowCardProps> = ({ data }) => {
   return (
     <div className="w-full bg-[#111111] p-6 rounded-xl">
       <p className="font-semibold mb-4 border-b-[0.1px] pb-5 border-b-[#4343439e]">
@@ -13,7 +18,9 @@ const BorrowCard = () => {
           <p className="flex-[0.21]">Debt</p>
           <p className="flex-[0.21]">APY</p>
         </div>
-        <BorrowItem />
+        {data.map((item: any, index: number) => {
+          return <BorrowItem key={index} data={item} />;
+        })}
       </div>
     </div>
   );

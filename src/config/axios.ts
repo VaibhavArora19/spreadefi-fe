@@ -2,7 +2,7 @@ import axios from 'axios';
 
 export const axiosScout = axios.create({
   baseURL: '/scout',
-  timeout: 1000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
