@@ -1,9 +1,11 @@
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
+import RepayModal from '@/components/popups/Repay/RepayModal';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
 const BorrowItem = () => {
   const [showBorrowActionModal, setShowBorrowActionModal] = useState(false);
+  const [showRepayModal, setShowRepayModal] = useState(false);
 
   return (
     <div className="flex items-center">
@@ -19,7 +21,11 @@ const BorrowItem = () => {
       <p className="flex-[0.21]">$23,234</p>
       <p className="flex-[0.18]">12.3%</p>
       <div className="flex gap-4 flex-[0.37]">
-        <button className="bg-white text-black py-2 px-4 text-xs rounded-md hover:bg-gray-200">
+        <button
+          onClick={() => {
+            setShowRepayModal(true);
+          }}
+          className="bg-white text-black py-2 px-4 text-xs rounded-md hover:bg-gray-200">
           Repay
         </button>
         <button
@@ -35,6 +41,14 @@ const BorrowItem = () => {
         <BorrowAndActionModal
           onClose={() => {
             setShowBorrowActionModal(false);
+          }}
+        />
+      ) : null}
+
+      {showRepayModal ? (
+        <RepayModal
+          onClose={() => {
+            setShowRepayModal(false);
           }}
         />
       ) : null}

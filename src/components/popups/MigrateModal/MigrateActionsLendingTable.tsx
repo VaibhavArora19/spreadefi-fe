@@ -1,6 +1,7 @@
 import Modal from '@/components/(ui)/Modal';
 import AssetTable from '@/components/tables/AssetTable/AssetTable';
 import { MigrateLendingData } from '@/data/DummyData';
+import useLockBodyScroll from '@/hooks/useLockBodyScroll';
 import React from 'react';
 import { IoClose } from 'react-icons/io5';
 
@@ -11,6 +12,7 @@ const MigrateActionsLendingTable = ({
   onClose: () => void;
   type: 'migrate' | 'borrowAndAction' | 'supply';
 }) => {
+  useLockBodyScroll(true);
   return (
     <Modal
       onClose={onClose}

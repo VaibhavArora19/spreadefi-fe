@@ -1,17 +1,21 @@
 import Image from 'next/image';
 import Modal from '../../(ui)/Modal';
 import { Button } from '../../ui/button';
-import ChainsSelector from './ChainsSelector';
-import TokenSelector from './TokenSelector';
-import TransactionOverview from './TransactionOverview';
-import { IoClose } from 'react-icons/io5';
 
-type SupplyModalProps = {
-  type: 'supply' | 'withdraw';
+import { IoClose } from 'react-icons/io5';
+import TransactionOverview from './TransactionOverview';
+import TokenSelector from './TokenSelector';
+import ChainsSelector from './ChainsSelector';
+
+type CommonActionModalProps = {
+  type: 'supply' | 'withdraw' | 'repay' | 'borrow';
   onClose: () => void;
 };
 
-const SupplyModal: React.FC<SupplyModalProps> = ({ type, onClose }) => {
+const CommonActionModal: React.FC<CommonActionModalProps> = ({
+  type,
+  onClose,
+}) => {
   return (
     <Modal className="w-[500px] p-5 ">
       <div className="flex justify-between items-center">
@@ -42,7 +46,7 @@ const SupplyModal: React.FC<SupplyModalProps> = ({ type, onClose }) => {
         <input
           type="number"
           placeholder="0.0"
-          className="text-3xl  text-white bg-inherit border-none outline-none placeholder:text-gray-500 p-4 w-[250px] overflow-hidden"
+          className="text-3xl  text-white bg-inherit border-none outline-none placeholder:text-gray-500 p-4 w-[200px] overflow-hidden"
           onWheel={(e) => (e.target as HTMLInputElement).blur()}
         />
         <div className="flex items-center gap-4 text-xs p-4">
@@ -61,4 +65,4 @@ const SupplyModal: React.FC<SupplyModalProps> = ({ type, onClose }) => {
   );
 };
 
-export default SupplyModal;
+export default CommonActionModal;

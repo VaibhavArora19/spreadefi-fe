@@ -1,5 +1,6 @@
 import MigrateActionsModal from '@/components/popups/MigrateModal/MigrateActionsModal';
-import SupplyModal from '@/components/popups/SupplyModal/SupplyModal';
+import WithdrawModal from '@/components/popups/Withdraw/WithdrawModal';
+import SupplyModal from '@/components/popups/common/SupplyModal';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
@@ -39,11 +40,10 @@ const SupplyItem = () => {
       </div>
 
       {showWithdrawModal ? (
-        <SupplyModal
+        <WithdrawModal
           onClose={() => {
             setShowWithdrawModal(false);
           }}
-          type="withdraw"
         />
       ) : null}
 

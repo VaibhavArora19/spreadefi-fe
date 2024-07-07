@@ -1,0 +1,116 @@
+'use client';
+
+import Modal from '@/components/(ui)/Modal';
+import { assetNameToImage } from '@/constants/assetInfo';
+import { TAssetName } from '@/types/asset';
+import Image from 'next/image';
+import React from 'react';
+
+type TokenItemProps = {
+  token: {
+    tokenName: TAssetName;
+    logo: string;
+    balance?: number;
+  };
+  onClose: () => void;
+  onSelect: (token: {
+    tokenName: TAssetName;
+    logo: string;
+    balance?: number;
+  }) => void;
+};
+
+const TokenItem: React.FC<TokenItemProps> = ({ token, onClose, onSelect }) => {
+  const handleClick = () => {
+    onSelect(token);
+    onClose();
+  };
+  return (
+    <div
+      onClick={handleClick}
+      className="flex items-center justify-between py-5 px-3 w-full bg-[#252525] cursor-pointer hover:bg-[#313131] text-white rounded-md">
+      <div className="flex items-center gap-2">
+        <Image src={token.logo} alt={token.tokenName} height={30} width={30} />
+        <p className="font-semibold text-sm uppercase ">{token.tokenName}</p>
+      </div>
+
+      {token.balance ? (
+        <div className="flex flex-col ">
+          <p className="font-medium text-sm text-right">{token.balance}</p>
+          <p className="text-xs text-[#707070] text-right mt-1">$12.34</p>
+        </div>
+      ) : null}
+    </div>
+  );
+};
+
+const TokenModal = ({
+  onClose,
+  onSelect,
+}: {
+  onClose: () => void;
+  onSelect: (token: {
+    tokenName: TAssetName;
+    logo: string;
+    balance?: number;
+  }) => void;
+}) => {
+  const tokens = [
+    {
+      tokenName: TAssetName.ETH,
+      logo: assetNameToImage(TAssetName.ETH),
+      balance: 0.12,
+    },
+    {
+      tokenName: TAssetName.WETH,
+      logo: assetNameToImage(TAssetName.WETH),
+      balance: 0.42,
+    },
+    {
+      tokenName: TAssetName.CBETH,
+      logo: assetNameToImage(TAssetName.CBETH),
+      balance: 1.3,
+    },
+    {
+      tokenName: TAssetName.DAI,
+      logo: assetNameToImage(TAssetName.DAI),
+      balance: 231.23,
+    },
+    {
+      tokenName: TAssetName.EZETH,
+      logo: assetNameToImage(TAssetName.EZETH),
+      balance: 1.3,
+    },
+    {
+      tokenName: TAssetName.USDT,
+      logo: assetNameToImage(TAssetName.USDT),
+      balance: 231.23,
+    },
+    {
+      tokenName: TAssetName.USDC,
+      logo: assetNameToImage(TAssetName.USDC),
+      balance: 231.23,
+    },
+  ];
+
+  return (
+    <Modal className="w-[500px] bg-[#111111] h-[450px] rounded-2xl overflow-scroll">
+      <p className="p-6 bg-[#1e1e1e] text-white text-base font-semibold">
+        Select Token
+      </p>
+
+      <div className="flex flex-col space-y-2 p-2 overflow-scroll">
+        {tokens.map((token) => (
+          <TokenItem
+            onSelect={onSelect}
+            onClose={onClose}
+            token={token}
+            key={token.tokenName}
+          />
+        ))}
+      </div>
+    </Modal>
+  );
+};
+
+export default TokenModal;

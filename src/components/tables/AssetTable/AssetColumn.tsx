@@ -16,7 +16,22 @@ import { Button } from '@/components/ui/button';
 
 const AssetTableColumn = (
   type: 'migrate' | 'borrowAndAction' | 'supply',
+  setShowMigrateSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowBorrowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
 ): ColumnDef<TAssetTableItem>[] => {
+  const showBorrowSupplyModalHandler = () => {
+    setShowBorrowSupplyModal ? setShowBorrowSupplyModal(true) : null;
+  };
+
+  const showMigrateSupplyModalHandler = () => {
+    setShowMigrateSupplyModal ? setShowMigrateSupplyModal(true) : null;
+  };
+
+  const showSupplyModalHandler = () => {
+    setShowSupplyModal ? setShowSupplyModal(true) : null;
+  };
+
   return [
     {
       accessorKey: 'assetSymbol',
@@ -170,7 +185,17 @@ const AssetTableColumn = (
       accessorKey: 'view',
       header: '',
       cell: ({ row }) => (
-        <Button onClick={() => {}} className="w-[80%] bg-white text-black">
+        <Button
+          onClick={() => {
+            if (type === 'migrate') {
+              showMigrateSupplyModalHandler();
+            } else if (type === 'borrowAndAction') {
+              showBorrowSupplyModalHandler();
+            } else {
+              showSupplyModalHandler();
+            }
+          }}
+          className="w-[80%] bg-white text-black">
           {type === 'supply'
             ? 'Supply'
             : type === 'migrate'
