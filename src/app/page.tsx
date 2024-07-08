@@ -1,9 +1,14 @@
-"use client";
+'use client';
 
-import DashboardInfoCard from "@/components/(ui)/DashboardInfoCard";
-import LendingBorrowingTable from "@/components/tables/LendingBorrowingTable/LendingBorrowingTable";
+import DashboardInfoCard from '@/components/(ui)/DashboardInfoCard';
+import LendingBorrowingTable from '@/components/tables/LendingBorrowingTable/LendingBorrowingTable';
+import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
+import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs';
+import { useState } from 'react';
 
 const Home = () => {
+  const [tab, setTab] = useState<string>('lendBorrow');
+
   return (
     <div>
       <div className="mb-10 flex gap-6">
@@ -28,7 +33,20 @@ const Home = () => {
           value="$2,623,054"
         />
       </div>
-      <LendingBorrowingTable />
+
+      <Tabs onValueChange={setTab} value={tab} className="w-[520px] dark mb-2">
+        <TabsList className="grid w-full grid-cols-3 bg-black">
+          <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
+          <TabsTrigger value="vault">Yield vaults</TabsTrigger>
+          <TabsTrigger value="loopingStrategy">Looping Strategy</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {tab === 'loopingStrategy' ? (
+        <LoopingStrategyTable />
+      ) : (
+        <LendingBorrowingTable />
+      )}
     </div>
   );
 };
