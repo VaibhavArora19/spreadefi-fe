@@ -12,6 +12,10 @@ export enum TAssetName {
   WBTC = 'wbtc',
 }
 
+export type TBalance = {
+  [contract_address: string]: string;
+};
+
 export type TAsset = {
   id: string;
   assetSymbol: string;
@@ -20,6 +24,7 @@ export type TAsset = {
   assetBorrowApy: number;
   points: string[];
   chainId: string;
+  assetAddress: string;
   protocolName: TProtocolName;
 };
 
