@@ -2,20 +2,21 @@ import BorrowModal from '@/components/popups/Borrow/BorrowModal';
 import SupplyModal from '@/components/popups/common/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { TStableCoinData } from '@/data/AssetsData';
-import { TAsset } from '@/types/asset';
+import { TAsset, TBalance } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-type SupplyAssetItemProps = { asset: TAsset; itemType: 'borrow' | 'supply' };
+type SupplyAssetItemProps = {
+  asset: TAsset;
+  itemType: 'borrow' | 'supply';
+  balances: any;
+};
 
 const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
   asset,
   itemType,
-}: {
-  asset: any;
-  itemType: 'borrow' | 'supply';
+  balances,
 }) => {
-  console.log(asset);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   return (
@@ -32,7 +33,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
           <p>{asset?.assetSymbol}</p>
         </div>
         <p className="flex-[0.25]">
-          ${asset?.walletBalance?.toLocaleString() || 0}
+          {balances[asset.assetAddress.trim().toLowerCase()] || '$0'}
         </p>
         <p className="flex-[0.25]">
           {itemType === 'borrow'

@@ -60,11 +60,13 @@ const Protocol = () => {
               ethDerivatives={ethDerivatives}
               btcDerivatives={btcDerivatives}
               remaining={remaining}
+              balances={assetData?.chainBalanceData}
             />
             <AssetsToBorrowCard
               ethDerivatives={ethDerivatives}
               btcDerivatives={btcDerivatives}
               remaining={remaining}
+              balances={assetData?.chainBalanceData}
             />
           </div>{' '}
         </div>

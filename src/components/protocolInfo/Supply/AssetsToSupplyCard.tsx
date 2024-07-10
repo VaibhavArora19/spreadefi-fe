@@ -1,16 +1,18 @@
 import React from 'react';
 import AssetToSupplyItem from './AssetToSupplyItem';
-import { TAsset } from '@/types/asset';
+import { TAsset, TBalance } from '@/types/asset';
 
 type AssetsToSupplyProps = {
   ethDerivatives: TAsset[];
   btcDerivatives: TAsset[];
   remaining: TAsset[];
+  balances: TBalance;
 };
 const AssetsToSupplyCard: React.FC<AssetsToSupplyProps> = ({
   ethDerivatives,
   btcDerivatives,
   remaining,
+  balances,
 }) => {
   return (
     <div className="w-[50%] bg-[#111111] p-6 rounded-xl h-fit">
@@ -21,16 +23,19 @@ const AssetsToSupplyCard: React.FC<AssetsToSupplyProps> = ({
         itemType="supply"
         assetsType="StableCoins"
         assetsList={remaining}
+        balances={balances}
       />
       <AssetToSupplyItem
         itemType="supply"
         assetsType="ETH Derivatives"
         assetsList={ethDerivatives}
+        balances={balances}
       />
       <AssetToSupplyItem
         itemType="supply"
         assetsType="BTC Derivatives"
         assetsList={btcDerivatives}
+        balances={balances}
       />
     </div>
   );
