@@ -1,10 +1,15 @@
 import MigrateActionsModal from '@/components/popups/MigrateModal/MigrateActionsModal';
 import WithdrawModal from '@/components/popups/Withdraw/WithdrawModal';
 import SupplyModal from '@/components/popups/common/SupplyModal';
+import { TAsset } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
 
-const SupplyItem = () => {
+type SupplyItemProps = {
+  data: { asset: TAsset; currentATokenBalance: string };
+};
+
+const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showMigrateModal, setShowMigrateModal] = useState(false);
   return (
@@ -17,10 +22,10 @@ const SupplyItem = () => {
             width={25}
             alt="ETH"
           />
-          <p>ETH</p>
+          <p>{data.asset.assetSymbol}</p>
         </div>
-        <p className="flex-[0.21]">$23,234</p>
-        <p className="flex-[0.21]">12.3%</p>
+        <p className="flex-[0.21]">{data.currentATokenBalance.slice(0, 4)}</p>
+        <p className="flex-[0.21]">{data.asset.assetSupplyApy.toFixed(2)}%</p>
         <div className="flex gap-4 flex-[0.35]">
           <button
             onClick={() => {
