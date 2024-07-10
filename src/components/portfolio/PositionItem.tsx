@@ -49,18 +49,13 @@ const PositionItem: React.FC<PositionItemProps> = ({
       <CollapsibleContent>
         <div className="flex flex-col gap-2">
           <TokenDetails
+            actionType={type}
             tokens={[
               {
                 name: 'ETH',
                 amount: '2.332 ETH',
                 usdValue: '$23,193.2',
                 iconSrc: '/assets/icons/tokens/eth.png',
-              },
-              {
-                name: 'ezETH',
-                amount: '2.332 ezETH',
-                usdValue: '$23,193.2',
-                iconSrc: '/assets/icons/tokens/ezeth.png',
               },
             ]}
             type="Supplied"

@@ -1,5 +1,7 @@
 export enum TProtocolName {
     AAVE = "aave",
     COMPOUND = "compound",
-    Balancer = "balancer"
+    Balancer = "balancer",
+    NILE = "nile",
+    HOP = "hop"
 }

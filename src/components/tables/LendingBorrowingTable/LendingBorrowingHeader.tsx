@@ -12,7 +12,7 @@ const LendingBorrowingHeader: React.FC<TLendingBorrowingHeaderProps> = ({
 }) => {
   return (
     <TableHeader>
-      {table.getHeaderGroups().map((headerGroup) => (
+      {table?.getHeaderGroups().map((headerGroup) => (
         <TableRow className="border-b border-[#1e1e1e] " key={headerGroup.id}>
           {headerGroup.headers.map((header) => {
             return (

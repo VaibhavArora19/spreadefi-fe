@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { AssetTableDummyData } from '@/data/DummyData';
 import { UseFilterDataReturn } from './useFilterData';
-import { TAssetTableItem } from '@/types/dataTable';
+import { TAssetTableItem, TLoopinStrategyTableItem } from '@/types/dataTable';
 
 export type UseFilterDataAssetTableProps = {
-  assetData: TAssetTableItem[];
+  assetData: TAssetTableItem[] | TLoopinStrategyTableItem[];
 };
 export const useFilterDataAssetTable = ({
   assetData = [],

@@ -1,5 +1,8 @@
 'use client';
 
+import BorrowSupplyModal from '@/components/popups/Borrow&Action/BorrowSupplyModal';
+import MigrateSupplyModal from '@/components/popups/MigrateModal/MigrateSupplyModal';
+import SupplyModal from '@/components/popups/common/SupplyModal';
 import AssetTableColumn from '@/components/tables/AssetTable/AssetColumn';
 import ChainFilterDropdown from '@/components/tables/LendingBorrowingTable/ChainFilterDropdown';
 import LendingBorrowingHeader from '@/components/tables/LendingBorrowingTable/LendingBorrowingHeader';
@@ -9,6 +12,7 @@ import { Input } from '@/components/ui/input';
 import { Table } from '@/components/ui/table';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
 import { useFetchAssetBySymbol } from '@/server/api/asset';
+import { TAssetTableItem } from '@/types/dataTable';
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -22,13 +26,24 @@ import {
 import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
 
-const AssetTable = () => {
+const AssetTable = ({
+  assetData,
+  type,
+}: {
+  assetData: TAssetTableItem[];
+  type: 'supply' | 'migrate' | 'borrowAndAction';
+}) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const pathname = usePathname();
-  const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
+
+  const [showMigrateSupplyModal, setShowMigrateSupplyModal] = useState(false);
+  const [showBorrowSupplyModal, setShowBorrowSupplyModal] = useState(false);
+  const [showSupplyModal, setShowSupplyModal] = useState(false);
+
+  // const pathname = usePathname();
+  // const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
   const {
     chainFilters,
     setChainFilters,
@@ -37,11 +52,16 @@ const AssetTable = () => {
     uniqueChains,
     uniqueProtocols,
     filteredData,
-  } = useFilterDataAssetTable({ assetData: assetData?.data || [] });
+  } = useFilterDataAssetTable({ assetData: assetData || [] });
 
   const table = useReactTable({
     data: filteredData,
-    columns: AssetTableColumn,
+    columns: AssetTableColumn(
+      type,
+      setShowMigrateSupplyModal,
+      setShowBorrowSupplyModal,
+      setShowSupplyModal,
+    ),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -89,6 +109,30 @@ const AssetTable = () => {
           <LendingBorrowingTableBody table={table} />
         </Table>
       </div>
+
+      {showMigrateSupplyModal ? (
+        <MigrateSupplyModal
+          onClose={() => {
+            setShowMigrateSupplyModal(false);
+          }}
+        />
+      ) : null}
+
+      {showSupplyModal ? (
+        <SupplyModal
+          onClose={() => {
+            setShowSupplyModal(false);
+          }}
+        />
+      ) : null}
+
+      {showBorrowSupplyModal ? (
+        <BorrowSupplyModal
+          onClose={() => {
+            setShowBorrowSupplyModal(false);
+          }}
+        />
+      ) : null}
     </>
   );
 };

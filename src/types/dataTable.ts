@@ -28,7 +28,17 @@ export type TAssetTableItem = {
   protocolName: TProtocolName;
 };
 
+export type TLoopinStrategyTableItem = {
+  id: string;
+  primaryAsset: string;
+  secondaryAsset: string;
+  points: string[];
+  chainId: string;
+  protocolName: TProtocolName;
+  apy: string;
+}
+
 export type TableItem =
   | TLendingBorrowingTableItem
   | TVaultTableItem
-  | TAssetTableItem;
+  | TAssetTableItem | TLoopinStrategyTableItem

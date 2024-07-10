@@ -1,4 +1,6 @@
-import SupplyModal from '@/components/popups/SupplyModal/SupplyModal';
+import MigrateActionsModal from '@/components/popups/MigrateModal/MigrateActionsModal';
+import WithdrawModal from '@/components/popups/Withdraw/WithdrawModal';
+import SupplyModal from '@/components/popups/common/SupplyModal';
 import { TAsset } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
@@ -9,6 +11,7 @@ type SupplyItemProps = {
 
 const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [showMigrateModal, setShowMigrateModal] = useState(false);
   return (
     <>
       <div className="flex items-center w-full">
@@ -31,18 +34,29 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
             className="bg-white text-black py-2 px-4 text-xs rounded-md hover:bg-gray-200">
             Withdraw
           </button>
-          <button className="bg-transparent text-white py-2  px-4 text-xs rounded-md border border-white hover:bg-white hover:text-black">
+          <button
+            onClick={() => {
+              setShowMigrateModal(true);
+            }}
+            className="bg-transparent text-white py-2  px-4 text-xs rounded-md border border-white hover:bg-white hover:text-black">
             Migrate
           </button>
         </div>
       </div>
 
       {showWithdrawModal ? (
-        <SupplyModal
+        <WithdrawModal
           onClose={() => {
             setShowWithdrawModal(false);
           }}
-          type="withdraw"
+        />
+      ) : null}
+
+      {showMigrateModal ? (
+        <MigrateActionsModal
+          onClose={() => {
+            setShowMigrateModal(false);
+          }}
         />
       ) : null}
     </>

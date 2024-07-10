@@ -8,6 +8,10 @@ export const protocolNameToImage = (name: TProtocolName) => {
             return "/assets/icons/protocols/compound.png";
         case TProtocolName.Balancer: 
             return "/assets/icons/protocols/balancer.png";
+        case TProtocolName.NILE: 
+            return "/assets/icons/protocols/nile.png"; 
+        case TProtocolName.HOP: 
+            return "/assets/icons/protocols/hop.webp"; 
         default: 
             return "";
     }

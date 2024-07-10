@@ -1,4 +1,5 @@
-import SupplyModal from '@/components/popups/SupplyModal/SupplyModal';
+import BorrowModal from '@/components/popups/Borrow/BorrowModal';
+import SupplyModal from '@/components/popups/common/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { TStableCoinData } from '@/data/AssetsData';
 import { TAsset } from '@/types/asset';
@@ -16,6 +17,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
 }) => {
   console.log(asset);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
+  const [showBorrowModal, setShowBorrowModal] = useState(false);
   return (
     <>
       <div className="flex items-center w-full p-3 rounded-md bg-[#242424]">
@@ -40,7 +42,11 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
         </p>
         <div className="flex gap-4 flex-[0.25]">
           {itemType === 'borrow' ? (
-            <button className="bg-transparent text-white py-2  w-full text-xs rounded-md border border-white hover:bg-white hover:text-black">
+            <button
+              onClick={() => {
+                setShowBorrowModal(true);
+              }}
+              className="bg-transparent text-white py-2  w-full text-xs rounded-md border border-white hover:bg-white hover:text-black">
               Borrow
             </button>
           ) : (
@@ -61,7 +67,14 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
           onClose={() => {
             setShowSupplyModal(false);
           }}
-          type="supply"
+        />
+      ) : null}
+
+      {showBorrowModal ? (
+        <BorrowModal
+          onClose={() => {
+            setShowBorrowModal(false);
+          }}
         />
       ) : null}
     </>

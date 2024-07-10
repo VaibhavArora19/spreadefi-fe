@@ -11,25 +11,27 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { Table } from '@/components/ui/table';
-import LendingBorrowingColumn from './LendingBorrowingColumn';
-import LendingBorrowingHeader from './LendingBorrowingHeader';
-import LendingBorrowingTableBody from './LendingBorrowingTableBody';
-import VaultTableColumn from '../VaultTable/VaultTableColumn';
 import { useState } from 'react';
 
-import TableControls from './TableControls';
-import ChainFilterDropdown from './ChainFilterDropdown';
-import ProtocolFilterDropdown from './ProtocolFilterDropdown';
-import { useFilterData } from '@/hooks/useFilterData';
 import { useFetchAssets } from '@/server/api/asset';
 import { useRouter } from 'next/navigation';
+import ChainFilterDropdown from '../LendingBorrowingTable/ChainFilterDropdown';
+import ProtocolFilterDropdown from '../LendingBorrowingTable/ProtocolFilterDropdown';
+import LendingBorrowingHeader from '../LendingBorrowingTable/LendingBorrowingHeader';
+import LendingBorrowingTableBody from '../LendingBorrowingTable/LendingBorrowingTableBody';
+import TableControls from '../LendingBorrowingTable/TableControls';
+import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
+import { LoopingTableDummyData } from '@/data/DummyData';
+import LoopingStrategyColum from './LoopingStrategyColumn';
+import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
 
-const LendingBorrowingTable = () => {
+const LoopingStrategyTable = () => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [tab, setTab] = useState<string>('lendBorrow');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
+  const [showSupplyModal, setShowSupplyModal] = useState(false);
+
   const { data, isLoading, isError, error } = useFetchAssets();
 
   const router = useRouter();
@@ -42,20 +44,11 @@ const LendingBorrowingTable = () => {
     uniqueChains,
     uniqueProtocols,
     filteredData,
-  } = useFilterData({
-    tab,
-    lendingTableData: data?.lendingTableData || [],
-    vaultTableData: data?.vaultTableData || [],
-  });
-
-  const columns =
-    tab === 'lendBorrow'
-      ? LendingBorrowingColumn(router)
-      : VaultTableColumn(router);
+  } = useFilterDataAssetTable({ assetData: LoopingTableDummyData });
 
   const table = useReactTable({
     data: filteredData || [],
-    columns,
+    columns: LoopingStrategyColum(setShowSupplyModal),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -72,8 +65,8 @@ const LendingBorrowingTable = () => {
     },
   });
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error: {error.message}</div>;
+  //   if (isLoading) return <div>Loading...</div>;
+  //   if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <div className="w-full">
@@ -98,8 +91,16 @@ const LendingBorrowingTable = () => {
           <LendingBorrowingTableBody table={table} />
         </Table>
       </div>
+
+      {showSupplyModal ? (
+        <LeverageSupplyModal
+          onClose={() => {
+            setShowSupplyModal(false);
+          }}
+        />
+      ) : null}
     </div>
   );
 };
 
-export default LendingBorrowingTable;
+export default LoopingStrategyTable;

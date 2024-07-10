@@ -27,7 +27,7 @@ const EthDerivativesTable = () => {
 
   const table = useReactTable({
     data: filteredData,
-    columns: AssetTableColumn,
+    columns: AssetTableColumn('supply'),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

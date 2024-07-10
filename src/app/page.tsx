@@ -5,6 +5,9 @@ import LendingBorrowingTable from '@/components/tables/LendingBorrowingTable/Len
 import { useFetchWalletPortfolio } from '@/server/api/balance';
 import { formatUnits } from 'viem';
 import { useAccount } from 'wagmi';
+import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
+import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs';
+import { useState } from 'react';
 
 const Home = () => {
   const { address } = useAccount();
@@ -12,6 +15,8 @@ const Home = () => {
   const { data: portfolio } = useFetchWalletPortfolio(
     '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
   );
+
+  const [tab, setTab] = useState<string>('lendBorrow');
 
   return (
     <div>
@@ -44,7 +49,20 @@ const Home = () => {
           ).toFixed(2)}
         />
       </div>
-      <LendingBorrowingTable />
+
+      <Tabs onValueChange={setTab} value={tab} className="w-[520px] dark mb-2">
+        <TabsList className="grid w-full grid-cols-3 bg-black">
+          <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
+          <TabsTrigger value="vault">Yield vaults</TabsTrigger>
+          <TabsTrigger value="loopingStrategy">Looping Strategy</TabsTrigger>
+        </TabsList>
+      </Tabs>
+
+      {tab === 'loopingStrategy' ? (
+        <LoopingStrategyTable />
+      ) : (
+        <LendingBorrowingTable />
+      )}
     </div>
   );
 };
