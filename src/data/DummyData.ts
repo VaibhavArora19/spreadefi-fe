@@ -31,6 +31,36 @@ export const AssetTableDummyData: TAssetTableItem[] = [
   },
 ] 
 
+export const EthDerivativesDummyData: TAssetTableItem[] = [
+  {
+    id: '0',
+    assetSymbol: 'WETH',
+    assetSupplyApy: '8.9%',
+    assetSupplyBoostedApys: '4.6%',
+    chainId: '10',
+    protocolName: TProtocolName.AAVE,
+    points: ['ezPoints', 'LXP-L'],
+  },
+  {
+    id: '1',
+    assetSymbol: 'WETH',
+    assetSupplyApy: '6.8%',
+    chainId: '42161',
+    assetSupplyBoostedApys: '4.6%',
+    protocolName: TProtocolName.Balancer,
+    points: ['ezPoints', 'LXP-L'],
+  },
+  {
+    id: '2',
+    assetSymbol: 'WETH',
+    assetSupplyApy: '9.3%',
+    chainId: '10',
+    assetSupplyBoostedApys: '1.3%',
+    protocolName: TProtocolName.COMPOUND,
+    points: ['ezPoints', 'LXP-L'],
+  },
+] 
+
 export const LoopingTableDummyData: TLoopinStrategyTableItem[] = [
   {
     id: '0',
