@@ -36,7 +36,7 @@ export const useFetchAssetBySymbol = (assetSymbol: string) => {
     try {
       const { data } = await axiosScout.get(`/asset/symbol/${assetSymbol}`);
 
-      return data;
+      return data.data;
     } catch (error: any) {
       console.error('error: ', error);
     }

@@ -10,7 +10,6 @@ const AssetPage = () => {
   const pathname = usePathname();
   const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
 
-  
   return (
     <div className="w-full">
       <AssetTable type="supply" assetData={assetData} />
