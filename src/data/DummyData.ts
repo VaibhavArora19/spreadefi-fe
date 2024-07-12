@@ -6,7 +6,7 @@ export const AssetTableDummyData: TAssetTableItem[] = [
     id: '0',
     assetSymbol: 'WETH',
     assetSupplyApy: '8.9%',
-    assetSupplyBoostedApys: '4.6%',
+    assetSupplyBoostedApy: '4.6%',
     chainId: '10',
     protocolName: TProtocolName.AAVE,
     points: ['ezPoints', 'LXP-L'],
@@ -16,7 +16,7 @@ export const AssetTableDummyData: TAssetTableItem[] = [
     assetSymbol: 'WETH',
     assetSupplyApy: '6.8%',
     chainId: '42161',
-    assetSupplyBoostedApys: '4.6%',
+    assetSupplyBoostedApy: '4.6%',
     protocolName: TProtocolName.Balancer,
     points: ['ezPoints', 'LXP-L'],
   },
@@ -25,7 +25,7 @@ export const AssetTableDummyData: TAssetTableItem[] = [
     assetSymbol: 'WETH',
     assetSupplyApy: '9.3%',
     chainId: '10',
-    assetSupplyBoostedApys: '1.3%',
+    assetSupplyBoostedApy: '1.3%',
     protocolName: TProtocolName.COMPOUND,
     points: ['ezPoints', 'LXP-L'],
   },
@@ -36,7 +36,7 @@ export const EthDerivativesDummyData: TAssetTableItem[] = [
     id: '0',
     assetSymbol: 'WETH',
     assetSupplyApy: '8.9%',
-    assetSupplyBoostedApys: '4.6%',
+    assetSupplyBoostedApy: '4.6%',
     chainId: '10',
     protocolName: TProtocolName.AAVE,
     points: ['ezPoints', 'LXP-L'],
@@ -46,7 +46,7 @@ export const EthDerivativesDummyData: TAssetTableItem[] = [
     assetSymbol: 'WETH',
     assetSupplyApy: '6.8%',
     chainId: '42161',
-    assetSupplyBoostedApys: '4.6%',
+    assetSupplyBoostedApy: '4.6%',
     protocolName: TProtocolName.Balancer,
     points: ['ezPoints', 'LXP-L'],
   },
@@ -55,7 +55,7 @@ export const EthDerivativesDummyData: TAssetTableItem[] = [
     assetSymbol: 'WETH',
     assetSupplyApy: '9.3%',
     chainId: '10',
-    assetSupplyBoostedApys: '1.3%',
+    assetSupplyBoostedApy: '1.3%',
     protocolName: TProtocolName.COMPOUND,
     points: ['ezPoints', 'LXP-L'],
   },
@@ -105,7 +105,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     id: "0",
     assetSymbol: "WETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "10",
     protocolName: TProtocolName.AAVE,
     points: ["ezPoints", "LXP-L"]
@@ -115,7 +115,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "WETH",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     protocolName: TProtocolName.Balancer,
     points: ["ezPoints", "LXP-L"]
   },
@@ -124,7 +124,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "WETH",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -132,7 +132,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     id: "3",
     assetSymbol: "WETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "10",
     protocolName: TProtocolName.AAVE,
     points: ["ezPoints", "LXP-L"]
@@ -142,7 +142,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "WETH",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "1.02%",
+    assetSupplyBoostedApy: "1.02%",
     protocolName: TProtocolName.Balancer,
     points: ["ezPoints", "LXP-L"]
   },
@@ -151,7 +151,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "ETH",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -159,7 +159,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     id: "6",
     assetSymbol: "ETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "10",
     protocolName: TProtocolName.AAVE,
     points: ["ezPoints", "LXP-L"]
@@ -169,7 +169,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "ETH",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     protocolName: TProtocolName.Balancer,
     points: ["ezPoints", "LXP-L"]
   },
@@ -178,7 +178,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "ETH",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -186,7 +186,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     id: "9",
     assetSymbol: "cbETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "10",
     protocolName: TProtocolName.AAVE,
     points: ["ezPoints", "LXP-L"]
@@ -196,7 +196,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "cbETH",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "1.02%",
+    assetSupplyBoostedApy: "1.02%",
     protocolName: TProtocolName.Balancer,
     points: ["ezPoints", "LXP-L"]
   },
@@ -205,7 +205,7 @@ export const MigrateLendingData : TAssetTableItem[] = [
     assetSymbol: "cbETH",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -217,7 +217,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     id: "0",
     assetSymbol: "USDC",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "8453",
     protocolName: TProtocolName.HOP,
     points: ["ezPoints", "LXP-L"]
@@ -227,7 +227,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "USDC",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     protocolName: TProtocolName.NILE,
     points: ["ezPoints", "LXP-L"]
   },
@@ -236,7 +236,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "USDC",
     assetSupplyApy: "9.3%",
     chainId: "8453",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -244,7 +244,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     id: "3",
     assetSymbol: "WETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "8453",
     protocolName: TProtocolName.HOP,
     points: ["ezPoints", "LXP-L"]
@@ -254,7 +254,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "WETH",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "1.02%",
+    assetSupplyBoostedApy: "1.02%",
     protocolName: TProtocolName.NILE,
     points: ["ezPoints", "LXP-L"]
   },
@@ -263,7 +263,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "ETH",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -271,7 +271,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     id: "6",
     assetSymbol: "ETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "10",
     protocolName: TProtocolName.AAVE,
     points: ["ezPoints", "LXP-L"]
@@ -281,7 +281,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "USDT",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     protocolName: TProtocolName.Balancer,
     points: ["ezPoints", "LXP-L"]
   },
@@ -290,7 +290,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "USDT",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
@@ -298,7 +298,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     id: "9",
     assetSymbol: "cbETH",
     assetSupplyApy: "8%.9",
-    assetSupplyBoostedApys: "4.6%",
+    assetSupplyBoostedApy: "4.6%",
     chainId: "8453",
     protocolName: TProtocolName.AAVE,
     points: ["ezPoints", "LXP-L"]
@@ -308,7 +308,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "cbETH",
     assetSupplyApy: "6.8%",
     chainId: "42161",
-    assetSupplyBoostedApys: "1.02%",
+    assetSupplyBoostedApy: "1.02%",
     protocolName: TProtocolName.Balancer,
     points: ["ezPoints", "LXP-L"]
   },
@@ -317,7 +317,7 @@ export const MigrateVaultData : TAssetTableItem[] = [
     assetSymbol: "cbETH",
     assetSupplyApy: "9.3%",
     chainId: "10",
-    assetSupplyBoostedApys: "1.3%",
+    assetSupplyBoostedApy: "1.3%",
     protocolName: TProtocolName.COMPOUND,
     points: ["ezPoints", "LXP-L", ]
   },
