@@ -50,11 +50,11 @@ const AssetTableColumn = (
       ),
     },
     {
-      accessorKey: 'totalApys',
+      accessorKey: 'assetSupplyApy',
       header: ({ column }) => {
         return (
           <div
-            className="flex gap-1 items-center w-[100px]"
+            className="flex gap-1 items-center w-[120px]"
             onClick={() =>
               column.toggleSorting(column.getIsSorted() === 'asc')
             }>
@@ -76,12 +76,12 @@ const AssetTableColumn = (
         );
       },
       cell: ({ row }) => (
-        <div className="lowercase flex gap-2 items-center w-[100px]">
-          <p>{row.getValue('totalApys')} </p>
+        <div className="lowercase flex gap-2 items-center w-[120px]">
+          <p>{parseFloat(row.getValue('assetSupplyApy')).toFixed(2)}% </p>
 
-          {row.original.assetSupplyBoostedApys ? (
-            <p className="lowercase text-sm w-fit text-yellow-500">
-              + {row.original.assetSupplyBoostedApys}
+          {row.original.assetSupplyBoostedApy ? (
+            <p className=" lowercase text-sm w-fit text-yellow-500">
+              + {row.original.assetSupplyBoostedApy}%
             </p>
           ) : null}
         </div>
@@ -112,20 +112,24 @@ const AssetTableColumn = (
 
       cell: ({ row }) => (
         <div className="flex gap-3 flex-wrap overflow-hidden text-ellipsis w-full">
-          {row.original.points.map((point, index) => (
-            <TooltipProvider key={index}>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="px-4 py-1 bg-green-700/20 text-green-400 rounded-md text-xs ">
-                    {point}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="bg-[#1e1e1e] text-white">{point}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+          {row.original.points.length > 0 ? (
+            row.original.points.map((point, index) => (
+              <TooltipProvider key={index}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="px-4 py-1 bg-green-700/20 text-green-400 rounded-md text-xs ">
+                      {point}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="bg-[#1e1e1e] text-white">{point}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))
+          ) : (
+            <div>-</div>
+          )}
         </div>
       ),
     },

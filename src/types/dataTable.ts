@@ -22,7 +22,7 @@ export type TAssetTableItem = {
   id: string;
   assetSymbol: string;
   assetSupplyApy: string;
-  assetSupplyBoostedApys?: string;
+  assetSupplyBoostedApy?: string;
   points: string[];
   chainId: string;
   protocolName: TProtocolName;
@@ -36,9 +36,10 @@ export type TLoopinStrategyTableItem = {
   chainId: string;
   protocolName: TProtocolName;
   apy: string;
-}
+};
 
 export type TableItem =
   | TLendingBorrowingTableItem
   | TVaultTableItem
-  | TAssetTableItem | TLoopinStrategyTableItem
+  | TAssetTableItem
+  | TLoopinStrategyTableItem;
