@@ -6,7 +6,6 @@ import {
   VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
@@ -24,9 +23,8 @@ import { useFilterData } from '@/hooks/useFilterData';
 import { useFetchAssets } from '@/server/api/asset';
 import { useRouter } from 'next/navigation';
 
-const LendingBorrowingTable = () => {
+const LendingBorrowingTable = ({ tab }: { tab: string }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [tab, setTab] = useState<string>('lendBorrow');
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
@@ -59,7 +57,6 @@ const LendingBorrowingTable = () => {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
@@ -78,7 +75,7 @@ const LendingBorrowingTable = () => {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <TableControls table={table} />
+        <TableControls table={table} type="lendBorrow" />
         <div className="flex gap-4 items-center">
           <ChainFilterDropdown
             chainFilters={chainFilters}

@@ -61,7 +61,7 @@ const Home = () => {
       {tab === 'loopingStrategy' ? (
         <LoopingStrategyTable />
       ) : (
-        <LendingBorrowingTable />
+        <LendingBorrowingTable tab={tab} />
       )}
     </div>
   );

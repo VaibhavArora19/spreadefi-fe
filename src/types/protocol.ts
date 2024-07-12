@@ -3,5 +3,9 @@ export enum TProtocolName {
     COMPOUND = "compound",
     Balancer = "balancer",
     NILE = "nile",
-    HOP = "hop"
+    HOP = "hop",
+    SEAMLESS = "seamless",
+    ZEROLEND= "zerolend",
+    BEEFY = "beefy",
+    HOPBEEFY = "hop beefy"
 }

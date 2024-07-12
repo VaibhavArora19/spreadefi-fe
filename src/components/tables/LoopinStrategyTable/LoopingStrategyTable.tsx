@@ -71,7 +71,7 @@ const LoopingStrategyTable = () => {
   return (
     <div className="w-full">
       <div className="flex items-center py-4">
-        <TableControls table={table} />
+        <TableControls table={table} type="looping" />
         <div className="flex gap-4 items-center">
           <ChainFilterDropdown
             chainFilters={chainFilters}

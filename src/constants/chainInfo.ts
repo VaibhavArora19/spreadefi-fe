@@ -15,6 +15,6 @@ export const CHAIN_CONFIG: TChainConfig = {
   },
   '59144': {
     chainName: 'Linea',
-    chainImageUrl: '/assets/icons/chains/op.png',
+    chainImageUrl: '/assets/icons/chains/linea.png',
   },
 };
