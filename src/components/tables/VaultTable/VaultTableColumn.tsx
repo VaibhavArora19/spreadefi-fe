@@ -15,7 +15,7 @@ import { Button } from '@/components/ui/button';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
 const VaultTableColumn = (
-  router: AppRouterInstance,
+  router?: AppRouterInstance,
 ): ColumnDef<TVaultTableItem>[] => [
   {
     accessorKey: 'assetSymbol',
@@ -86,7 +86,7 @@ const VaultTableColumn = (
     header: 'Protocols',
     cell: ({ row }) => (
       <div className="flex -space-x-1">
-        {row.original.protocols.map((protocol, index) => (
+        {row.original.protocolNames.map((protocol, index) => (
           <TooltipProvider key={index}>
             <Tooltip>
               <TooltipTrigger>

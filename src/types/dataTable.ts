@@ -15,7 +15,7 @@ export type TVaultTableItem = {
   assetSymbol: string;
   assetSupplyApys: string;
   chainIds: string[];
-  protocols: TProtocolName[];
+  protocolNames: TProtocolName[];
 };
 
 export type TAssetTableItem = {
