@@ -10,6 +10,17 @@ export enum TAssetName {
   DAI = 'dai',
   USDT = 'usdt',
   WBTC = 'wbtc',
+  RETH = "reth",
+  FRXETH = "frxeth",
+  USDBC = "usdbc",
+  USDCE = "usdc.e",
+  SEAM = "seam",
+  LUSD = "lusd",
+  OP = "op",
+  LINK = "link",
+  FRAX = "frax",
+  DEGEN = "degen",
+  ARB = "arb"
 }
 
 export type TBalance = {

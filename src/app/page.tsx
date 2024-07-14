@@ -68,6 +68,7 @@ const Home = () => {
           isLoading={isLoading}
           isError={isError}
           error={error}
+          tab={tab}
         />
       )}
     </div>

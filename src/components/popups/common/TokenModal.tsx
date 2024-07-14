@@ -5,6 +5,7 @@ import { assetNameToImage } from '@/constants/assetInfo';
 import { TAssetName } from '@/types/asset';
 import Image from 'next/image';
 import React from 'react';
+import { IoClose } from 'react-icons/io5';
 
 type TokenItemProps = {
   token: {
@@ -95,9 +96,10 @@ const TokenModal = ({
 
   return (
     <Modal className="w-[500px] bg-[#111111] h-[450px] rounded-2xl overflow-scroll">
-      <p className="p-6 bg-[#1e1e1e] text-white text-base font-semibold">
-        Select Token
-      </p>
+      <div className="flex items-center justify-between p-6 bg-[#1e1e1e] w-full">
+        <p className=" text-white text-base font-semibold">Select Token</p>
+        <IoClose onClick={onClose} size={18} className="cursor-pointer" />
+      </div>
 
       <div className="flex flex-col space-y-2 p-2 overflow-scroll">
         {tokens.map((token) => (

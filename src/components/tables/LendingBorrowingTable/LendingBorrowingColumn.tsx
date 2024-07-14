@@ -28,6 +28,7 @@ const LendingBorrowingColumn = (
           height={25}
           width={25}
           alt="weth"
+          className="rounded-full"
         />
         <p>{row.getValue('assetSymbol')}</p>
       </div>

@@ -12,6 +12,15 @@ export const protocolNameToImage = (name: TProtocolName) => {
             return "/assets/icons/protocols/nile.png"; 
         case TProtocolName.HOP: 
             return "/assets/icons/protocols/hop.webp"; 
+        case TProtocolName.HOP: 
+        case TProtocolName.HOPBEEFY:
+            return "/assets/icons/protocols/hop.webp"; 
+        case TProtocolName.BEEFY: 
+            return "/assets/icons/protocols/beefy.png"; 
+        case TProtocolName.SEAMLESS: 
+            return "/assets/icons/tokens/seam.png"; 
+        case TProtocolName.ZEROLEND: 
+            return "/assets/icons/protocols/zerolend.svg";
         default: 
             return "";
     }

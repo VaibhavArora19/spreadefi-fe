@@ -3,6 +3,7 @@
 import Modal from '@/components/(ui)/Modal';
 import Image from 'next/image';
 import React from 'react';
+import { IoClose } from 'react-icons/io5';
 
 type ChainItemProps = {
   chain: {
@@ -70,9 +71,10 @@ const ChainModal: React.FC<ChainModalProps> = ({ onClose, onSelect }) => {
 
   return (
     <Modal className="w-[500px] bg-[#111111] h-[450px] rounded-2xl overflow-hidden">
-      <p className="p-6 bg-[#1e1e1e] text-white text-base font-semibold">
-        Select Chains
-      </p>
+      <div className="flex items-center justify-between p-6 bg-[#1e1e1e] w-full">
+        <p className=" text-white text-base font-semibold">Select Chain</p>
+        <IoClose onClick={onClose} size={18} className="cursor-pointer" />
+      </div>
 
       <div className="flex flex-col space-y-2 p-2">
         {chains.map((chain) => (

@@ -17,8 +17,7 @@ import {
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Label } from '@/components/ui/label';
+import MultiplierSlider from './MultiplierSlider';
 
 const LoopingStrategyColum = (
   setShowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
@@ -152,22 +151,7 @@ const LoopingStrategyColum = (
     {
       accessorKey: 'multiplier',
       header: 'Multiplier',
-      cell: ({ row }) => (
-        <RadioGroup className="flex items-center gap-3" defaultValue="3">
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="3" id="r1" />
-            <Label htmlFor="r1">3x</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="6" id="r2" />
-            <Label htmlFor="r2">6x</Label>
-          </div>
-          <div className="flex items-center space-x-2">
-            <RadioGroupItem value="9" id="r3" />
-            <Label htmlFor="r3">9x</Label>
-          </div>
-        </RadioGroup>
-      ),
+      cell: ({ row }) => <MultiplierSlider />,
     },
     {
       accessorKey: 'APY',
