@@ -9,16 +9,23 @@ import { TokenDetails } from './TokenDetails';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { TProtocolName } from '@/types/protocol';
+import { TAsset } from '@/types/asset';
 
 type PositionItemProps = {
   positionName: string;
-  collateral: number;
-  debt: number;
+  collateral: string | number;
+  debt: string | number;
   ratio: number;
   apy: number;
   chain: string;
   protocolName: TProtocolName;
   type: 'vault' | 'lendBorrow';
+  assets?: {
+    asset: TAsset;
+    currentATokenBalance: number;
+    currentStableDebt: number;
+    currentVariableDebt: number;
+  }[];
 };
 
 const PositionItem: React.FC<PositionItemProps> = ({
@@ -30,6 +37,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
   chain,
   protocolName,
   type,
+  assets,
 }) => (
   <div className="w-full bg-[#181818] p-4 pb-3 rounded-md">
     <Collapsible>
@@ -43,6 +51,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
           ratio={ratio}
           apy={apy}
           type={type}
+          chainId={chain}
         />
         <MdKeyboardArrowDown className="text-center text-white w-full mt-2 text-xl" />
       </CollapsibleTrigger>
@@ -50,27 +59,21 @@ const PositionItem: React.FC<PositionItemProps> = ({
         <div className="flex flex-col gap-2">
           <TokenDetails
             actionType={type}
-            tokens={[
-              {
-                name: 'ETH',
-                amount: '2.332 ETH',
-                usdValue: '$23,193.2',
-                iconSrc: '/assets/icons/tokens/eth.png',
-              },
-            ]}
+            tokens={
+              assets?.filter((value: any) => value.currentATokenBalance > 0)!
+            }
             type="Supplied"
           />
 
           {type !== 'vault' ? (
             <TokenDetails
-              tokens={[
-                {
-                  name: 'USDC',
-                  amount: '2332 USDC',
-                  usdValue: '$2332.12',
-                  iconSrc: '/assets/icons/tokens/usdc.png',
-                },
-              ]}
+              tokens={
+                assets?.filter(
+                  (value) =>
+                    value.currentStableDebt > 0 ||
+                    value.currentVariableDebt > 0,
+                )!
+              }
               type="Borrowed"
             />
           ) : null}

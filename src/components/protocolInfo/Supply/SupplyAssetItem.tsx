@@ -33,7 +33,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
           <p>{asset?.assetSymbol}</p>
         </div>
         <p className="flex-[0.25]">
-          {balances[asset.assetAddress.trim().toLowerCase()] || '$0'}
+          {balances[asset.assetAddress.trim().toLowerCase()]?.price || '$0'}
         </p>
         <p className="flex-[0.25]">
           {itemType === 'borrow'

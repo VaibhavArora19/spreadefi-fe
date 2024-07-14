@@ -1,16 +1,15 @@
-import { useFetchWalletPortfolio } from '@/server/api/balance';
 import DividedBar from '../(ui)/DividerBar';
 import { PortfolioDetail } from './PortfolioDetail';
 import { formatUnits } from 'viem';
-import { useAccount } from 'wagmi';
 
-const PortfolioCard = () => {
-  const { address } = useAccount();
-
-  const { data: portfolio } = useFetchWalletPortfolio(
-    '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
-  );
-
+type PortfolioCardProps = {
+  portfolio: {
+    totalCollateralBase: string | number;
+    totalDebtBase: string;
+    totalBalanceUSD: string;
+  };
+};
+const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
   return (
     <div className="w-full bg-[#111111] rounded-lg overflow-hidden">
       <div className="bg-[#1e1e1e] p-6 ">Portfolio Value</div>
@@ -19,20 +18,20 @@ const PortfolioCard = () => {
         <PortfolioDetail
           label="Net worth"
           value={
-            parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 6)) -
-            parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 6))
+            parseFloat(formatUnits(BigInt(portfolio?.totalCollateralBase), 6)) -
+            parseFloat(formatUnits(BigInt(portfolio?.totalDebtBase), 6))
           }
           className="text-white text-4xl"
         />
         <PortfolioDetail
           label="Wallet"
-          value={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 6))}
+          value={parseFloat(formatUnits(BigInt(portfolio?.totalBalanceUSD), 6))}
           className="text-green-800 text-xl"
         />
         <PortfolioDetail
           label="Lend"
           value={parseFloat(
-            formatUnits(portfolio?.totalCollateralBase || 0, 6),
+            formatUnits(BigInt(portfolio?.totalCollateralBase), 6),
           )}
           className="text-green-600 text-xl"
         />
@@ -43,17 +42,23 @@ const PortfolioCard = () => {
         />
         <PortfolioDetail
           label="Borrowed"
-          value={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 6))}
+          value={parseFloat(formatUnits(BigInt(portfolio?.totalDebtBase), 6))}
           className="text-red-500 text-xl"
         />
       </div>
 
       <div className="px-6 pb-6 pt-2 ">
         <DividedBar
-          borrowed={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 6))}
+          borrowed={parseFloat(
+            formatUnits(BigInt(portfolio?.totalDebtBase), 6),
+          )}
           vault={18000}
-          wallet={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 6))}
-          lend={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 6))}
+          wallet={parseFloat(
+            formatUnits(BigInt(portfolio?.totalBalanceUSD), 6),
+          )}
+          lend={parseFloat(
+            formatUnits(BigInt(portfolio?.totalCollateralBase), 6),
+          )}
         />
       </div>
     </div>

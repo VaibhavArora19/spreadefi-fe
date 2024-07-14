@@ -8,6 +8,7 @@ import { useAccount } from 'wagmi';
 import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
 import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs';
 import { useState } from 'react';
+import { useFetchAssets } from '@/server/api/asset';
 
 const Home = () => {
   const { address } = useAccount();
@@ -15,6 +16,7 @@ const Home = () => {
   const { data: portfolio } = useFetchWalletPortfolio(
     '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
   );
+  const { data, isLoading, isError, error } = useFetchAssets();
 
   const [tab, setTab] = useState<string>('lendBorrow');
 
@@ -59,9 +61,14 @@ const Home = () => {
       </Tabs>
 
       {tab === 'loopingStrategy' ? (
-        <LoopingStrategyTable />
+        <LoopingStrategyTable loopingTableData={data?.loopingTableData} />
       ) : (
-        <LendingBorrowingTable />
+        <LendingBorrowingTable
+          data={data}
+          isLoading={isLoading}
+          isError={isError}
+          error={error}
+        />
       )}
     </div>
   );

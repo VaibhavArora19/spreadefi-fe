@@ -35,26 +35,3 @@ export const useFetchTokenBalance = (address: string) => {
     queryFn: fetchTokenBalance,
   });
 };
-
-export const useFetchSpecificProtocolBalance = (
-  address: string,
-  protocolName: string,
-  chainId: string,
-) => {
-  const fetchTokenBalance = async () => {
-    try {
-      const { data } = await axiosScout.get(
-        '/balance/' + address + '/' + protocolName + '/' + chainId,
-      );
-
-      return data?.data;
-    } catch (error: any) {
-      console.error('error: ', error);
-    }
-  };
-
-  return useQuery({
-    queryKey: [BALANCES.BALANCE],
-    queryFn: fetchTokenBalance,
-  });
-};
