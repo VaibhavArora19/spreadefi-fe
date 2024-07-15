@@ -7,11 +7,12 @@ interface PositionCardProps {
   iconSrc: string;
   chainIconSrc: string;
   positionName: string;
-  collateral: number;
-  debt: number;
+  collateral: string | number;
+  debt: string | number;
   ratio: number;
   apy: number;
   type: 'lendBorrow' | 'vault';
+  chainId: string;
 }
 
 export const PositionCard: React.FC<PositionCardProps> = ({
@@ -23,6 +24,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
   ratio,
   apy,
   type,
+  chainId,
 }) => (
   <div className="flex gap-10 items-center border-b border-b-[#2a2a2a] pb-4">
     <div className="rounded-md relative">
@@ -48,6 +50,7 @@ export const PositionCard: React.FC<PositionCardProps> = ({
       positionName={positionName}
       ratio={ratio}
       type={type}
+      chainId={chainId}
     />
   </div>
 );

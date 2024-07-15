@@ -24,8 +24,10 @@ import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
 import { LoopingTableDummyData } from '@/data/DummyData';
 import LoopingStrategyColum from './LoopingStrategyColumn';
 import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
+import { useAccount } from 'wagmi';
+import { useExecuteTransactions } from '@/server/api/transactions';
 
-const LoopingStrategyTable = () => {
+const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -33,6 +35,8 @@ const LoopingStrategyTable = () => {
   const [showSupplyModal, setShowSupplyModal] = useState(false);
 
   const { data, isLoading, isError, error } = useFetchAssets();
+  const { address } = useAccount();
+  const { execute } = useExecuteTransactions();
 
   const router = useRouter();
 
@@ -64,6 +68,13 @@ const LoopingStrategyTable = () => {
       rowSelection,
     },
   });
+
+  const handleLeverageSubmit = async () => {
+    //!show modal here asking user to connect wallet
+    if (!address) return;
+
+    const data = await execute();
+  };
 
   //   if (isLoading) return <div>Loading...</div>;
   //   if (isError) return <div>Error: {error.message}</div>;
@@ -97,6 +108,7 @@ const LoopingStrategyTable = () => {
           onClose={() => {
             setShowSupplyModal(false);
           }}
+          onSubmit={handleLeverageSubmit}
         />
       ) : null}
     </div>

@@ -37,27 +37,3 @@ export const useFetchTokenBalance = (address: string) => {
     staleTime: 600000, //10 minutes
   });
 };
-
-export const useFetchSpecificProtocolBalance = (
-  address: string,
-  protocolName: string,
-  chainId: string,
-) => {
-  const fetchTokenBalance = async () => {
-    try {
-      const { data } = await axiosScout.get(
-        '/balance/' + address + '/' + protocolName + '/' + chainId,
-      );
-
-      return data?.data;
-    } catch (error: any) {
-      console.error('error: ', error);
-    }
-  };
-
-  return useQuery({
-    queryKey: [BALANCES.BALANCE],
-    queryFn: fetchTokenBalance,
-    staleTime: 600000, //10 minutes
-  });
-};

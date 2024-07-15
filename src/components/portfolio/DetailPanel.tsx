@@ -5,11 +5,12 @@ import { MdOutlineArrowOutward } from 'react-icons/md';
 
 interface DetailPanelProps {
   positionName: string;
-  collateral: number;
-  debt: number;
+  collateral: string | number;
+  debt: string | number;
   ratio: number;
   apy: number;
   type: 'vault' | 'lendBorrow';
+  chainId: string;
 }
 
 const DetailPanel: React.FC<DetailPanelProps> = ({
@@ -19,6 +20,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
   ratio,
   apy,
   type,
+  chainId,
 }) => {
   const router = useRouter();
   return (
@@ -42,7 +44,7 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
       <Button
         onClick={(e) => {
           e.stopPropagation();
-          router.push('/portfolio/compound/optimism');
+          router.push(`/portfolio?protocol=${positionName}&chain=${chainId}`);
         }}
         className="w-[150px] bg-inherit text-white border border-white  mr-2 py-5 flex gap-2 items-center hover:bg-white hover:text-black">
         View more
