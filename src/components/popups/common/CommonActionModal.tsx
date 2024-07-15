@@ -91,7 +91,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
         break;
 
       case 'chain':
-        if (type === Action.WITHDRAW) {
+        if (type === Action.WITHDRAW || type === Action.BORROW) {
           //* in case of withdraw the value selected by user will be toChain i.e. chain on which user wants his funds back
           if (toChain !== value) {
             dispatch(transactionPayloadActions.setToToken(''));
@@ -112,7 +112,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
       case 'token':
         if (typeof value === 'string') return;
 
-        if (type === Action.WITHDRAW) {
+        if (type === Action.WITHDRAW || type === Action.BORROW) {
           dispatch(transactionPayloadActions.setToToken(value.address));
         } else {
           dispatch(transactionPayloadActions.setFromToken(value.address));

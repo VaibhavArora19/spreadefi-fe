@@ -32,16 +32,16 @@ const ChainsSelector = ({ setChain, type }: TProps) => {
           setShowChainModal(true);
         }}
         className="text-xs bg-[#151515] p-2 w-[100px] rounded-md flex items-center gap-2">
-        {(type === Action.WITHDRAW ? toChain !== '' : fromChain !== '') ? (
+        {(type === Action.WITHDRAW || type == Action.BORROW ? toChain !== '' : fromChain !== '') ? (
           <>
             <Image
               src={
-                type === Action.WITHDRAW
+                type === Action.WITHDRAW || type == Action.BORROW
                   ? CHAIN_CONFIG[toChain].chainImageUrl
                   : CHAIN_CONFIG[fromChain].chainImageUrl
               }
               alt={
-                type === Action.WITHDRAW
+                type === Action.WITHDRAW || type == Action.BORROW
                   ? CHAIN_CONFIG[toChain].chainName
                   : CHAIN_CONFIG[fromChain].chainName
               }
@@ -49,7 +49,7 @@ const ChainsSelector = ({ setChain, type }: TProps) => {
               width={15}
             />
             <span className="text-xs">
-              {type === Action.WITHDRAW
+              {type === Action.WITHDRAW || type == Action.BORROW
                 ? CHAIN_CONFIG[toChain].chainName
                 : CHAIN_CONFIG[fromChain].chainName}
             </span>

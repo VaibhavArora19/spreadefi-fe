@@ -28,7 +28,7 @@ const TokenSelector = ({
   } | null>(null);
 
   useEffect(() => {
-    if (type === Action.WITHDRAW) {
+    if (type === Action.WITHDRAW || type === Action.BORROW) {
       if (toToken !== '' && tokens.length !== 0) {
         const [token] = tokens.filter((t) => t.address === toToken);
 

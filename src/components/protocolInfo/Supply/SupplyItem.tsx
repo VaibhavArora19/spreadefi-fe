@@ -45,6 +45,9 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
         ethers.utils.getAddress(token.address) === ethers.utils.getAddress(data.asset.assetAddress),
     );
 
+    //!add some error here
+    if (!filterFromToken) return;
+
     protocol && dispatch(transactionPayloadActions.setStrategyName(protocol));
     protocolChainId && dispatch(transactionPayloadActions.setFromChain(protocolChainId));
     dispatch(transactionPayloadActions.setFromToken(data.asset.assetAddress));

@@ -1,10 +1,12 @@
 import BorrowModal from '@/components/popups/Borrow/BorrowModal';
 import SupplyModal from '@/components/popups/common/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
+import { useFetchTokenList, useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
 import { transactionPayloadActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
 import { Action } from '@/types/strategy';
+import { ethers } from 'ethers';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -20,6 +22,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   const { execute } = useExecuteTransactions();
+  const { fetchList } = useFetchTokenListForChain();
   const dispatch = useDispatch();
   const { address } = useAccount();
 
@@ -28,6 +31,27 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
     if (!address) return;
 
     const data = await execute();
+  };
+
+  const borrowModalHandler = async () => {
+    //!add some warning here
+    if (!asset.chainId) return;
+
+    const tokens = await fetchList(asset.chainId);
+    const [filterFromToken] = tokens.filter(
+      (token) =>
+        ethers.utils.getAddress(token.address) === ethers.utils.getAddress(asset.assetAddress),
+    );
+
+    //!add some error here
+    if (!filterFromToken) return;
+
+    dispatch(transactionPayloadActions.setStrategyName(asset.protocolName));
+    dispatch(transactionPayloadActions.setFromChain(asset.chainId));
+    dispatch(transactionPayloadActions.setFromToken(asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(filterFromToken.decimals));
+
+    setShowBorrowModal(true);
   };
 
   return (
@@ -55,8 +79,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         <div className="flex gap-4 flex-[0.25]">
           {itemType === 'borrow' ? (
             <button
-              onClick={() => {
-                setShowBorrowModal(true);
+              onClick={async () => {
+                await borrowModalHandler();
               }}
               className="bg-transparent text-white py-2  w-full text-xs rounded-md border border-white hover:bg-white hover:text-black">
               Borrow
@@ -90,6 +114,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
       {showBorrowModal ? (
         <BorrowModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowBorrowModal(false);
           }}
           onSubmit={handleSupplyOrBorrowSubmit}
