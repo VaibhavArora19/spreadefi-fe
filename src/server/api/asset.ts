@@ -19,7 +19,11 @@ export const useFetchAssets = () => {
         (asset) => asset.protocolType === 'Yield',
       );
 
-      return { lendingTableData, vaultTableData };
+      const loopingTableData = data.data.filter(
+        (asset) => asset.protocolType === 'Looping',
+      );
+
+      return { lendingTableData, vaultTableData, loopingTableData };
     } catch (error: any) {
       console.error('error: ', error);
     }

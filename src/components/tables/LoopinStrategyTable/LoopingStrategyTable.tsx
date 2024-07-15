@@ -25,7 +25,7 @@ import { LoopingTableDummyData } from '@/data/DummyData';
 import LoopingStrategyColum from './LoopingStrategyColumn';
 import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
 
-const LoopingStrategyTable = () => {
+const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});

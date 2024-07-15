@@ -1,16 +1,15 @@
-import { useFetchWalletPortfolio } from '@/server/api/balance';
 import DividedBar from '../(ui)/DividerBar';
 import { PortfolioDetail } from './PortfolioDetail';
 import { formatUnits } from 'viem';
-import { useAccount } from 'wagmi';
 
-const PortfolioCard = () => {
-  const { address } = useAccount();
-
-  const { data: portfolio } = useFetchWalletPortfolio(
-    '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
-  );
-
+type PortfolioCardProps = {
+  portfolio: {
+    totalCollateralBase: any;
+    totalDebtBase: any;
+    totalBalanceUSD: any;
+  };
+};
+const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
   return (
     <div className="w-full bg-[#111111] rounded-lg overflow-hidden">
       <div className="bg-[#1e1e1e] p-6 ">Portfolio Value</div>

@@ -20,15 +20,19 @@ import TableControls from './TableControls';
 import ChainFilterDropdown from './ChainFilterDropdown';
 import ProtocolFilterDropdown from './ProtocolFilterDropdown';
 import { useFilterData } from '@/hooks/useFilterData';
-import { useFetchAssets } from '@/server/api/asset';
 import { useRouter } from 'next/navigation';
 
-const LendingBorrowingTable = ({ tab }: { tab: string }) => {
+const LendingBorrowingTable = ({
+  tab,
+  data,
+  isLoading,
+  isError,
+  error,
+}: any) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
-  const { data, isLoading, isError, error } = useFetchAssets();
 
   const router = useRouter();
 
