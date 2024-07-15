@@ -4,15 +4,12 @@ import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
+import { useAppDispatch } from '@/redux/hooks';
+import { transactionPayloadActions } from '@/redux/actions';
 
 const AssetTableColumn = (
   type: 'migrate' | 'borrowAndAction' | 'supply',
@@ -20,6 +17,8 @@ const AssetTableColumn = (
   setShowBorrowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
   setShowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
 ): ColumnDef<TAssetTableItem>[] => {
+  const dispatch = useAppDispatch();
+
   const showBorrowSupplyModalHandler = () => {
     setShowBorrowSupplyModal ? setShowBorrowSupplyModal(true) : null;
   };
@@ -55,9 +54,7 @@ const AssetTableColumn = (
         return (
           <div
             className="flex gap-1 items-center w-[120px]"
-            onClick={() =>
-              column.toggleSorting(column.getIsSorted() === 'asc')
-            }>
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
             APY
             <TooltipProvider>
               <Tooltip>
@@ -100,8 +97,7 @@ const AssetTableColumn = (
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="bg-[#1e1e1e] text-white">
-                    Points rewarded for supplying tokens in this particular
-                    asset pool
+                    Points rewarded for supplying tokens in this particular asset pool
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -176,9 +172,7 @@ const AssetTableColumn = (
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">
-                  {row.original.protocolName}
-                </p>
+                <p className="bg-[#1e1e1e] text-white">{row.original.protocolName}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -196,15 +190,15 @@ const AssetTableColumn = (
             } else if (type === 'borrowAndAction') {
               showBorrowSupplyModalHandler();
             } else {
+              dispatch(transactionPayloadActions.setStrategyName(row.original.protocolName));
+              dispatch(transactionPayloadActions.setToChain(row.original.chainId));
+              dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
+
               showSupplyModalHandler();
             }
           }}
           className="w-[80%] bg-white text-black">
-          {type === 'supply'
-            ? 'Supply'
-            : type === 'migrate'
-            ? 'Migrate'
-            : 'Borrow & Action'}
+          {type === 'supply' ? 'Supply' : type === 'migrate' ? 'Migrate' : 'Borrow & Action'}
         </Button>
       ),
     },

@@ -9,10 +9,6 @@ type TableControlsProps = {
 };
 
 const TableControls: React.FC<TableControlsProps> = ({ table, type }) => {
-  console.log(
-    'xxx',
-    table.getColumn('assetSymbol')?.getFilterValue() as string,
-  );
   return (
     <div className="flex w-full gap-8">
       <Input

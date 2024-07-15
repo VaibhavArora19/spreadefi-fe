@@ -25,7 +25,7 @@ const MigrateBorrow = ({
     <Modal className="w-[500px] p-5 ">
       <div className="flex justify-between items-center mb-4">
         <p className="font-medium text-lg capitalize">
-          {type === 'borrowAction' ? 'Borrow & Suppy' : 'Migrate'} Assets
+          {type === 'borrowAction' ? 'Borrow & Supply' : 'Migrate'} Assets
         </p>
 
         <div className="flex items-center gap-1 relative">
@@ -50,12 +50,7 @@ const MigrateBorrow = ({
         />
         <div className="flex items-center gap-4 text-xs p-4">
           <div className="flex items-center gap-2 py-3 px-4 rounded-md bg-[#111]">
-            <Image
-              src={'/assets/icons/tokens/cbeth.png'}
-              height={20}
-              width={20}
-              alt="cbeth"
-            />
+            <Image src={'/assets/icons/tokens/cbeth.png'} height={20} width={20} alt="cbeth" />
 
             {/**
              *  token to be migrated - get it from table

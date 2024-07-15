@@ -37,6 +37,7 @@ export type TAsset = {
   chainId: string;
   assetAddress: string;
   protocolName: TProtocolName;
+  protocolType: string;
 };
 
 export type TAssetsResponse = {

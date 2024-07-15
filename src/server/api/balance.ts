@@ -16,6 +16,7 @@ export const useFetchWalletPortfolio = (address: string) => {
   return useQuery({
     queryKey: [BALANCES.PORTFOLIO],
     queryFn: fetchWalletPortfolio,
+    staleTime: 600000, //10 minutes
   });
 };
 
@@ -33,5 +34,6 @@ export const useFetchTokenBalance = (address: string) => {
   return useQuery({
     queryKey: [BALANCES.BALANCE],
     queryFn: fetchTokenBalance,
+    staleTime: 600000, //10 minutes
   });
 };

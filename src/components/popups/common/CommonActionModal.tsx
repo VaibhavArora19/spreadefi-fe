@@ -6,16 +6,100 @@ import { IoClose } from 'react-icons/io5';
 import TransactionOverview from './TransactionOverview';
 import TokenSelector from './TokenSelector';
 import ChainsSelector from './ChainsSelector';
+import { useAppDispatch, useTransactionPayloadStore } from '@/redux/hooks';
+import { tokensActions, transactionPayloadActions } from '@/redux/actions';
+import { TTransactionPayload } from '@/types/transaction';
+import { Action } from '@/types/strategy';
+import { useAccount, useCall } from 'wagmi';
+import { useTransactionsBuilder } from '@/server/api/transactions';
+import { useCallback, useEffect, useState } from 'react';
+import { ethers } from 'ethers';
 
 type CommonActionModalProps = {
-  type: 'supply' | 'withdraw' | 'repay' | 'borrow';
+  type: Action.SUPPLY | Action.WITHDRAW | Action.REPAY | Action.BORROW;
   onClose: () => void;
+  onSubmit: () => void;
 };
 
-const CommonActionModal: React.FC<CommonActionModalProps> = ({
-  type,
-  onClose,
-}) => {
+type ChangeOptions = 'amount' | 'chain' | 'token';
+
+const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, onSubmit }) => {
+  const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
+
+  const { address } = useAccount();
+  const dispatch = useAppDispatch();
+
+  const { strategyName, fromAmount, fromToken, fromChain, fromTokenDecimals, toToken, toChain } =
+    useTransactionPayloadStore();
+
+  const { data } = useTransactionsBuilder(transactionPayload);
+
+  const prepareTransactionPayload = useCallback(() => {
+    if (strategyName === '' || !address || !fromAmount || !fromToken || !fromChain) return;
+
+    const payload: TTransactionPayload = {
+      strategyName,
+      action: type,
+      txDetails: {
+        fromAmount: ethers.utils.parseUnits(fromAmount, fromTokenDecimals).toString(),
+        fromToken: fromToken as string,
+        fromChain: fromChain as string,
+        toToken,
+        toChain,
+        fromAddress: address,
+        toAddress: address,
+      },
+    };
+
+    setTransactionPayload(payload);
+  }, [
+    fromAmount,
+    fromTokenDecimals,
+    fromToken,
+    fromChain,
+    toToken,
+    toChain,
+    address,
+    strategyName,
+    type,
+  ]);
+
+  useEffect(() => {
+    const debouncedFunction = setTimeout(() => {
+      prepareTransactionPayload();
+    }, 5000);
+
+    return () => clearTimeout(debouncedFunction);
+  }, [fromAmount, fromToken, fromChain]);
+
+  const changeHandler = async (
+    option: ChangeOptions,
+    value: string | { address: string; decimals: number },
+  ) => {
+    switch (option) {
+      case 'amount':
+        dispatch(transactionPayloadActions.setFromAmount(value));
+        break;
+
+      case 'chain':
+        if (fromChain !== value) {
+          dispatch(transactionPayloadActions.setFromToken(''));
+          dispatch(transactionPayloadActions.setFromTokenDecimals(0));
+          dispatch(tokensActions.setTokens([]));
+        }
+
+        dispatch(transactionPayloadActions.setFromChain(value));
+        break;
+
+      case 'token':
+        if (typeof value === 'string') return;
+
+        dispatch(transactionPayloadActions.setFromToken(value.address));
+        dispatch(transactionPayloadActions.setFromTokenDecimals(value.decimals));
+        break;
+    }
+  };
+
   return (
     <Modal className="w-[500px] p-5 ">
       <div className="flex justify-between items-center">
@@ -25,19 +109,9 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({
 
       <div className="flex items-center gap-1 flex-wrap text-xs text-[#a8a8a8]  pb-4 border-b-[0.5px] border-[#272727] mb-4">
         <p className="capitalize ">{type}</p>
-        <Image
-          src={'/assets/icons/tokens/weth.png'}
-          height={20}
-          width={20}
-          alt="WETH"
-        />
+        <Image src={'/assets/icons/tokens/weth.png'} height={20} width={20} alt="WETH" />
         <p>WETH on</p>
-        <Image
-          src={'/assets/icons/protocols/aave.png'}
-          height={20}
-          width={20}
-          alt="WETH"
-        />
+        <Image src={'/assets/icons/protocols/aave.png'} height={20} width={20} alt="WETH" />
         AAVE from any chain using any token!
       </div>
 
@@ -47,18 +121,31 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({
           type="number"
           placeholder="0.0"
           className="text-3xl  text-white bg-inherit border-none outline-none placeholder:text-gray-500 p-4 w-[200px] overflow-hidden"
+          value={fromAmount}
+          onChange={(e) => changeHandler('amount', e.target.value)}
           onWheel={(e) => (e.target as HTMLInputElement).blur()}
         />
         <div className="flex items-center gap-4 text-xs p-4">
-          <ChainsSelector />
+          <ChainsSelector setChain={(chain) => changeHandler('chain', chain.chainId.toString())} />
 
-          <TokenSelector />
+          <TokenSelector
+            setToken={(token) =>
+              changeHandler('token', {
+                address: token.address,
+                decimals: token.decimals,
+              })
+            }
+          />
         </div>
       </div>
 
       <TransactionOverview />
 
-      <Button className="w-full text-black bg-white mt-4 py-6 capitalize">
+      <Button
+        className="w-full text-black bg-white mt-4 py-6 capitalize"
+        onClick={() => {
+          onSubmit();
+        }}>
         {type}
       </Button>
     </Modal>

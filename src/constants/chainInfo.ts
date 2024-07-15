@@ -18,3 +18,30 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainImageUrl: '/assets/icons/chains/linea.png',
   },
 };
+
+export const chainList = [
+  {
+    chainId: 42161,
+    chainName: 'Arbitrum One',
+    shortName: 'Arbitrum',
+    logo: '/assets/icons/chains/arbitrum.png',
+  },
+  {
+    chainId: 8453,
+    chainName: 'Base Mainnet',
+    shortName: 'Base',
+    logo: '/assets/icons/chains/base.png',
+  },
+  {
+    chainId: 10,
+    chainName: 'OP Mainnet',
+    shortName: 'Optimism',
+    logo: '/assets/icons/chains/op.png',
+  },
+  {
+    chainId: 59144,
+    chainName: 'Linea mainnet',
+    shortName: 'Linea',
+    logo: '/assets/icons/chains/linea.png',
+  },
+];

@@ -8,29 +8,20 @@ import ProtocolOverview from '@/components/protocolInfo/ProtocolOverview';
 import AssetsToSupplyCard from '@/components/protocolInfo/Supply/AssetsToSupplyCard';
 import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import {
-  useFetchTokenBalance,
-  useFetchWalletPortfolio,
-} from '@/server/api/balance';
+import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
 import { TAsset } from '@/types/asset';
-import {
-  TAssetBalance,
-  TFormattedAsset,
-  TFormattedAssetBalance,
-} from '@/types/balance';
+import { TAssetBalance, TFormattedAsset, TFormattedAssetBalance } from '@/types/balance';
 import { TProtocolName } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
-import { useAccount } from 'wagmi';
 
 const Portfolio = () => {
   const searchParams = useSearchParams();
   const protocol = searchParams.get('protocol');
   const chain = searchParams.get('chain');
   const [tab, setTab] = useState('lendBorrow');
-  const [formattedBalances, setFormattedBalances] =
-    useState<TFormattedAssetBalance[]>();
+  const [formattedBalances, setFormattedBalances] = useState<TFormattedAssetBalance[]>();
   const [assets, setAssets] = useState<TAsset[]>();
   const [ethDerivatives, setEthDerivatives] = useState<TAsset[]>([]);
   const [btcDerivatives, setBtcDerivatives] = useState<TAsset[]>([]);
@@ -38,15 +29,9 @@ const Portfolio = () => {
   const [supplied, setSupplied] = useState<TAssetBalance[]>();
   const [borrowed, setBorrowed] = useState<TAssetBalance[]>();
 
-  const { address } = useAccount();
+  const { data: balances } = useFetchTokenBalance('0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6');
 
-  const { data: balances } = useFetchTokenBalance(
-    '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
-  );
-
-  const { data: portfolio } = useFetchWalletPortfolio(
-    '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
-  );
+  const { data: portfolio } = useFetchWalletPortfolio('0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6');
 
   useEffect(() => {
     if (balances) {
@@ -61,17 +46,11 @@ const Portfolio = () => {
       const borrowed: TAssetBalance[] = [];
 
       balances.filteredBalances.forEach((asset: TAssetBalance) => {
-        if (
-          asset.protocol.toLowerCase() == protocol.toLowerCase() &&
-          asset.chainId == chain
-        ) {
+        if (asset.protocol.toLowerCase() == protocol.toLowerCase() && asset.chainId == chain) {
           if (Number(asset.currentATokenBalance) > 0) {
             suppiled.push(asset);
           }
-          if (
-            Number(asset.currentStableDebt) > 0 ||
-            Number(asset.currentVariableDebt) > 0
-          ) {
+          if (Number(asset.currentStableDebt) > 0 || Number(asset.currentVariableDebt) > 0) {
             borrowed.push(asset);
           }
         }
@@ -91,7 +70,8 @@ const Portfolio = () => {
       assets.forEach((asset) => {
         if (
           asset.protocolName.toLowerCase() == protocol.toLowerCase() &&
-          asset.chainId == chain
+          asset.chainId == chain &&
+          asset.protocolType !== 'Looping'
         ) {
           if (asset.assetSymbol.includes('ETH')) {
             ethDerivatives.push(asset);
@@ -116,8 +96,7 @@ const Portfolio = () => {
       const { protocol, chainId, ...rest } = item;
 
       let existingEntry = formattedData.find(
-        (entry: TFormattedAssetBalance) =>
-          entry.protocol === protocol && entry.chainId === chainId,
+        (entry: TFormattedAssetBalance) => entry.protocol === protocol && entry.chainId === chainId,
       );
 
       if (existingEntry) {
@@ -134,11 +113,7 @@ const Portfolio = () => {
     setFormattedBalances(formattedData);
   }
 
-  function getCollateralAnddebt(
-    protocolName: string,
-    chainId: string,
-    index: number,
-  ) {
+  function getCollateralAnddebt(protocolName: string, chainId: string, index: number) {
     let protocolKey;
 
     if (protocolName === 'Aave') {
@@ -152,9 +127,7 @@ const Portfolio = () => {
     }
 
     if (portfolio[protocolKey] && portfolio[protocolKey][chainId]) {
-      return parseFloat(
-        formatUnits(portfolio[protocolKey][chainId][index] || 0, 8),
-      );
+      return parseFloat(formatUnits(portfolio[protocolKey][chainId][index] || 0, 8));
     } else {
       return 0;
     }
@@ -217,30 +190,20 @@ const Portfolio = () => {
             formattedBalances &&
             portfolio && (
               <div className="flex flex-col gap-3">
-                {formattedBalances.map(
-                  (balance: TFormattedAssetBalance, index: number) => (
-                    <PositionItem
-                      key={index}
-                      chain={balance.chainId}
-                      protocolName={balance.protocol}
-                      apy={12}
-                      collateral={getCollateralAnddebt(
-                        balance.protocol,
-                        balance.chainId,
-                        0,
-                      )}
-                      debt={getCollateralAnddebt(
-                        balance.protocol,
-                        balance.chainId,
-                        1,
-                      )}
-                      positionName={balance.protocol}
-                      ratio={12}
-                      type="lendBorrow"
-                      assets={balance.assets}
-                    />
-                  ),
-                )}
+                {formattedBalances.map((balance: TFormattedAssetBalance, index: number) => (
+                  <PositionItem
+                    key={index}
+                    chain={balance.chainId}
+                    protocolName={balance.protocol}
+                    apy={12}
+                    collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
+                    debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
+                    positionName={balance.protocol}
+                    ratio={12}
+                    type="lendBorrow"
+                    assets={balance.assets}
+                  />
+                ))}
               </div>
             )
           ) : (

@@ -1,6 +1,7 @@
 'use client';
 
 import Modal from '@/components/(ui)/Modal';
+import { chainList } from '@/constants/chainInfo';
 import Image from 'next/image';
 import React from 'react';
 import { IoClose } from 'react-icons/io5';
@@ -48,27 +49,6 @@ type ChainModalProps = {
 };
 
 const ChainModal: React.FC<ChainModalProps> = ({ onClose, onSelect }) => {
-  const chains = [
-    {
-      chainId: 123,
-      chainName: 'Arbitrum One',
-      shortName: 'Arbitrum',
-      logo: '/assets/icons/chains/arbitrum.png',
-    },
-    {
-      chainId: 137,
-      chainName: 'Base Mainnet',
-      shortName: 'Base',
-      logo: '/assets/icons/chains/base.png',
-    },
-    {
-      chainId: 11,
-      chainName: 'OP Mainnet',
-      shortName: 'Optimism',
-      logo: '/assets/icons/chains/op.png',
-    },
-  ];
-
   return (
     <Modal className="w-[500px] bg-[#111111] h-[450px] rounded-2xl overflow-hidden">
       <div className="flex items-center justify-between p-6 bg-[#1e1e1e] w-full">
@@ -77,7 +57,7 @@ const ChainModal: React.FC<ChainModalProps> = ({ onClose, onSelect }) => {
       </div>
 
       <div className="flex flex-col space-y-2 p-2">
-        {chains.map((chain) => (
+        {chainList.map((chain) => (
           <ChainItem
             onClose={onClose}
             onSelect={onSelect}

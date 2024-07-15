@@ -10,7 +10,6 @@ export const axiosScout = axios.create({
 
 export const axiosCompass = axios.create({
   baseURL: '/compass',
-  timeout: 1000,
   headers: {
     'Content-Type': 'application/json',
   },
