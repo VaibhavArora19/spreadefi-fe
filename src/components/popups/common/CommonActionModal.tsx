@@ -35,7 +35,16 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
   const { data } = useTransactionsBuilder(transactionPayload);
 
   const prepareTransactionPayload = useCallback(() => {
-    if (strategyName === '' || !address || !fromAmount || !fromToken || !fromChain) return;
+    if (
+      strategyName === '' ||
+      !address ||
+      !fromAmount ||
+      !fromToken ||
+      !fromChain ||
+      !toToken ||
+      !toChain
+    )
+      return;
 
     const payload: TTransactionPayload = {
       strategyName,
@@ -70,7 +79,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     }, 5000);
 
     return () => clearTimeout(debouncedFunction);
-  }, [fromAmount, fromToken, fromChain]);
+  }, [fromAmount, fromToken, fromChain, toToken, toChain]);
 
   const changeHandler = async (
     option: ChangeOptions,
@@ -82,20 +91,33 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
         break;
 
       case 'chain':
-        if (fromChain !== value) {
-          dispatch(transactionPayloadActions.setFromToken(''));
-          dispatch(transactionPayloadActions.setFromTokenDecimals(0));
-          dispatch(tokensActions.setTokens([]));
+        if (type === Action.WITHDRAW) {
+          //* in case of withdraw the value selected by user will be toChain i.e. chain on which user wants his funds back
+          if (toChain !== value) {
+            dispatch(transactionPayloadActions.setToToken(''));
+            dispatch(tokensActions.setTokens([]));
+          }
+          dispatch(transactionPayloadActions.setToChain(value));
+        } else {
+          if (fromChain !== value) {
+            dispatch(transactionPayloadActions.setFromToken(''));
+            dispatch(transactionPayloadActions.setFromTokenDecimals(0));
+            dispatch(tokensActions.setTokens([]));
+          }
+          dispatch(transactionPayloadActions.setFromChain(value));
         }
 
-        dispatch(transactionPayloadActions.setFromChain(value));
         break;
 
       case 'token':
         if (typeof value === 'string') return;
 
-        dispatch(transactionPayloadActions.setFromToken(value.address));
-        dispatch(transactionPayloadActions.setFromTokenDecimals(value.decimals));
+        if (type === Action.WITHDRAW) {
+          dispatch(transactionPayloadActions.setToToken(value.address));
+        } else {
+          dispatch(transactionPayloadActions.setFromToken(value.address));
+          dispatch(transactionPayloadActions.setFromTokenDecimals(value.decimals));
+        }
         break;
     }
   };
@@ -126,7 +148,10 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
           onWheel={(e) => (e.target as HTMLInputElement).blur()}
         />
         <div className="flex items-center gap-4 text-xs p-4">
-          <ChainsSelector setChain={(chain) => changeHandler('chain', chain.chainId.toString())} />
+          <ChainsSelector
+            setChain={(chain) => changeHandler('chain', chain.chainId.toString())}
+            type={type}
+          />
 
           <TokenSelector
             setToken={(token) =>
@@ -135,6 +160,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
                 decimals: token.decimals,
               })
             }
+            type={type}
           />
         </div>
       </div>

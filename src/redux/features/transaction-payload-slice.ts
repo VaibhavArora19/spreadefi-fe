@@ -46,17 +46,17 @@ const transactionPayloadSlice = createSlice({
       state.fromTokenDecimals = action.payload;
     },
     resetState: (state) => {
-      state = {
-        strategyName: '',
-        fromChain: '',
-        fromAmount: '',
-        fromToken: '',
-        fromTokenDecimals: 0,
-        toChain: '',
-        toToken: '',
-        fromAddress: '',
-        toAddress: '',
-      };
+      state.strategyName = '';
+      state.fromChain = '';
+      state.fromAmount = '';
+      state.fromToken = '';
+      state.fromTokenDecimals = 0;
+      state.toChain = '';
+      state.toToken = '';
+      state.fromAddress = '';
+      state.toAddress = '';
+      state.fundAmount = '';
+      state.fundToken = '';
     },
   },
 });

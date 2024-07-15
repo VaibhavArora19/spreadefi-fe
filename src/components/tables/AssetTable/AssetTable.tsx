@@ -25,7 +25,8 @@ import {
 } from '@tanstack/react-table';
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
-import { useTransactionPayloadStore } from '@/redux/hooks';
+import { useDispatch } from 'react-redux';
+import { transactionPayloadActions } from '@/redux/actions';
 
 const AssetTable = ({
   assetData,
@@ -53,8 +54,7 @@ const AssetTable = ({
     uniqueProtocols,
     filteredData,
   } = useFilterDataAssetTable({ assetData: assetData || [] });
-  const { fromAmount, fromChain, fromToken, toChain, toToken, fromTokenDecimals } =
-    useTransactionPayloadStore();
+  const dispatch = useDispatch();
 
   const { execute } = useExecuteTransactions();
 
@@ -129,6 +129,7 @@ const AssetTable = ({
       {showSupplyModal ? (
         <SupplyModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowSupplyModal(false);
           }}
           onSubmit={handleSupplySubmit}

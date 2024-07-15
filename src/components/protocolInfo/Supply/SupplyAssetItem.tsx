@@ -1,10 +1,13 @@
 import BorrowModal from '@/components/popups/Borrow/BorrowModal';
 import SupplyModal from '@/components/popups/common/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
+import { transactionPayloadActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
+import { Action } from '@/types/strategy';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useAccount } from 'wagmi';
 
 type SupplyAssetItemProps = {
@@ -17,6 +20,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
   const { execute } = useExecuteTransactions();
+  const dispatch = useDispatch();
   const { address } = useAccount();
 
   const handleSupplyOrBorrowSubmit = async () => {
@@ -61,6 +65,9 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
             <button
               onClick={(e: any) => {
                 e.stopPropagation();
+                dispatch(transactionPayloadActions.setStrategyName(asset.protocolName));
+                dispatch(transactionPayloadActions.setToChain(asset.chainId));
+                dispatch(transactionPayloadActions.setToToken(asset.assetAddress));
                 setShowSupplyModal(true);
               }}
               className="bg-transparent text-white py-2  w-full text-xs rounded-md border border-white hover:bg-white hover:text-black">
@@ -73,6 +80,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
       {showSupplyModal ? (
         <SupplyModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowSupplyModal(false);
           }}
           onSubmit={handleSupplyOrBorrowSubmit}

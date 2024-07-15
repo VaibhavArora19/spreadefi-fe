@@ -1,9 +1,11 @@
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 import RepayModal from '@/components/popups/Repay/RepayModal';
+import { transactionPayloadActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
+import { useDispatch } from 'react-redux';
 import { useAccount } from 'wagmi';
 
 type BorrowItemProps = {
@@ -15,6 +17,7 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
   const [showRepayModal, setShowRepayModal] = useState(false);
   const { address } = useAccount();
   const { execute } = useExecuteTransactions();
+  const dispatch = useDispatch();
 
   const handleRepaySubmit = async () => {
     //!show modal here asking user to connect wallet
@@ -34,6 +37,10 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
       <div className="flex gap-4 flex-[0.37]">
         <button
           onClick={() => {
+            dispatch(transactionPayloadActions.setStrategyName(data.asset.protocolName));
+            dispatch(transactionPayloadActions.setToToken(data.asset.assetAddress));
+            dispatch(transactionPayloadActions.setToChain(data.asset.chainId));
+
             setShowRepayModal(true);
           }}
           className="bg-white text-black py-2 px-4 text-xs rounded-md hover:bg-gray-200">
@@ -59,6 +66,7 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
       {showRepayModal ? (
         <RepayModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowRepayModal(false);
           }}
           onSubmit={handleRepaySubmit}
