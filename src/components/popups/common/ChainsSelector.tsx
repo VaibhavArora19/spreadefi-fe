@@ -1,23 +1,26 @@
 import React, { useState } from 'react';
 import ChainModal from './ChainModal';
 import Image from 'next/image';
+import { useTransactionPayloadStore } from '@/redux/hooks';
+import { CHAIN_CONFIG } from '@/constants/chainInfo';
 
-const ChainsSelector = () => {
+type TChain = {
+  chainId: number;
+  chainName: string;
+  logo: string;
+  shortName: string;
+};
+
+type TProps = {
+  setChain: (chain: TChain) => void;
+};
+
+const ChainsSelector = ({ setChain }: TProps) => {
   const [showChainModal, setShowChainModal] = useState(false);
-  const [selectedChain, setSelectedChain] = useState<{
-    chainId: number;
-    chainName: string;
-    logo: string;
-    shortName: string;
-  } | null>(null);
+  const { fromChain } = useTransactionPayloadStore();
 
-  const handleSelectChain = (chain: {
-    chainId: number;
-    chainName: string;
-    logo: string;
-    shortName: string;
-  }) => {
-    setSelectedChain(chain);
+  const handleSelectChain = (chain: TChain) => {
+    setChain(chain);
   };
 
   return (
@@ -27,15 +30,15 @@ const ChainsSelector = () => {
           setShowChainModal(true);
         }}
         className="text-xs bg-[#151515] p-2 w-[100px] rounded-md flex items-center gap-2">
-        {selectedChain ? (
+        {fromChain !== '' ? (
           <>
             <Image
-              src={selectedChain.logo}
-              alt={selectedChain.chainName}
+              src={CHAIN_CONFIG[fromChain].chainImageUrl}
+              alt={CHAIN_CONFIG[fromChain].chainName}
               height={15}
               width={15}
             />
-            <span className="text-xs">{selectedChain.shortName}</span>
+            <span className="text-xs">{CHAIN_CONFIG[fromChain].chainName}</span>
           </>
         ) : (
           <p className="mx-auto">Chain</p>

@@ -1,22 +1,52 @@
-import React, { useState } from 'react';
+import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import TokenModal from './TokenModal';
-import { TAssetName } from '@/types/asset';
 import Image from 'next/image';
+import { useTokensStore, useTransactionPayloadStore } from '@/redux/hooks';
 
-const TokenSelector = () => {
+const TokenSelector = ({
+  setToken,
+}: {
+  setToken: (token: {
+    tokenName: string;
+    logo: string | undefined;
+    balance: number;
+    address: string;
+    decimals: number;
+  }) => void;
+}) => {
+  const { fromToken } = useTransactionPayloadStore();
+  const { tokens } = useTokensStore();
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [selectedToken, setSelectedToken] = useState<{
-    tokenName: TAssetName;
-    logo: string;
-    balance?: number;
+    tokenName: string;
+    logo: string | undefined;
+    balance: number;
+    address: string;
   } | null>(null);
 
+  useEffect(() => {
+    if (fromToken !== '' && tokens.length !== 0) {
+      const [token] = tokens.filter((t) => t.address === fromToken);
+
+      setSelectedToken({
+        tokenName: token.name,
+        logo: token.logoURI,
+        balance: 0,
+        address: token.address,
+      });
+    } else {
+      setSelectedToken(null);
+    }
+  }, [fromToken, tokens]);
+
   const handleTokenSelect = (token: {
-    tokenName: TAssetName;
-    logo: string;
-    balance?: number;
+    tokenName: string;
+    logo: string | undefined;
+    balance: number;
+    address: string;
+    decimals: number;
   }) => {
-    setSelectedToken(token);
+    setToken(token);
   };
 
   return (
@@ -29,7 +59,7 @@ const TokenSelector = () => {
         {selectedToken ? (
           <>
             <Image
-              src={selectedToken.logo}
+              src={selectedToken.logo ? selectedToken.logo : ''}
               alt={selectedToken.tokenName}
               height={15}
               width={15}

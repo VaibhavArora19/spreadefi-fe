@@ -2,6 +2,7 @@
 
 import Modal from '@/components/(ui)/Modal';
 import { assetNameToImage } from '@/constants/assetInfo';
+import { useFetchTokenList } from '@/hooks/useFetchTokenList';
 import { TAssetName } from '@/types/asset';
 import Image from 'next/image';
 import React from 'react';
@@ -9,15 +10,19 @@ import { IoClose } from 'react-icons/io5';
 
 type TokenItemProps = {
   token: {
-    tokenName: TAssetName;
-    logo: string;
-    balance?: number;
+    tokenName: string;
+    logo: string | undefined;
+    balance: number;
+    address: string;
+    decimals: number;
   };
   onClose: () => void;
   onSelect: (token: {
-    tokenName: TAssetName;
-    logo: string;
-    balance?: number;
+    tokenName: string;
+    logo: string | undefined;
+    balance: number;
+    address: string;
+    decimals: number;
   }) => void;
 };
 
@@ -31,7 +36,7 @@ const TokenItem: React.FC<TokenItemProps> = ({ token, onClose, onSelect }) => {
       onClick={handleClick}
       className="flex items-center justify-between py-5 px-3 w-full bg-[#252525] cursor-pointer hover:bg-[#313131] text-white rounded-md">
       <div className="flex items-center gap-2">
-        <Image src={token.logo} alt={token.tokenName} height={30} width={30} />
+        <Image src={token.logo ? token.logo : ''} alt={token.tokenName} height={30} width={30} />
         <p className="font-semibold text-sm uppercase ">{token.tokenName}</p>
       </div>
 
@@ -51,48 +56,14 @@ const TokenModal = ({
 }: {
   onClose: () => void;
   onSelect: (token: {
-    tokenName: TAssetName;
-    logo: string;
-    balance?: number;
+    tokenName: string;
+    logo: string | undefined;
+    balance: number;
+    address: string;
+    decimals: number;
   }) => void;
 }) => {
-  const tokens = [
-    {
-      tokenName: TAssetName.ETH,
-      logo: assetNameToImage(TAssetName.ETH),
-      balance: 0.12,
-    },
-    {
-      tokenName: TAssetName.WETH,
-      logo: assetNameToImage(TAssetName.WETH),
-      balance: 0.42,
-    },
-    {
-      tokenName: TAssetName.CBETH,
-      logo: assetNameToImage(TAssetName.CBETH),
-      balance: 1.3,
-    },
-    {
-      tokenName: TAssetName.DAI,
-      logo: assetNameToImage(TAssetName.DAI),
-      balance: 231.23,
-    },
-    {
-      tokenName: TAssetName.EZETH,
-      logo: assetNameToImage(TAssetName.EZETH),
-      balance: 1.3,
-    },
-    {
-      tokenName: TAssetName.USDT,
-      logo: assetNameToImage(TAssetName.USDT),
-      balance: 231.23,
-    },
-    {
-      tokenName: TAssetName.USDC,
-      logo: assetNameToImage(TAssetName.USDC),
-      balance: 231.23,
-    },
-  ];
+  const { data: tokens } = useFetchTokenList();
 
   return (
     <Modal className="w-[500px] bg-[#111111] h-[450px] rounded-2xl overflow-scroll">
@@ -102,14 +73,21 @@ const TokenModal = ({
       </div>
 
       <div className="flex flex-col space-y-2 p-2 overflow-scroll">
-        {tokens.map((token) => (
-          <TokenItem
-            onSelect={onSelect}
-            onClose={onClose}
-            token={token}
-            key={token.tokenName}
-          />
-        ))}
+        {tokens &&
+          tokens.map((token) => (
+            <TokenItem
+              onSelect={onSelect}
+              onClose={onClose}
+              token={{
+                tokenName: token.name,
+                logo: token.logoURI,
+                balance: 0,
+                address: token.address,
+                decimals: token.decimals,
+              }}
+              key={token.address}
+            />
+          ))}
       </div>
     </Modal>
   );

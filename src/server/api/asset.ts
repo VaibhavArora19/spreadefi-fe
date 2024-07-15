@@ -7,17 +7,11 @@ import { useQuery } from '@tanstack/react-query';
 export const useFetchAssets = () => {
   const fetchAssets = async () => {
     try {
-      const { data } = await axiosScout.get<TApiResponse<TAssetsResponse[]>>(
-        '/asset',
-      );
+      const { data } = await axiosScout.get<TApiResponse<TAssetsResponse[]>>('/asset');
 
-      const lendingTableData = data.data.filter(
-        (asset) => asset.protocolType === 'Lending',
-      );
+      const lendingTableData = data.data.filter((asset) => asset.protocolType === 'Lending');
 
-      const vaultTableData = data.data.filter(
-        (asset) => asset.protocolType === 'Yield',
-      );
+      const vaultTableData = data.data.filter((asset) => asset.protocolType === 'Yield');
 
       return { lendingTableData, vaultTableData };
     } catch (error: any) {
@@ -28,6 +22,8 @@ export const useFetchAssets = () => {
   return useQuery({
     queryKey: [ASSETS.FETCH],
     queryFn: fetchAssets,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
   });
 };
 
@@ -46,5 +42,6 @@ export const useFetchAssetBySymbol = (assetSymbol: string) => {
     queryKey: [ASSETS.FETCH_BY_SYMBOL, assetSymbol],
     queryFn: fetchAssetsBySymbol,
     retry: 3,
+    staleTime: Infinity,
   });
 };

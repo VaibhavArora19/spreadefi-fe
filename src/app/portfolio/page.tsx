@@ -6,17 +6,13 @@ import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFetchTokenBalance } from '@/server/api/balance';
 import { TProtocolName } from '@/types/protocol';
 import React, { useState } from 'react';
-import { useAccount } from 'wagmi';
 
 const Portfolio = () => {
   const [tab, setTab] = useState('lendBorrow');
-  const { address } = useAccount();
 
   const { data: balances } = useFetchTokenBalance(
     '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
   );
-
-  console.log(balances);
 
   return (
     <div className="w-[95%] mx-auto">

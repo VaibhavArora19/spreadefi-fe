@@ -11,7 +11,7 @@ import ProtocolFilterDropdown from '@/components/tables/LendingBorrowingTable/Pr
 import { Input } from '@/components/ui/input';
 import { Table } from '@/components/ui/table';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
-import { useFetchAssetBySymbol } from '@/server/api/asset';
+import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAssetTableItem } from '@/types/dataTable';
 import {
   ColumnFiltersState,
@@ -23,8 +23,9 @@ import {
   useReactTable,
   VisibilityState,
 } from '@tanstack/react-table';
-import { usePathname } from 'next/navigation';
 import React, { useState } from 'react';
+import { useAccount } from 'wagmi';
+import { useTransactionPayloadStore } from '@/redux/hooks';
 
 const AssetTable = ({
   assetData,
@@ -33,6 +34,7 @@ const AssetTable = ({
   assetData: TAssetTableItem[];
   type: 'supply' | 'migrate' | 'borrowAndAction';
 }) => {
+  const { address } = useAccount();
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -42,8 +44,6 @@ const AssetTable = ({
   const [showBorrowSupplyModal, setShowBorrowSupplyModal] = useState(false);
   const [showSupplyModal, setShowSupplyModal] = useState(false);
 
-  // const pathname = usePathname();
-  // const { data: assetData } = useFetchAssetBySymbol(pathname.slice(1));
   const {
     chainFilters,
     setChainFilters,
@@ -53,6 +53,10 @@ const AssetTable = ({
     uniqueProtocols,
     filteredData,
   } = useFilterDataAssetTable({ assetData: assetData || [] });
+  const { fromAmount, fromChain, fromToken, toChain, toToken, fromTokenDecimals } =
+    useTransactionPayloadStore();
+
+  const { execute } = useExecuteTransactions();
 
   const table = useReactTable({
     data: filteredData,
@@ -77,17 +81,21 @@ const AssetTable = ({
       rowSelection,
     },
   });
+
+  const handleSupplySubmit = async () => {
+    //!show modal here asking user to connect wallet
+    if (!address) return;
+
+    const data = await execute();
+  };
+
   return (
     <>
       <div className="flex items-center py-4 justify-between">
         <Input
           placeholder="Search token by name"
-          value={
-            (table.getColumn('assetSymbol')?.getFilterValue() as string) ?? ''
-          }
-          onChange={(event) =>
-            table.getColumn('assetSymbol')?.setFilterValue(event.target.value)
-          }
+          value={(table.getColumn('assetSymbol')?.getFilterValue() as string) ?? ''}
+          onChange={(event) => table.getColumn('assetSymbol')?.setFilterValue(event.target.value)}
           className="max-w-md py-4 bg-[#27272A] border-none text-white placeholder:text-[#84848A]"
         />
         <div className="flex gap-4 items-center">
@@ -123,6 +131,7 @@ const AssetTable = ({
           onClose={() => {
             setShowSupplyModal(false);
           }}
+          onSubmit={handleSupplySubmit}
         />
       ) : null}
 
