@@ -10,6 +10,7 @@ import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { TProtocolName } from '@/types/protocol';
 import { TAsset } from '@/types/asset';
+import { TFormattedAsset } from '@/types/balance';
 
 type PositionItemProps = {
   positionName: string;
@@ -20,12 +21,7 @@ type PositionItemProps = {
   chain: string;
   protocolName: TProtocolName;
   type: 'vault' | 'lendBorrow';
-  assets?: {
-    asset: TAsset;
-    currentATokenBalance: number;
-    currentStableDebt: number;
-    currentVariableDebt: number;
-  }[];
+  assets?: TFormattedAsset[];
 };
 
 const PositionItem: React.FC<PositionItemProps> = ({
@@ -60,7 +56,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
           <TokenDetails
             actionType={type}
             tokens={
-              assets?.filter((value: any) => value.currentATokenBalance > 0)!
+              assets?.filter((value) => Number(value.currentATokenBalance) > 0)!
             }
             type="Supplied"
           />
@@ -70,8 +66,8 @@ const PositionItem: React.FC<PositionItemProps> = ({
               tokens={
                 assets?.filter(
                   (value) =>
-                    value.currentStableDebt > 0 ||
-                    value.currentVariableDebt > 0,
+                    Number(value.currentStableDebt) > 0 ||
+                    Number(value.currentVariableDebt) > 0,
                 )!
               }
               type="Borrowed"

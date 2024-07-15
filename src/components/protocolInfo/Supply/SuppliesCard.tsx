@@ -1,10 +1,10 @@
 import Image from 'next/image';
 import React from 'react';
 import SupplyItem from './SupplyItem';
-import { TAsset } from '@/types/asset';
+import { TAssetBalance } from '@/types/balance';
 
 type SuppliesCardProps = {
-  data: TAsset[];
+  data: TAssetBalance[];
 };
 
 const SuppliesCard: React.FC<SuppliesCardProps> = ({ data }) => {
@@ -19,7 +19,7 @@ const SuppliesCard: React.FC<SuppliesCardProps> = ({ data }) => {
           <p className="flex-[0.21]">Balance</p>
           <p className="flex-[0.21]">APY</p>
         </div>
-        {data.map((item: any, index: number) => {
+        {data.map((item: TAssetBalance, index: number) => {
           return <SupplyItem key={index} data={item} />;
         })}
       </div>

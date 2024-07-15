@@ -9,7 +9,7 @@ import React, { useState } from 'react';
 type SupplyAssetItemProps = {
   asset: TAsset;
   itemType: 'borrow' | 'supply';
-  balances: any;
+  balances: TBalance;
 };
 
 const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
@@ -52,7 +52,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({
             </button>
           ) : (
             <button
-              onClick={(e: any) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 setShowSupplyModal(true);
               }}
