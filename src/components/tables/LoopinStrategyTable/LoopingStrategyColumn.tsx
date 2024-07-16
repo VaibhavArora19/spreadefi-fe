@@ -11,19 +11,25 @@ import { Button } from '@/components/ui/button';
 import MultiplierSlider from './MultiplierSlider';
 import { useDispatch } from 'react-redux';
 import { transactionPayloadActions } from '@/redux/actions';
+import { useState } from 'react';
 
 const LoopingStrategyColum = (
   setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
 ): ColumnDef<TLoopinStrategyTableItem>[] => {
   const dispatch = useDispatch();
 
+  const [multipliers, setMultipliers] = useState<{ [key: string]: number }>({});
+
+  const handleMultiplierChange = (id: string, value: number) => {
+    setMultipliers((prev) => ({ ...prev, [id]: value }));
+  };
+
   const showSupplyModalHandler = (row: Row<TLoopinStrategyTableItem>) => {
     //! @Aman-Mandal add leverage here
     dispatch(transactionPayloadActions.setStrategyName('Looping-' + row.getValue('protocolName')));
-    dispatch(transactionPayloadActions.setToChain(row.getValue('chainId')));
+    dispatch(transactionPayloadActions.setToChain(row.original.chainId));
     dispatch(transactionPayloadActions.setToToken(row.getValue('assetAddress')));
-    // dispatch(transactionPayloadActions)
-
+    dispatch(transactionPayloadActions.setLeverage(multipliers[row.id]));
     setShowSupplyModal ? setShowSupplyModal(true) : null;
   };
 
@@ -153,7 +159,12 @@ const LoopingStrategyColum = (
     {
       accessorKey: 'multiplier',
       header: 'Multiplier',
-      cell: ({ row }) => <MultiplierSlider />,
+      cell: ({ row }) => (
+        <MultiplierSlider
+          value={multipliers[row.id] || 30}
+          onChange={(value) => handleMultiplierChange(row.id, value)}
+        />
+      ),
     },
     {
       accessorKey: 'APY',

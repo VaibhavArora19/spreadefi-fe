@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Slider from '@mui/material/Slider';
 import Tooltip from '@mui/material/Tooltip';
 import { styled } from '@mui/material';
@@ -29,18 +29,21 @@ const WhiteSlider = styled(Slider)({
   },
 });
 
-const MultiplierSlider: React.FC = () => {
-  const [sliderValue, setSliderValue] = useState<number>(30);
+interface MultiplierSliderProps {
+  value: number;
+  onChange: (value: number) => void;
+}
 
+const MultiplierSlider: React.FC<MultiplierSliderProps> = ({ value, onChange }) => {
   return (
     <div className="w-48 pr-4">
       <WhiteSlider
-        onChange={(e, value) => {
-          if (typeof value === 'number') {
-            setSliderValue(value);
+        onChange={(e, newValue) => {
+          if (typeof newValue === 'number') {
+            onChange(newValue);
           }
         }}
-        value={sliderValue}
+        value={value}
         valueLabelDisplay="auto"
         step={10}
         min={10}
