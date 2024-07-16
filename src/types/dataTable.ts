@@ -31,7 +31,7 @@ export type TAssetTableItem = {
 
 export type TLoopinStrategyTableItem = {
   id: string;
-  primaryAsset: string;
+  assetAddress: string;
   secondaryAsset: string;
   points: string[];
   chainId: string;

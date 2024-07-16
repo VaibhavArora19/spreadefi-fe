@@ -8,7 +8,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useChainId } from 'wagmi';
 import { useDispatch } from 'react-redux';
 import { transactionsActions } from '@/redux/actions';
-import { useTransactionStore } from '@/redux/hooks';
+import { useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
 import { executeTransaction } from '@/helpers/execute';
 import { ethers } from 'ethers';
 import { networkConfig } from '@/config/network';
@@ -16,6 +16,7 @@ import { AAVE_POOL_ABI } from '@/constants/abi/aave';
 
 export const useTransactionsBuilder = (transactionPayload: TTransactionPayload | null) => {
   const dispatch = useDispatch();
+  const { leverage } = useTransactionPayloadStore();
 
   const findATokenAddress = async (
     strategyName: StrategyName,
@@ -45,8 +46,14 @@ export const useTransactionsBuilder = (transactionPayload: TTransactionPayload |
         ...(transactionPayload as TTransactionPayload),
       };
 
+      txPayload.txDetails.fromToken = ethers.utils.getAddress(
+        txPayload?.txDetails.fromToken as string,
+      );
+
+      txPayload.txDetails.toToken = ethers.utils.getAddress(txPayload?.txDetails.toToken as string);
+
       if (transactionPayload?.strategyName.includes('Looping')) {
-        txPayload.txDetails.leverage = transactionPayload.txDetails.leverage;
+        if (leverage) txPayload.txDetails.leverage = leverage / 10;
       }
 
       if (

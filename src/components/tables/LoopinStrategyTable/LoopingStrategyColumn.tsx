@@ -25,10 +25,9 @@ const LoopingStrategyColum = (
   };
 
   const showSupplyModalHandler = (row: Row<TLoopinStrategyTableItem>) => {
-    //! @Aman-Mandal add leverage here
-    dispatch(transactionPayloadActions.setStrategyName('Looping-' + row.getValue('protocolName')));
+    dispatch(transactionPayloadActions.setStrategyName(row.original.protocolName + '-Looping'));
     dispatch(transactionPayloadActions.setToChain(row.original.chainId));
-    dispatch(transactionPayloadActions.setToToken(row.getValue('assetAddress')));
+    dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
     dispatch(transactionPayloadActions.setLeverage(multipliers[row.id]));
     setShowSupplyModal ? setShowSupplyModal(true) : null;
   };
