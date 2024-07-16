@@ -20,7 +20,7 @@ const ProtocolHeader: React.FC<ProtocolHeaderType> = ({
         width={35}
         alt={chain}
       />
-      <p className="text-2xl font-semibold">{capitalize(protocol)} Finance</p>
+      <p className="text-2xl font-semibold">{capitalize(protocol)}</p>
     </div>
   );
 };

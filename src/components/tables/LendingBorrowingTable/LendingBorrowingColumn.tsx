@@ -3,12 +3,7 @@ import { TableItem, TLendingBorrowingTableItem } from '@/types/dataTable';
 import Image from 'next/image';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
@@ -49,10 +44,7 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <div className="lowercase">
         {row.original.assetSupplyApys[0].toFixed(2)}% -{' '}
-        {row.original.assetSupplyApys[
-          row.original.assetSupplyApys.length - 1
-        ].toFixed(2)}
-        %
+        {row.original.assetSupplyApys[row.original.assetSupplyApys.length - 1].toFixed(2)}%
       </div>
     ),
   },
@@ -71,12 +63,7 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <div className="lowercase bg-green-500/10 px-4 py-1 border-[1px] text-xs border-green-900 rounded-full w-fit text-green-500">
         {row.original.assetSupplyBoostedApys[0]}% -{' '}
-        {
-          row.original.assetSupplyBoostedApys[
-            row.original.assetSupplyBoostedApys.length - 1
-          ]
-        }
-        %
+        {row.original.assetSupplyBoostedApys[row.original.assetSupplyBoostedApys.length - 1]}%
       </div>
     ),
   },
@@ -95,18 +82,10 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <div className="lowercase flex gap-2">
         <p>
+          {(row.original.assetSupplyApys[0] + row.original.assetSupplyBoostedApys[0]).toFixed(2)}% -{' '}
           {(
-            row.original.assetSupplyApys[0] +
-            row.original.assetSupplyBoostedApys[0]
-          ).toFixed(2)}
-          % -{' '}
-          {(
-            row.original.assetSupplyApys[
-              row.original.assetSupplyApys.length - 1
-            ] +
-            row.original.assetSupplyBoostedApys[
-              row.original.assetSupplyBoostedApys.length - 1
-            ]
+            row.original.assetSupplyApys[row.original.assetSupplyApys.length - 1] +
+            row.original.assetSupplyBoostedApys[row.original.assetSupplyBoostedApys.length - 1]
           ).toFixed(2)}
           %
         </p>
@@ -116,9 +95,7 @@ const LendingBorrowingColumn = (
             <Tooltip>
               <TooltipTrigger>🐚</TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white capitalize">
-                  Points available
-                </p>
+                <p className="bg-[#1e1e1e] text-white capitalize">Points available</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -145,9 +122,7 @@ const LendingBorrowingColumn = (
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">
-                  {CHAIN_CONFIG[chain].chainName}
-                </p>
+                <p className="bg-[#1e1e1e] text-white">{CHAIN_CONFIG[chain].chainName}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -187,7 +162,7 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <Button
         onClick={() => {
-          router?.push(`/${row.original.assetSymbol}`);
+          router?.push(`/lend/${row.original.assetSymbol}`);
         }}
         className="w-full bg-white text-black">
         View

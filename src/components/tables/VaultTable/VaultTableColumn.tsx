@@ -3,20 +3,13 @@ import { TableItem, TVaultTableItem } from '@/types/dataTable';
 import Image from 'next/image';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
 
-const VaultTableColumn = (
-  router?: AppRouterInstance,
-): ColumnDef<TVaultTableItem>[] => [
+const VaultTableColumn = (router?: AppRouterInstance): ColumnDef<TVaultTableItem>[] => [
   {
     accessorKey: 'assetSymbol',
     header: 'Asset',
@@ -71,9 +64,7 @@ const VaultTableColumn = (
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">
-                  {CHAIN_CONFIG[chain].chainName}
-                </p>
+                <p className="bg-[#1e1e1e] text-white">{CHAIN_CONFIG[chain].chainName}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -111,7 +102,13 @@ const VaultTableColumn = (
     accessorKey: 'view',
     header: '',
     cell: ({ row }) => (
-      <Button className="w-[50%] bg-white text-black">View</Button>
+      <Button
+        onClick={() => {
+          router?.push(`/vault/${row.original.assetSymbol}`);
+        }}
+        className="w-[50%] bg-white text-black">
+        View
+      </Button>
     ),
   },
 ];
