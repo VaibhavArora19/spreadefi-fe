@@ -13,9 +13,7 @@ export const useFetchAssets = () => {
 
       const vaultTableData = data.data.filter((asset) => asset.protocolType === 'Yield');
 
-      const loopingTableData = data.data.filter(
-        (asset) => asset.protocolType === 'Looping',
-      );
+      const loopingTableData = data.data.filter((asset) => asset.protocolType === 'Looping');
 
       return { lendingTableData, vaultTableData, loopingTableData };
     } catch (error: any) {
@@ -45,6 +43,25 @@ export const useFetchAssetBySymbol = (assetSymbol: string) => {
   return useQuery({
     queryKey: [ASSETS.FETCH_BY_SYMBOL, assetSymbol],
     queryFn: fetchAssetsBySymbol,
+    retry: 3,
+    staleTime: Infinity,
+  });
+};
+
+export const useFetchAssetByProtocolType = (protocolType: string) => {
+  const fetchAssetByProtocolType = async () => {
+    try {
+      const { data } = await axiosScout.get(`/asset/protocolType/${protocolType}`);
+
+      return data.data;
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
+  };
+
+  return useQuery({
+    queryKey: [ASSETS.FETCH_BY_PROTOCOL_TYPE, protocolType],
+    queryFn: fetchAssetByProtocolType,
     retry: 3,
     staleTime: Infinity,
   });

@@ -45,6 +45,10 @@ export const useTransactionsBuilder = (transactionPayload: TTransactionPayload |
         ...(transactionPayload as TTransactionPayload),
       };
 
+      if (transactionPayload?.strategyName.includes('Looping')) {
+        txPayload.txDetails.leverage = transactionPayload.txDetails.leverage;
+      }
+
       if (
         transactionPayload?.action === Action.WITHDRAW ||
         transactionPayload?.action === Action.BORROW

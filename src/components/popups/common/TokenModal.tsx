@@ -1,9 +1,7 @@
 'use client';
 
 import Modal from '@/components/(ui)/Modal';
-import { assetNameToImage } from '@/constants/assetInfo';
 import { useFetchTokenList } from '@/hooks/useFetchTokenList';
-import { TAssetName } from '@/types/asset';
 import { Action } from '@/types/strategy';
 import Image from 'next/image';
 import React from 'react';

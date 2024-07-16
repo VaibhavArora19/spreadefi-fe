@@ -8,15 +8,14 @@ import { useAccount } from 'wagmi';
 import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
 import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs';
 import { useState } from 'react';
-import { useFetchAssets } from '@/server/api/asset';
+import { useFetchAssetByProtocolType, useFetchAssets } from '@/server/api/asset';
 
 const Home = () => {
   const { address } = useAccount();
   // const { data: portfolio } = useFetchWalletPortfolio(address as string);
-  const { data: portfolio } = useFetchWalletPortfolio(
-    '0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6',
-  );
+  const { data: portfolio } = useFetchWalletPortfolio('0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6');
   const { data, isLoading, isError, error } = useFetchAssets();
+  const { data: loopingData } = useFetchAssetByProtocolType('Looping');
 
   const [tab, setTab] = useState<string>('lendBorrow');
 
@@ -38,17 +37,13 @@ const Home = () => {
         <DashboardInfoCard
           iconSrc="/assets/icons/icon2.png"
           label="Supplied"
-          value={parseFloat(
-            formatUnits(portfolio?.totalCollateralBase || 0, 8),
-          ).toFixed(2)}
+          value={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8)).toFixed(2)}
         />
 
         <DashboardInfoCard
           iconSrc="/assets/icons/icon3.png"
           label="Borrowed"
-          value={parseFloat(
-            formatUnits(portfolio?.totalDebtBase || 0, 8),
-          ).toFixed(2)}
+          value={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8)).toFixed(2)}
         />
       </div>
 
@@ -61,7 +56,7 @@ const Home = () => {
       </Tabs>
 
       {tab === 'loopingStrategy' ? (
-        <LoopingStrategyTable loopingTableData={data?.loopingTableData} />
+        <LoopingStrategyTable loopingTableData={loopingData} />
       ) : (
         <LendingBorrowingTable
           data={data}

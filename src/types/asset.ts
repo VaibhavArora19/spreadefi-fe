@@ -2,6 +2,7 @@ import { TProtocolName } from './protocol';
 
 export enum TAssetName {
   WETH = 'weth',
+  WSTETH = 'wsteth',
   ETH = 'eth',
   EZETH = 'ezeth',
   RSETH = 'rseth',

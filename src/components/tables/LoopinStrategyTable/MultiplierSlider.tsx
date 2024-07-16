@@ -8,10 +8,7 @@ interface ValueLabelComponentProps {
   value: number;
 }
 
-const ValueLabelComponent: React.FC<ValueLabelComponentProps> = ({
-  children,
-  value,
-}) => {
+const ValueLabelComponent: React.FC<ValueLabelComponentProps> = ({ children, value }) => {
   return (
     <Tooltip open enterTouchDelay={0} placement="top" title={`${value / 10}x`}>
       {children}

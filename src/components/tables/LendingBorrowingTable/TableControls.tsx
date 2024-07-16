@@ -16,7 +16,7 @@ const TableControls: React.FC<TableControlsProps> = ({ table, type }) => {
         value={
           type === 'lendBorrow'
             ? (table.getColumn('assetSymbol')?.getFilterValue() as string)
-            : (table.getColumn('primaryAsset')?.getFilterValue() as string)
+            : (table.getColumn('assetSymbol')?.getFilterValue() as string)
 
           // (table.getColumn('assetSymbol')?.getFilterValue() as string) ??
           // (table.getColumn('primaryAsset')?.getFilterValue() as string)
@@ -24,9 +24,7 @@ const TableControls: React.FC<TableControlsProps> = ({ table, type }) => {
         onChange={(event) =>
           type === 'lendBorrow'
             ? table.getColumn('assetSymbol')?.setFilterValue(event.target.value)
-            : table
-                .getColumn('primaryAsset')
-                ?.setFilterValue(event.target.value)
+            : table.getColumn('assetSymbol')?.setFilterValue(event.target.value)
         }
         className="w-[80%] py-4 bg-gray-300 border-none text-black placeholder:text-[#84848A]"
       />

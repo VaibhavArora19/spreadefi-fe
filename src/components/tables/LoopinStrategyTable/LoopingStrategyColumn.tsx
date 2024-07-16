@@ -1,46 +1,47 @@
-import { ColumnDef } from '@tanstack/react-table';
-import {
-  TableItem,
-  TAssetTableItem,
-  TLoopinStrategyTableItem,
-} from '@/types/dataTable';
+import { ColumnDef, Row } from '@tanstack/react-table';
+import { TableItem, TAssetTableItem, TLoopinStrategyTableItem } from '@/types/dataTable';
 import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '@/components/ui/tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
 import MultiplierSlider from './MultiplierSlider';
+import { useDispatch } from 'react-redux';
+import { transactionPayloadActions } from '@/redux/actions';
 
 const LoopingStrategyColum = (
-  setShowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
+  setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
 ): ColumnDef<TLoopinStrategyTableItem>[] => {
-  const showSupplyModalHandler = () => {
+  const dispatch = useDispatch();
+
+  const showSupplyModalHandler = (row: Row<TLoopinStrategyTableItem>) => {
+    //! @Aman-Mandal add leverage here
+    dispatch(transactionPayloadActions.setStrategyName('Looping-' + row.getValue('protocolName')));
+    dispatch(transactionPayloadActions.setToChain(row.getValue('chainId')));
+    dispatch(transactionPayloadActions.setToToken(row.getValue('assetAddress')));
+    // dispatch(transactionPayloadActions)
+
     setShowSupplyModal ? setShowSupplyModal(true) : null;
   };
 
   return [
     {
-      accessorKey: 'primaryAsset',
+      accessorKey: 'assetSymbol',
       header: 'Asset',
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
           <Image
-            src={assetNameToImage(row.getValue('primaryAsset'))}
+            src={assetNameToImage(row.getValue('assetSymbol'))}
             height={20}
             width={20}
             alt="weth"
             className="rounded-full"
           />
           <Image
-            src={assetNameToImage(row.original.secondaryAsset)}
+            src={assetNameToImage('weth')}
             height={20}
             width={20}
             alt="weth"
@@ -48,7 +49,7 @@ const LoopingStrategyColum = (
           />
 
           <p className="ml-2">
-            {row.getValue('primaryAsset')} / {row.original.secondaryAsset}{' '}
+            {row.getValue('assetSymbol')} / {'WETH'}{' '}
           </p>
         </div>
       ),
@@ -80,7 +81,7 @@ const LoopingStrategyColum = (
       ),
     },
     {
-      accessorKey: 'protocols',
+      accessorKey: 'protocolName',
       header: 'Protocols',
       cell: ({ row }) => (
         <div className="flex -space-x-1">
@@ -96,9 +97,7 @@ const LoopingStrategyColum = (
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">
-                  {row.original.protocolName}
-                </p>
+                <p className="bg-[#1e1e1e] text-white">{row.original.protocolName}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
@@ -118,8 +117,7 @@ const LoopingStrategyColum = (
                 </TooltipTrigger>
                 <TooltipContent>
                   <p className="bg-[#1e1e1e] text-white">
-                    Points rewarded for supplying tokens in this particular
-                    asset pool
+                    Points rewarded for supplying tokens in this particular asset pool
                   </p>
                 </TooltipContent>
               </Tooltip>
@@ -130,20 +128,24 @@ const LoopingStrategyColum = (
 
       cell: ({ row }) => (
         <div className="flex gap-3 flex-wrap overflow-hidden text-ellipsis w-full">
-          {row.original.points.map((point, index) => (
-            <TooltipProvider key={index}>
-              <Tooltip>
-                <TooltipTrigger>
-                  <div className="px-4 py-1 bg-green-700/20 text-green-400 rounded-md text-xs ">
-                    {point}
-                  </div>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="bg-[#1e1e1e] text-white">{point}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ))}
+          {row.original.points.length > 0 ? (
+            row.original.points.map((point, index) => (
+              <TooltipProvider key={index}>
+                <Tooltip>
+                  <TooltipTrigger>
+                    <div className="px-4 py-1 bg-green-700/20 text-green-400 rounded-md text-xs ">
+                      {point}
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p className="bg-[#1e1e1e] text-white">{point}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            ))
+          ) : (
+            <div className="text-center align-center">-</div>
+          )}
         </div>
       ),
     },
@@ -159,9 +161,7 @@ const LoopingStrategyColum = (
         return (
           <div
             className="flex gap-1 items-center w-[100px]"
-            onClick={() =>
-              column.toggleSorting(column.getIsSorted() === 'asc')
-            }>
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
             APY
             <TooltipProvider>
               <Tooltip>
@@ -191,7 +191,9 @@ const LoopingStrategyColum = (
       header: '',
       cell: ({ row }) => (
         <Button
-          onClick={showSupplyModalHandler}
+          onClick={() => {
+            showSupplyModalHandler(row);
+          }}
           className="w-[80%] bg-white text-black">
           Supply
         </Button>

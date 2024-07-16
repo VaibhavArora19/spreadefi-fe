@@ -13,7 +13,6 @@ import {
 import { Table } from '@/components/ui/table';
 import { useState } from 'react';
 
-import { useFetchAssets } from '@/server/api/asset';
 import { useRouter } from 'next/navigation';
 import ChainFilterDropdown from '../LendingBorrowingTable/ChainFilterDropdown';
 import ProtocolFilterDropdown from '../LendingBorrowingTable/ProtocolFilterDropdown';
@@ -21,11 +20,12 @@ import LendingBorrowingHeader from '../LendingBorrowingTable/LendingBorrowingHea
 import LendingBorrowingTableBody from '../LendingBorrowingTable/LendingBorrowingTableBody';
 import TableControls from '../LendingBorrowingTable/TableControls';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
-import { LoopingTableDummyData } from '@/data/DummyData';
 import LoopingStrategyColum from './LoopingStrategyColumn';
 import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
 import { useAccount } from 'wagmi';
 import { useExecuteTransactions } from '@/server/api/transactions';
+import { useDispatch } from 'react-redux';
+import { transactionPayloadActions } from '@/redux/actions';
 
 const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -34,11 +34,11 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const [rowSelection, setRowSelection] = useState({});
   const [showSupplyModal, setShowSupplyModal] = useState(false);
 
-  const { data, isLoading, isError, error } = useFetchAssets();
   const { address } = useAccount();
   const { execute } = useExecuteTransactions();
 
   const router = useRouter();
+  const dispatch = useDispatch();
 
   const {
     chainFilters,
@@ -48,7 +48,7 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
     uniqueChains,
     uniqueProtocols,
     filteredData,
-  } = useFilterDataAssetTable({ assetData: LoopingTableDummyData });
+  } = useFilterDataAssetTable({ assetData: loopingTableData });
 
   const table = useReactTable({
     data: filteredData || [],
@@ -106,6 +106,7 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
       {showSupplyModal ? (
         <LeverageSupplyModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowSupplyModal(false);
           }}
           onSubmit={handleLeverageSubmit}
