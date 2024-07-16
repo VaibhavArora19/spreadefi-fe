@@ -34,7 +34,16 @@ export const useFetchAssetBySymbol = (assetSymbol: string) => {
     try {
       const { data } = await axiosScout.get(`/asset/symbol/${assetSymbol}`);
 
-      return data.data;
+
+      const lendingTableData = data.data.filter((asset: any) => asset.protocolType === "Lending")
+
+      const vaultTableData = data.data.filter((asset: any) => asset.protocolType === 'Yield');
+
+      const loopingTableData = data.data.filter(
+        (asset: any) => asset.protocolType === 'Looping',
+      );
+
+      return  { lendingTableData, vaultTableData, loopingTableData };
     } catch (error: any) {
       console.error('error: ', error);
     }

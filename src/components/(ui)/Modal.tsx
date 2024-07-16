@@ -1,5 +1,6 @@
 import React from 'react';
 import Backdrop from './Backdrop';
+import useLockBodyScroll from '@/hooks/useLockBodyScroll';
 
 const Modal = ({
   children,
@@ -10,6 +11,8 @@ const Modal = ({
   className?: string;
   onClose?: () => void;
 }) => {
+  useLockBodyScroll(true);
+
   return (
     <>
       <Backdrop onClose={onClose} />
