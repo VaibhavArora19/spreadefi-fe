@@ -2,9 +2,11 @@ import React, { Dispatch, SetStateAction, useEffect, useState } from 'react';
 import TokenModal from './TokenModal';
 import Image from 'next/image';
 import { useTokensStore, useTransactionPayloadStore } from '@/redux/hooks';
+import { Action } from '@/types/strategy';
 
 const TokenSelector = ({
   setToken,
+  type,
 }: {
   setToken: (token: {
     tokenName: string;
@@ -13,8 +15,9 @@ const TokenSelector = ({
     address: string;
     decimals: number;
   }) => void;
+  type: Action;
 }) => {
-  const { fromToken } = useTransactionPayloadStore();
+  const { fromToken, toToken } = useTransactionPayloadStore();
   const { tokens } = useTokensStore();
   const [showTokenModal, setShowTokenModal] = useState(false);
   const [selectedToken, setSelectedToken] = useState<{
@@ -25,19 +28,34 @@ const TokenSelector = ({
   } | null>(null);
 
   useEffect(() => {
-    if (fromToken !== '' && tokens.length !== 0) {
-      const [token] = tokens.filter((t) => t.address === fromToken);
+    if (type === Action.WITHDRAW || type === Action.BORROW) {
+      if (toToken !== '' && tokens.length !== 0) {
+        const [token] = tokens.filter((t) => t.address === toToken);
 
-      setSelectedToken({
-        tokenName: token.name,
-        logo: token.logoURI,
-        balance: 0,
-        address: token.address,
-      });
+        setSelectedToken({
+          tokenName: token.name,
+          logo: token.logoURI,
+          balance: 0,
+          address: token.address,
+        });
+      } else {
+        setSelectedToken(null);
+      }
     } else {
-      setSelectedToken(null);
+      if (fromToken !== '' && tokens.length !== 0) {
+        const [token] = tokens.filter((t) => t.address === fromToken);
+
+        setSelectedToken({
+          tokenName: token.name,
+          logo: token.logoURI,
+          balance: 0,
+          address: token.address,
+        });
+      } else {
+        setSelectedToken(null);
+      }
     }
-  }, [fromToken, tokens]);
+  }, [fromToken, toToken, tokens]);
 
   const handleTokenSelect = (token: {
     tokenName: string;
@@ -77,6 +95,7 @@ const TokenSelector = ({
           onClose={() => {
             setShowTokenModal(false);
           }}
+          type={type}
         />
       ) : null}
     </>

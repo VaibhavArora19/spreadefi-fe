@@ -35,6 +35,8 @@ export const executeTransaction = async (
     });
 
     currentChain = Number(transaction.chain);
+
+    await sleep(500);
   }
 
   if (transaction.type === Action.SQUID) {

@@ -4,6 +4,7 @@ import Modal from '@/components/(ui)/Modal';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { useFetchTokenList } from '@/hooks/useFetchTokenList';
 import { TAssetName } from '@/types/asset';
+import { Action } from '@/types/strategy';
 import Image from 'next/image';
 import React from 'react';
 import { IoClose } from 'react-icons/io5';
@@ -53,6 +54,7 @@ const TokenItem: React.FC<TokenItemProps> = ({ token, onClose, onSelect }) => {
 const TokenModal = ({
   onClose,
   onSelect,
+  type,
 }: {
   onClose: () => void;
   onSelect: (token: {
@@ -62,8 +64,9 @@ const TokenModal = ({
     address: string;
     decimals: number;
   }) => void;
+  type: Action;
 }) => {
-  const { data: tokens } = useFetchTokenList();
+  const { data: tokens } = useFetchTokenList(type);
 
   return (
     <Modal className="w-[500px] bg-[#111111] h-[450px] rounded-2xl overflow-scroll">

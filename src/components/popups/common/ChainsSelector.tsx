@@ -3,6 +3,7 @@ import ChainModal from './ChainModal';
 import Image from 'next/image';
 import { useTransactionPayloadStore } from '@/redux/hooks';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
+import { Action } from '@/types/strategy';
 
 type TChain = {
   chainId: number;
@@ -13,11 +14,12 @@ type TChain = {
 
 type TProps = {
   setChain: (chain: TChain) => void;
+  type: Action;
 };
 
-const ChainsSelector = ({ setChain }: TProps) => {
+const ChainsSelector = ({ setChain, type }: TProps) => {
   const [showChainModal, setShowChainModal] = useState(false);
-  const { fromChain } = useTransactionPayloadStore();
+  const { fromChain, toChain } = useTransactionPayloadStore();
 
   const handleSelectChain = (chain: TChain) => {
     setChain(chain);
@@ -30,15 +32,27 @@ const ChainsSelector = ({ setChain }: TProps) => {
           setShowChainModal(true);
         }}
         className="text-xs bg-[#151515] p-2 w-[100px] rounded-md flex items-center gap-2">
-        {fromChain !== '' ? (
+        {(type === Action.WITHDRAW || type == Action.BORROW ? toChain !== '' : fromChain !== '') ? (
           <>
             <Image
-              src={CHAIN_CONFIG[fromChain].chainImageUrl}
-              alt={CHAIN_CONFIG[fromChain].chainName}
+              src={
+                type === Action.WITHDRAW || type == Action.BORROW
+                  ? CHAIN_CONFIG[toChain].chainImageUrl
+                  : CHAIN_CONFIG[fromChain].chainImageUrl
+              }
+              alt={
+                type === Action.WITHDRAW || type == Action.BORROW
+                  ? CHAIN_CONFIG[toChain].chainName
+                  : CHAIN_CONFIG[fromChain].chainName
+              }
               height={15}
               width={15}
             />
-            <span className="text-xs">{CHAIN_CONFIG[fromChain].chainName}</span>
+            <span className="text-xs">
+              {type === Action.WITHDRAW || type == Action.BORROW
+                ? CHAIN_CONFIG[toChain].chainName
+                : CHAIN_CONFIG[fromChain].chainName}
+            </span>
           </>
         ) : (
           <p className="mx-auto">Chain</p>
