@@ -18,20 +18,20 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
         <PortfolioDetail
           label="Net worth"
           value={
-            parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 6)) -
-            parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 6))
+            parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8)) -
+            parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))
           }
           className="text-white text-4xl"
         />
         <PortfolioDetail
           label="Wallet"
-          value={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 6))}
+          value={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 8))}
           className="text-green-800 text-xl"
         />
         <PortfolioDetail
           label="Lend"
           value={parseFloat(
-            formatUnits(portfolio?.totalCollateralBase || 0, 6),
+            formatUnits(portfolio?.totalCollateralBase || 0, 8),
           )}
           className="text-green-600 text-xl"
         />
@@ -42,17 +42,17 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
         />
         <PortfolioDetail
           label="Borrowed"
-          value={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 6))}
+          value={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))}
           className="text-red-500 text-xl"
         />
       </div>
 
       <div className="px-6 pb-6 pt-2 ">
         <DividedBar
-          borrowed={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 6))}
+          borrowed={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))}
           vault={18000}
-          wallet={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 6))}
-          lend={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 6))}
+          wallet={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 8))}
+          lend={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8))}
         />
       </div>
     </div>

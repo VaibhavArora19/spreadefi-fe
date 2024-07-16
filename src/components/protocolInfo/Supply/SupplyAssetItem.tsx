@@ -2,7 +2,7 @@ import BorrowModal from '@/components/popups/Borrow/BorrowModal';
 import SupplyModal from '@/components/popups/common/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { useExecuteTransactions } from '@/server/api/transactions';
-import { TAsset } from '@/types/asset';
+import { TAsset, TBalance } from '@/types/asset';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
@@ -10,7 +10,7 @@ import { useAccount } from 'wagmi';
 type SupplyAssetItemProps = {
   asset: TAsset;
   itemType: 'borrow' | 'supply';
-  balances: any;
+  balances: TBalance;
 };
 
 const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, balances }) => {
@@ -59,7 +59,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
             </button>
           ) : (
             <button
-              onClick={(e: any) => {
+              onClick={(e) => {
                 e.stopPropagation();
                 setShowSupplyModal(true);
               }}

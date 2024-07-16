@@ -10,6 +10,7 @@ import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
 import { TAsset } from '@/types/asset';
+import { TAssetBalance, TFormattedAsset, TFormattedAssetBalance } from '@/types/balance';
 import { TProtocolName } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -20,13 +21,13 @@ const Portfolio = () => {
   const protocol = searchParams.get('protocol');
   const chain = searchParams.get('chain');
   const [tab, setTab] = useState('lendBorrow');
-  const [formattedBalances, setFormattedBalances]: any = useState();
-  const [assets, setAssets]: any = useState();
+  const [formattedBalances, setFormattedBalances] = useState<TFormattedAssetBalance[]>();
+  const [assets, setAssets] = useState<TAsset[]>();
   const [ethDerivatives, setEthDerivatives] = useState<TAsset[]>([]);
   const [btcDerivatives, setBtcDerivatives] = useState<TAsset[]>([]);
   const [remaining, setRemaining] = useState<TAsset[]>([]);
-  const [supplied, setSupplied]: any = useState();
-  const [borrowed, setBorrowed]: any = useState();
+  const [supplied, setSupplied] = useState<TAssetBalance[]>();
+  const [borrowed, setBorrowed] = useState<TAssetBalance[]>();
 
   const { data: balances } = useFetchTokenBalance('0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6');
 
@@ -41,15 +42,15 @@ const Portfolio = () => {
 
   useEffect(() => {
     if (balances && protocol && chain) {
-      const suppiled: any = [];
-      const borrowed: any = [];
+      const suppiled: TAssetBalance[] = [];
+      const borrowed: TAssetBalance[] = [];
 
-      balances.filteredBalances.forEach((asset: any) => {
+      balances.filteredBalances.forEach((asset: TAssetBalance) => {
         if (asset.protocol.toLowerCase() == protocol.toLowerCase() && asset.chainId == chain) {
-          if (asset.currentATokenBalance > 0) {
+          if (Number(asset.currentATokenBalance) > 0) {
             suppiled.push(asset);
           }
-          if (asset.currentStableDebt > 0 || asset.currentVariableDebt > 0) {
+          if (Number(asset.currentStableDebt) > 0 || Number(asset.currentVariableDebt) > 0) {
             borrowed.push(asset);
           }
         }
@@ -66,8 +67,12 @@ const Portfolio = () => {
       const btcDerivatives: TAsset[] = [];
       const remaining: TAsset[] = [];
 
-      assets.forEach((asset: any) => {
-        if (asset.protocolName.toLowerCase() == protocol.toLowerCase() && asset.chainId == chain) {
+      assets.forEach((asset) => {
+        if (
+          asset.protocolName.toLowerCase() == protocol.toLowerCase() &&
+          asset.chainId == chain &&
+          asset.protocolType !== 'Looping'
+        ) {
           if (asset.assetSymbol.includes('ETH')) {
             ethDerivatives.push(asset);
           } else if (asset.assetSymbol.includes('BTC')) {
@@ -84,14 +89,14 @@ const Portfolio = () => {
     }
   }, [assets, protocol, chain]);
 
-  function formatData(data: any) {
-    const formattedData: any = [];
+  function formatData(data: TAssetBalance[]) {
+    const formattedData: TFormattedAssetBalance[] = [];
 
-    data.forEach((item: any) => {
+    data.forEach((item: TAssetBalance) => {
       const { protocol, chainId, ...rest } = item;
 
       let existingEntry = formattedData.find(
-        (entry: any) => entry.protocol === protocol && entry.chainId === chainId,
+        (entry: TFormattedAssetBalance) => entry.protocol === protocol && entry.chainId === chainId,
       );
 
       if (existingEntry) {
@@ -122,7 +127,7 @@ const Portfolio = () => {
     }
 
     if (portfolio[protocolKey] && portfolio[protocolKey][chainId]) {
-      return parseFloat(formatUnits(portfolio[protocolKey][chainId][index] || 0, 6));
+      return parseFloat(formatUnits(portfolio[protocolKey][chainId][index] || 0, 8));
     } else {
       return 0;
     }
@@ -185,7 +190,7 @@ const Portfolio = () => {
             formattedBalances &&
             portfolio && (
               <div className="flex flex-col gap-3">
-                {formattedBalances.map((balance: any, index: number) => (
+                {formattedBalances.map((balance: TFormattedAssetBalance, index: number) => (
                   <PositionItem
                     key={index}
                     chain={balance.chainId}

@@ -2,14 +2,10 @@ import Image from 'next/image';
 import { Button } from '../ui/button';
 import { TAsset } from '@/types/asset';
 import { assetNameToImage } from '@/constants/assetInfo';
+import { TFormattedAsset } from '@/types/balance';
 
 interface TokenDetailsProps {
-  tokens?: {
-    asset: TAsset;
-    currentATokenBalance: number;
-    currentStableDebt: number;
-    currentVariableDebt: number;
-  }[];
+  tokens?: TFormattedAsset[];
   type: 'Supplied' | 'Borrowed';
   actionType?: 'vault' | 'lendBorrow';
 }
