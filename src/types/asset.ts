@@ -10,21 +10,21 @@ export enum TAssetName {
   DAI = 'dai',
   USDT = 'usdt',
   WBTC = 'wbtc',
-  RETH = "reth",
-  FRXETH = "frxeth",
-  USDBC = "usdbc",
-  USDCE = "usdc.e",
-  SEAM = "seam",
-  LUSD = "lusd",
-  OP = "op",
-  LINK = "link",
-  FRAX = "frax",
-  DEGEN = "degen",
-  ARB = "arb"
+  RETH = 'reth',
+  FRXETH = 'frxeth',
+  USDBC = 'usdbc',
+  USDCE = 'usdc.e',
+  SEAM = 'seam',
+  LUSD = 'lusd',
+  OP = 'op',
+  LINK = 'link',
+  FRAX = 'frax',
+  DEGEN = 'degen',
+  ARB = 'arb',
 }
 
 export type TBalance = {
-  [contract_address: string]: string;
+  [contract_address: string]: { price: string };
 };
 
 export type TAsset = {
@@ -37,6 +37,7 @@ export type TAsset = {
   chainId: string;
   assetAddress: string;
   protocolName: TProtocolName;
+  protocolType: string;
 };
 
 export type TAssetsResponse = {
