@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react';
-import { AssetTableDummyData } from '@/data/DummyData';
 import { UseFilterDataReturn } from './useFilterData';
 import { TAssetTableItem, TLoopinStrategyTableItem } from '@/types/dataTable';
 
@@ -27,8 +26,7 @@ export const useFilterDataAssetTable = ({
     return assetData.filter(
       (item) =>
         (chainFilters.length === 0 || chainFilters.includes(item.chainId)) &&
-        (protocolFilters.length === 0 ||
-          protocolFilters.includes(item.protocolName)),
+        (protocolFilters.length === 0 || protocolFilters.includes(item.protocolName)),
     );
   }, [chainFilters, protocolFilters, assetData]);
 

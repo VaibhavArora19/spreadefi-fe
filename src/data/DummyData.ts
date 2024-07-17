@@ -71,45 +71,6 @@ export const EthDerivativesDummyData: TAssetTableItem[] = [
   },
 ];
 
-export const LoopingTableDummyData: TLoopinStrategyTableItem[] = [
-  {
-    id: '0',
-    primaryAsset: 'WETH',
-    secondaryAsset: 'ETH',
-    apy: '8.9%',
-    chainId: '10',
-    protocolName: TProtocolName.AAVE,
-    points: ['ezPoints', 'LXP-L'],
-  },
-  {
-    id: '1',
-    primaryAsset: 'WETH',
-    secondaryAsset: 'ezeth',
-    apy: '6.8%',
-    chainId: '42161',
-    protocolName: TProtocolName.Balancer,
-    points: ['ezPoints', 'LXP-L'],
-  },
-  {
-    id: '2',
-    primaryAsset: 'WETH',
-    secondaryAsset: 'ETH',
-    apy: '9.3%',
-    chainId: '10',
-    protocolName: TProtocolName.COMPOUND,
-    points: ['ezPoints', 'LXP-L'],
-  },
-  {
-    id: '3',
-    primaryAsset: 'USDC',
-    secondaryAsset: 'USDT',
-    apy: '9.3%',
-    chainId: '10',
-    protocolName: TProtocolName.COMPOUND,
-    points: ['ezPoints', 'LXP-L'],
-  },
-];
-
 export const MigrateLendingData: TAssetTableItem[] = [
   {
     id: '0',
