@@ -5,7 +5,7 @@ export const assetNameToImage = (name: TAssetName | string) => {
     case TAssetName.WETH:
       return '/assets/icons/tokens/weth.png';
     case TAssetName.WSTETH:
-      return '/assets/icons/tokens/weth.png';
+      return '/assets/icons/tokens/wsteth.png';
     case TAssetName.ETH:
       return '/assets/icons/tokens/eth.png';
     case TAssetName.EZETH:
