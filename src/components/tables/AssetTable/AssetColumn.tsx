@@ -1,4 +1,4 @@
-import { ColumnDef } from '@tanstack/react-table';
+import { ColumnDef, Row } from '@tanstack/react-table';
 import { TableItem, TAssetTableItem } from '@/types/dataTable';
 import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
@@ -8,26 +8,49 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
-import { useAppDispatch } from '@/redux/hooks';
+import { useAppDispatch, useTransactionPayloadStore } from '@/redux/hooks';
 import { transactionPayloadActions } from '@/redux/actions';
+import { Action } from '@/types/strategy';
 
 const AssetTableColumn = (
-  type: 'migrate' | 'borrowAndAction' | 'supply',
+  type:
+    | Action.WITHDRAW_SUPPLY
+    | Action.WITHDRAW_DEPOSIT
+    | Action.BORROW_SUPPLY
+    | Action.BORROW_DEPOSIT
+    | Action.SUPPLY,
   setShowMigrateSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
   setShowBorrowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
   setShowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
 ): ColumnDef<TAssetTableItem>[] => {
   const dispatch = useAppDispatch();
+  const { strategyName } = useTransactionPayloadStore();
 
   const showBorrowSupplyModalHandler = () => {
     setShowBorrowSupplyModal ? setShowBorrowSupplyModal(true) : null;
   };
 
-  const showMigrateSupplyModalHandler = () => {
+  const showMigrateSupplyModalHandler = (row: Row<TAssetTableItem>) => {
+    strategyName.split('-')[1] === ''
+      ? dispatch(
+          transactionPayloadActions.setStrategyName(strategyName + row.original.protocolName),
+        )
+      : dispatch(
+          transactionPayloadActions.setStrategyName(
+            strategyName.split('-')[0] + '-' + row.original.protocolName,
+          ),
+        );
+    dispatch(transactionPayloadActions.setToChain(row.original.chainId));
+    dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
+
     setShowMigrateSupplyModal ? setShowMigrateSupplyModal(true) : null;
   };
 
-  const showSupplyModalHandler = () => {
+  const showSupplyModalHandler = (row: Row<TAssetTableItem>) => {
+    dispatch(transactionPayloadActions.setStrategyName(row.original.protocolName));
+    dispatch(transactionPayloadActions.setToChain(row.original.chainId));
+    dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
+
     setShowSupplyModal ? setShowSupplyModal(true) : null;
   };
 
@@ -185,20 +208,20 @@ const AssetTableColumn = (
       cell: ({ row }) => (
         <Button
           onClick={() => {
-            if (type === 'migrate') {
-              showMigrateSupplyModalHandler();
-            } else if (type === 'borrowAndAction') {
+            if (type === Action.WITHDRAW_SUPPLY || type === Action.WITHDRAW_DEPOSIT) {
+              showMigrateSupplyModalHandler(row);
+            } else if (type === Action.BORROW_SUPPLY || type === Action.BORROW_DEPOSIT) {
               showBorrowSupplyModalHandler();
             } else {
-              dispatch(transactionPayloadActions.setStrategyName(row.original.protocolName));
-              dispatch(transactionPayloadActions.setToChain(row.original.chainId));
-              dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
-
-              showSupplyModalHandler();
+              showSupplyModalHandler(row);
             }
           }}
           className="w-[80%] bg-white text-black">
-          {type === 'supply' ? 'Supply' : type === 'migrate' ? 'Migrate' : 'Borrow & Action'}
+          {type === Action.SUPPLY
+            ? 'Supply'
+            : type === Action.WITHDRAW_SUPPLY || type === Action.WITHDRAW_DEPOSIT
+            ? 'Migrate'
+            : 'Borrow & Action'}
         </Button>
       ),
     },

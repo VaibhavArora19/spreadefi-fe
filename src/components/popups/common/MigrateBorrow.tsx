@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Modal from '@/components/(ui)/Modal';
 import { IoClose } from 'react-icons/io5';
 import Image from 'next/image';
@@ -8,24 +8,102 @@ import useLockBodyScroll from '@/hooks/useLockBodyScroll';
 import { Switch } from '@/components/ui/switch';
 import MigrateTransactionOverview from './MigrateTransactionOverview';
 import Slippage from './Slippage';
+import { useTransactionPayloadStore } from '@/redux/hooks';
+import { Action } from '@/types/strategy';
+import { useDispatch } from 'react-redux';
+import { transactionPayloadActions } from '@/redux/actions';
+import { useExecuteTransactions, useTransactionsBuilder } from '@/server/api/transactions';
+import { TTransactionPayload } from '@/types/transaction';
+import { useAccount } from 'wagmi';
+import { ethers } from 'ethers';
 
 const MigrateBorrow = ({
   onClose,
   type,
 }: {
   onClose: () => void;
-  type: 'borrowAction' | 'migrate';
+  type:
+    | Action.BORROW_SUPPLY
+    | Action.WITHDRAW_SUPPLY
+    | Action.WITHDRAW_DEPOSIT
+    | Action.BORROW_DEPOSIT;
 }) => {
+  const { strategyName, fromToken, fromAmount, fromChain, toToken, toChain, fromTokenDecimals } =
+    useTransactionPayloadStore();
+  const dispatch = useDispatch();
+  const { address } = useAccount();
+  const { execute } = useExecuteTransactions();
+
   useLockBodyScroll(true);
 
   const [showSettings, setShowSettings] = useState(false);
+  const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
   const [tab, setTab] = useState('auto');
+
+  const { data } = useTransactionsBuilder(transactionPayload);
+
+  const handleTransactionSubmit = async () => {
+    //!show modal here asking user to connect wallet
+    if (!address) return;
+
+    const data = await execute();
+  };
+
+  const prepareTransactionPayload = useCallback(() => {
+    if (
+      strategyName === '' ||
+      !address ||
+      !fromAmount ||
+      !fromToken ||
+      !fromChain ||
+      !toToken ||
+      !toChain
+    )
+      return;
+
+    const payload: TTransactionPayload = {
+      strategyName,
+      action: type,
+      txDetails: {
+        fromAmount: ethers.utils.parseUnits(fromAmount, fromTokenDecimals).toString(),
+        fromToken: fromToken as string,
+        fromChain: fromChain as string,
+        toToken,
+        toChain,
+        fromAddress: address,
+        toAddress: address,
+      },
+    };
+
+    setTransactionPayload(payload);
+  }, [
+    fromAmount,
+    fromTokenDecimals,
+    fromToken,
+    fromChain,
+    toToken,
+    toChain,
+    address,
+    strategyName,
+    type,
+  ]);
+
+  useEffect(() => {
+    const debouncedFunction = setTimeout(() => {
+      prepareTransactionPayload();
+    }, 5000);
+
+    return () => clearTimeout(debouncedFunction);
+  }, [fromAmount, fromToken, fromChain, toToken, toChain]);
 
   return (
     <Modal className="w-[500px] p-5 ">
       <div className="flex justify-between items-center mb-4">
         <p className="font-medium text-lg capitalize">
-          {type === 'borrowAction' ? 'Borrow & Supply' : 'Migrate'} Assets
+          {type === Action.BORROW_SUPPLY || type === Action.BORROW_DEPOSIT
+            ? 'Borrow & Supply'
+            : 'Migrate'}{' '}
+          Assets
         </p>
 
         <div className="flex items-center gap-1 relative">
@@ -46,6 +124,8 @@ const MigrateBorrow = ({
           type="number"
           placeholder="0.0"
           className="text-3xl  text-white bg-inherit border-none outline-none placeholder:text-gray-500 p-4 w-[250px] overflow-hidden"
+          value={fromAmount}
+          onChange={(e) => dispatch(transactionPayloadActions.setFromAmount(e.target.value))}
           onWheel={(e) => (e.target as HTMLInputElement).blur()}
         />
         <div className="flex items-center gap-4 text-xs p-4">
@@ -84,9 +164,11 @@ const MigrateBorrow = ({
 
       <Button
         type="button"
-        onClick={() => {}}
+        onClick={handleTransactionSubmit}
         className="w-full text-black bg-white mt-4 py-6 capitalize">
-        {type === 'migrate' ? 'Migrate' : 'Borrow & Supply'}
+        {type === Action.WITHDRAW_SUPPLY || type === Action.WITHDRAW_DEPOSIT
+          ? 'Migrate'
+          : 'Borrow & Supply'}
       </Button>
 
       {showSettings && <Slippage setTab={setTab} tab={tab} />}

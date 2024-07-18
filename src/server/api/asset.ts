@@ -34,16 +34,13 @@ export const useFetchAssetBySymbol = (assetSymbol: string) => {
     try {
       const { data } = await axiosScout.get(`/asset/symbol/${assetSymbol}`);
 
-
-      const lendingTableData = data.data.filter((asset: any) => asset.protocolType === "Lending")
+      const lendingTableData = data.data.filter((asset: any) => asset.protocolType === 'Lending');
 
       const vaultTableData = data.data.filter((asset: any) => asset.protocolType === 'Yield');
 
-      const loopingTableData = data.data.filter(
-        (asset: any) => asset.protocolType === 'Looping',
-      );
+      const loopingTableData = data.data.filter((asset: any) => asset.protocolType === 'Looping');
 
-      return  { lendingTableData, vaultTableData, loopingTableData };
+      return { lendingTableData, vaultTableData, loopingTableData };
     } catch (error: any) {
       console.error('error: ', error);
     }
@@ -73,5 +70,30 @@ export const useFetchAssetByProtocolType = (protocolType: string) => {
     queryFn: fetchAssetByProtocolType,
     retry: 3,
     staleTime: Infinity,
+  });
+};
+
+export const useFetchFilterAsset = (
+  excludeProtocol: string | null,
+  includeProtocolType: string,
+) => {
+  const fetchFilteredAsset = async () => {
+    try {
+      const { data } = await axiosScout.get(
+        `/asset/filter?excludeProtocol=${excludeProtocol}&includeProtocolType=${includeProtocolType}`,
+      );
+
+      return data.data;
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
+  };
+  return useQuery({
+    queryKey: [ASSETS.FETCH_BY_PROTOCOL_TYPE, excludeProtocol],
+    queryFn: fetchFilteredAsset,
+    enabled: !!excludeProtocol,
+    staleTime: Infinity,
+    refetchOnMount: 'always',
+    retry: 3,
   });
 };

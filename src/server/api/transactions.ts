@@ -26,9 +26,15 @@ export const useTransactionsBuilder = (transactionPayload: TTransactionPayload |
     //@ts-ignore
     const provider = new ethers.providers.JsonRpcProvider(networkConfig[fromChain].rpc);
 
+    const poolAddress = strategyName.includes('-')
+      ? //@ts-ignore
+        networkConfig[fromChain][strategyName.split('-')[0]].poolAddress
+      : //@ts-ignore
+        networkConfig[fromChain][strategyName].poolAddress;
+
     const contract = new ethers.Contract(
       //@ts-ignore
-      networkConfig[fromChain][strategyName].poolAddress,
+      poolAddress,
       AAVE_POOL_ABI,
       provider,
     );
@@ -58,7 +64,8 @@ export const useTransactionsBuilder = (transactionPayload: TTransactionPayload |
 
       if (
         transactionPayload?.action === Action.WITHDRAW ||
-        transactionPayload?.action === Action.BORROW
+        transactionPayload?.action === Action.WITHDRAW_DEPOSIT ||
+        transactionPayload?.action === Action.WITHDRAW_SUPPLY
       ) {
         const aTokenAddress = await findATokenAddress(
           transactionPayload?.strategyName as StrategyName,

@@ -3,6 +3,7 @@
 import AssetTable from '@/components/tables/AssetTable/AssetTable';
 import EthDerivativesTable from '@/components/tables/EthDerivativesTable/EthDerivativesTable';
 import { useFetchAssetBySymbol } from '@/server/api/asset';
+import { Action } from '@/types/strategy';
 import { useParams } from 'next/navigation';
 
 const AssetPage = () => {
@@ -12,7 +13,7 @@ const AssetPage = () => {
 
   return (
     <div className="w-full">
-      <AssetTable type="supply" assetData={assetData?.vaultTableData} />
+      <AssetTable type={Action.SUPPLY} assetData={assetData?.vaultTableData} />
       <div>
         <p className="mt-6">You can also deposit ETH derivatives here</p>
         <EthDerivativesTable />

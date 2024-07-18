@@ -35,6 +35,27 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
     const data = await execute();
   };
 
+  const migrateModalHandler = async () => {
+    //! add some warning here
+    if (!protocolChainId) return;
+
+    const tokens = await fetchList(protocolChainId);
+    const [filterFromToken] = tokens.filter(
+      (token) =>
+        ethers.utils.getAddress(token.address) === ethers.utils.getAddress(data.asset.assetAddress),
+    );
+
+    //!add some error here
+    if (!filterFromToken) return;
+
+    dispatch(transactionPayloadActions.setStrategyName((protocol + '-').trim()));
+    dispatch(transactionPayloadActions.setFromChain(protocolChainId));
+    dispatch(transactionPayloadActions.setFromToken(data.asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(filterFromToken.decimals));
+
+    setShowMigrateModal(true);
+  };
+
   const withdrawModalHandler = async () => {
     //! add some warning here
     if (!protocolChainId) return;
@@ -74,9 +95,7 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
             Withdraw
           </button>
           <button
-            onClick={() => {
-              setShowMigrateModal(true);
-            }}
+            onClick={migrateModalHandler}
             className="bg-transparent text-white py-2  px-4 text-xs rounded-md border border-white hover:bg-white hover:text-black">
             Migrate
           </button>
@@ -96,6 +115,7 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
       {showMigrateModal ? (
         <MigrateActionsModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowMigrateModal(false);
           }}
         />

@@ -5,6 +5,7 @@ import LendingBorrowingHeader from '@/components/tables/LendingBorrowingTable/Le
 import LendingBorrowingTableBody from '@/components/tables/LendingBorrowingTable/LendingBorrowingTableBody';
 import { Table } from '@/components/ui/table';
 import { useFilterDataEthDerivativesTable } from '@/hooks/useFilterDataEthDerivativesTable';
+import { Action } from '@/types/strategy';
 import {
   ColumnFiltersState,
   getCoreRowModel,
@@ -27,7 +28,7 @@ const EthDerivativesTable = () => {
 
   const table = useReactTable({
     data: filteredData,
-    columns: AssetTableColumn('supply'),
+    columns: AssetTableColumn(Action.SUPPLY),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

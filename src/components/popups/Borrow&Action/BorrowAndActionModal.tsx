@@ -5,6 +5,7 @@ import { IoIosWallet } from 'react-icons/io';
 import { Tooltip } from '@mui/material';
 import MigrateActionsVaultTable from '../MigrateModal/MigrateActionsVaultTable';
 import MigrateActionsLendingTable from '../MigrateModal/MigrateActionsLendingTable';
+import { Action } from '@/types/strategy';
 
 const BorrowAndActionModal = ({ onClose }: { onClose: () => void }) => {
   const [showLendingTable, setShowLendingTable] = useState(false);
@@ -25,9 +26,7 @@ const BorrowAndActionModal = ({ onClose }: { onClose: () => void }) => {
             }}
             className="bg-[#1e1e1e] rounded-lg hover:border-[0.5px] hover:border-[#707070] space-y-4 p-4 cursor-pointer flex-[0.5]">
             <IoIosWallet size={30} className="text-[#707070]" />
-            <p className="text-white text-sm">
-              Borrow & deposit to another yield vault
-            </p>
+            <p className="text-white text-sm">Borrow & deposit to another yield vault</p>
           </div>
 
           <div
@@ -36,16 +35,14 @@ const BorrowAndActionModal = ({ onClose }: { onClose: () => void }) => {
             }}
             className="bg-[#1e1e1e] rounded-lg hover:border-[0.5px] hover:border-[#707070] space-y-4 p-4 cursor-pointer flex-[0.5]">
             <IoIosWallet size={30} className="text-[#707070]" />
-            <p className="text-white text-sm">
-              Borrow & deposit into another lending position
-            </p>
+            <p className="text-white text-sm">Borrow & deposit into another lending position</p>
           </div>
         </div>
       </Modal>
 
       {showLendingTable ? (
         <MigrateActionsLendingTable
-          type="borrowAndAction"
+          type={Action.BORROW_SUPPLY}
           onClose={() => {
             setShowLendingTable(false);
           }}
@@ -54,7 +51,7 @@ const BorrowAndActionModal = ({ onClose }: { onClose: () => void }) => {
 
       {showVaultTable ? (
         <MigrateActionsVaultTable
-          type="borrowAndAction"
+          type={Action.BORROW_DEPOSIT}
           onClose={() => {
             setShowVaultTable(false);
           }}

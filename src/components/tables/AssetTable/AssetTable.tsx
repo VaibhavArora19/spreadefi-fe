@@ -27,13 +27,19 @@ import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useDispatch } from 'react-redux';
 import { transactionPayloadActions } from '@/redux/actions';
+import { Action } from '@/types/strategy';
 
 const AssetTable = ({
   assetData,
   type,
 }: {
   assetData: TAssetTableItem[];
-  type: 'supply' | 'migrate' | 'borrowAndAction';
+  type:
+    | Action.SUPPLY
+    | Action.WITHDRAW_SUPPLY
+    | Action.WITHDRAW_DEPOSIT
+    | Action.BORROW_DEPOSIT
+    | Action.BORROW_SUPPLY;
 }) => {
   const { address } = useAccount();
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -120,7 +126,10 @@ const AssetTable = ({
 
       {showMigrateSupplyModal ? (
         <MigrateSupplyModal
+          type={type as Action.WITHDRAW_DEPOSIT | Action.WITHDRAW_SUPPLY}
           onClose={() => {
+            //* the state in this case should not be reset as this is only the first modal to be closed
+            //* there exists another modal which resets the state when it gets closed
             setShowMigrateSupplyModal(false);
           }}
         />
@@ -141,6 +150,7 @@ const AssetTable = ({
           onClose={() => {
             setShowBorrowSupplyModal(false);
           }}
+          type={type as Action.BORROW_DEPOSIT | Action.BORROW_SUPPLY}
         />
       ) : null}
     </>
