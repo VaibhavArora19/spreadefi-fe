@@ -81,14 +81,22 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         </p>
         <div className="flex gap-4 flex-[0.25]">
           {itemType === 'borrow' ? (
-            <button
-              onClick={async () => {
-                // await borrowModalHandler();
-                setShowBorrowActionModal(true);
-              }}
-              className="bg-transparent text-white py-2  w-full text-xs rounded-md border border-white hover:bg-white hover:text-black">
-              Borrow & Action
-            </button>
+            <div className="flex items-center gap-2 w-full">
+              <button
+                onClick={async () => {
+                  await borrowModalHandler();
+                }}
+                className="bg-transparent text-white py-2  px-5 text-xs rounded-md border border-white hover:bg-white hover:text-black">
+                Borrow
+              </button>
+              <button
+                onClick={async () => {
+                  setShowBorrowActionModal(true);
+                }}
+                className=" py-2 w-[110px] text-xs rounded-md bg-white text-black hover:bg-gray-200">
+                Borrow & Action
+              </button>
+            </div>
           ) : (
             <button
               onClick={(e) => {
@@ -115,7 +123,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         />
       ) : null}
 
-      {/* {showBorrowModal ? (
+      {showBorrowModal ? (
         <BorrowModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
@@ -123,7 +131,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
           }}
           onSubmit={handleSupplyOrBorrowSubmit}
         />
-      ) : null} */}
+      ) : null}
 
       {showBorrowActionModal ? (
         <BorrowAndActionModal
