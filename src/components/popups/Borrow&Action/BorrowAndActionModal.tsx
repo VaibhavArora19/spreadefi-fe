@@ -2,7 +2,6 @@ import Modal from '@/components/(ui)/Modal';
 import React, { useState } from 'react';
 import { IoClose } from 'react-icons/io5';
 import { IoIosWallet } from 'react-icons/io';
-import { Tooltip } from '@mui/material';
 import MigrateActionsVaultTable from '../MigrateModal/MigrateActionsVaultTable';
 import MigrateActionsLendingTable from '../MigrateModal/MigrateActionsLendingTable';
 import { Action } from '@/types/strategy';
@@ -56,9 +55,7 @@ const BorrowAndActionModal = ({ onClose }: { onClose: () => void }) => {
             setShowVaultTable(false);
           }}
         />
-      ) : (
-        false
-      )}
+      ) : null}
     </>
   );
 };
