@@ -11,6 +11,7 @@ import Image from 'next/image';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAccount } from 'wagmi';
+import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 
 type SupplyAssetItemProps = {
   asset: TAsset;
@@ -21,6 +22,8 @@ type SupplyAssetItemProps = {
 const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, balances }) => {
   const [showSupplyModal, setShowSupplyModal] = useState(false);
   const [showBorrowModal, setShowBorrowModal] = useState(false);
+  const [showBorrowActionModal, setShowBorrowActionModal] = useState(false);
+
   const { execute } = useExecuteTransactions();
   const { fetchList } = useFetchTokenListForChain();
   const dispatch = useDispatch();
@@ -80,10 +83,11 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
           {itemType === 'borrow' ? (
             <button
               onClick={async () => {
-                await borrowModalHandler();
+                // await borrowModalHandler();
+                setShowBorrowActionModal(true);
               }}
               className="bg-transparent text-white py-2  w-full text-xs rounded-md border border-white hover:bg-white hover:text-black">
-              Borrow
+              Borrow & Action
             </button>
           ) : (
             <button
@@ -111,13 +115,21 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         />
       ) : null}
 
-      {showBorrowModal ? (
+      {/* {showBorrowModal ? (
         <BorrowModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
             setShowBorrowModal(false);
           }}
           onSubmit={handleSupplyOrBorrowSubmit}
+        />
+      ) : null} */}
+
+      {showBorrowActionModal ? (
+        <BorrowAndActionModal
+          onClose={() => {
+            setShowBorrowActionModal(false);
+          }}
         />
       ) : null}
     </>
