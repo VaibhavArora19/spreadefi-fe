@@ -28,8 +28,16 @@ const MigrateBorrow = ({
     | Action.WITHDRAW_DEPOSIT
     | Action.BORROW_DEPOSIT;
 }) => {
-  const { strategyName, fromToken, fromAmount, fromChain, toToken, toChain, fromTokenDecimals } =
-    useTransactionPayloadStore();
+  const {
+    strategyName,
+    fromToken,
+    fromAmount,
+    fromChain,
+    toToken,
+    toChain,
+    fromTokenDecimals,
+    slippage,
+  } = useTransactionPayloadStore();
   const dispatch = useDispatch();
   const { address } = useAccount();
   const { execute } = useExecuteTransactions();
@@ -75,6 +83,8 @@ const MigrateBorrow = ({
       },
     };
 
+    if (slippage !== 0) payload.txDetails.slippage = slippage;
+
     setTransactionPayload(payload);
   }, [
     fromAmount,
@@ -86,6 +96,7 @@ const MigrateBorrow = ({
     address,
     strategyName,
     type,
+    slippage,
   ]);
 
   useEffect(() => {
@@ -94,7 +105,7 @@ const MigrateBorrow = ({
     }, 5000);
 
     return () => clearTimeout(debouncedFunction);
-  }, [fromAmount, fromToken, fromChain, toToken, toChain]);
+  }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage]);
 
   return (
     <Modal className="w-[500px] p-5 ">

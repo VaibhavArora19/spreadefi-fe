@@ -16,6 +16,7 @@ const initialState: TTransactionPayload['txDetails'] & {
   fromAddress: '',
   toAddress: '',
   leverage: 0,
+  slippage: 0,
 };
 
 const transactionPayloadSlice = createSlice({
@@ -49,6 +50,9 @@ const transactionPayloadSlice = createSlice({
     setLeverage: (state, action) => {
       state.leverage = action.payload;
     },
+    setSlippage: (state, action) => {
+      state.slippage = action.payload;
+    },
     resetState: (state) => {
       state.strategyName = '';
       state.fromChain = '';
@@ -62,6 +66,7 @@ const transactionPayloadSlice = createSlice({
       state.fundAmount = '';
       state.fundToken = '';
       state.leverage = 0;
+      state.slippage = 0;
     },
   },
 });

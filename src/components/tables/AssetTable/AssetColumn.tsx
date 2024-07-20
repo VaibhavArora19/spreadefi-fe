@@ -18,7 +18,8 @@ const AssetTableColumn = (
     | Action.WITHDRAW_DEPOSIT
     | Action.BORROW_SUPPLY
     | Action.BORROW_DEPOSIT
-    | Action.SUPPLY,
+    | Action.SUPPLY
+    | Action.DEPOSIT,
   setShowMigrateSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
   setShowBorrowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,
   setShowSupplyModal?: React.Dispatch<React.SetStateAction<boolean>>,

@@ -36,6 +36,7 @@ const AssetTable = ({
   assetData: TAssetTableItem[];
   type:
     | Action.SUPPLY
+    | Action.DEPOSIT
     | Action.WITHDRAW_SUPPLY
     | Action.WITHDRAW_DEPOSIT
     | Action.BORROW_DEPOSIT
