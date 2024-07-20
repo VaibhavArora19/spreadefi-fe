@@ -45,7 +45,7 @@ const MigrateBorrow = ({
   useLockBodyScroll(true);
 
   const [showSettings, setShowSettings] = useState(false);
-  const [isArrivalOnGas, setIsArrivalOnGas] = useState(false);
+  const [isArrivalOnGas, setIsArrivalOnGas] = useState(false); // @vaibhav
   const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
   const [tab, setTab] = useState('auto');
 
