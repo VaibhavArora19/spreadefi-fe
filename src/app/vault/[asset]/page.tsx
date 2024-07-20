@@ -13,7 +13,7 @@ const AssetPage = () => {
 
   return (
     <div className="w-full">
-      <AssetTable type={Action.DEPOSIT} assetData={assetData?.vaultTableData} />
+      <AssetTable type={Action.SUPPLY} assetData={assetData?.vaultTableData} />
       <div>
         <p className="mt-6">You can also deposit ETH derivatives here</p>
         <EthDerivativesTable />

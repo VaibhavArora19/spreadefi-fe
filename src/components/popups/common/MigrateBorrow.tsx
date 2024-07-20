@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, {  useCallback, useEffect, useState } from 'react';
 import Modal from '@/components/(ui)/Modal';
 import { IoClose } from 'react-icons/io5';
 import Image from 'next/image';
@@ -45,6 +45,7 @@ const MigrateBorrow = ({
   useLockBodyScroll(true);
 
   const [showSettings, setShowSettings] = useState(false);
+  const [isArrivalOnGas, setIsArrivalOnGas] = useState(false);
   const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
   const [tab, setTab] = useState('auto');
 
@@ -170,7 +171,12 @@ const MigrateBorrow = ({
 
       <div className="bg-[#1E1E1E] w-full mt-3 rounded-xl p-4 flex items-center justify-between">
         <p className="text-sm">Arrival on gas</p>
-        <Switch />
+        <Switch
+          onCheckedChange={(checked) => {
+            setIsArrivalOnGas(checked);
+          }}
+          checked={isArrivalOnGas}
+        />
       </div>
 
       <Button
