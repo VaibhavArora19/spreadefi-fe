@@ -139,6 +139,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
             dispatch(transactionPayloadActions.resetState());
             setShowSupplyModal(false);
           }}
+          type={Action.SUPPLY}
           onSubmit={handleSupplyOrBorrowSubmit}
         />
       ) : null}

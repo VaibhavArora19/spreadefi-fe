@@ -1,4 +1,4 @@
-import React, {  useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import Modal from '@/components/(ui)/Modal';
 import { IoClose } from 'react-icons/io5';
 import Image from 'next/image';
@@ -37,6 +37,7 @@ const MigrateBorrow = ({
     toChain,
     fromTokenDecimals,
     slippage,
+    receiveGasOnDestination,
   } = useTransactionPayloadStore();
   const dispatch = useDispatch();
   const { address } = useAccount();
@@ -45,7 +46,6 @@ const MigrateBorrow = ({
   useLockBodyScroll(true);
 
   const [showSettings, setShowSettings] = useState(false);
-  const [isArrivalOnGas, setIsArrivalOnGas] = useState(false); // @vaibhav
   const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
   const [tab, setTab] = useState('auto');
 
@@ -81,10 +81,11 @@ const MigrateBorrow = ({
         toChain,
         fromAddress: address,
         toAddress: address,
+        receiveGasOnDestination,
       },
     };
 
-    if (slippage !== 0) payload.txDetails.slippage = slippage;
+    if (slippage !== 0 && tab === 'custom') payload.txDetails.slippage = slippage;
 
     setTransactionPayload(payload);
   }, [
@@ -98,6 +99,8 @@ const MigrateBorrow = ({
     strategyName,
     type,
     slippage,
+    receiveGasOnDestination,
+    tab,
   ]);
 
   useEffect(() => {
@@ -106,7 +109,7 @@ const MigrateBorrow = ({
     }, 5000);
 
     return () => clearTimeout(debouncedFunction);
-  }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage]);
+  }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage, receiveGasOnDestination, tab]);
 
   return (
     <Modal className="w-[500px] p-5 ">
@@ -173,9 +176,9 @@ const MigrateBorrow = ({
         <p className="text-sm">Arrival on gas</p>
         <Switch
           onCheckedChange={(checked) => {
-            setIsArrivalOnGas(checked);
+            dispatch(transactionPayloadActions.setReceiveGasOnDestination(checked));
           }}
-          checked={isArrivalOnGas}
+          checked={receiveGasOnDestination}
         />
       </div>
 

@@ -16,7 +16,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 
 type CommonActionModalProps = {
-  type: Action.SUPPLY | Action.WITHDRAW | Action.REPAY | Action.BORROW;
+  type: Action.SUPPLY | Action.WITHDRAW | Action.REPAY | Action.BORROW | Action.DEPOSIT;
   onClose: () => void;
   onSubmit: () => void;
 };
@@ -29,8 +29,16 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
   const { address } = useAccount();
   const dispatch = useAppDispatch();
 
-  const { strategyName, fromAmount, fromToken, fromChain, fromTokenDecimals, toToken, toChain } =
-    useTransactionPayloadStore();
+  const {
+    strategyName,
+    fromAmount,
+    fromToken,
+    fromChain,
+    fromTokenDecimals,
+    toToken,
+    toChain,
+    receiveGasOnDestination,
+  } = useTransactionPayloadStore();
 
   const { data } = useTransactionsBuilder(transactionPayload);
 
@@ -57,6 +65,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
         toChain,
         fromAddress: address,
         toAddress: address,
+        receiveGasOnDestination,
       },
     };
 

@@ -20,6 +20,7 @@ export type TTransactionPayload = {
     fundAmount?: string;
     leverage?: number;
     slippage?: number;
+    receiveGasOnDestination?: boolean;
   };
 };
 

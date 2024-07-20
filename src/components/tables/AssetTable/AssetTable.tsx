@@ -142,6 +142,7 @@ const AssetTable = ({
             dispatch(transactionPayloadActions.resetState());
             setShowSupplyModal(false);
           }}
+          type={type as Action.SUPPLY | Action.DEPOSIT}
           onSubmit={handleSupplySubmit}
         />
       ) : null}

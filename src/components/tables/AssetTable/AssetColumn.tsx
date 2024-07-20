@@ -1,3 +1,5 @@
+'use client';
+
 import { ColumnDef, Row } from '@tanstack/react-table';
 import { TableItem, TAssetTableItem } from '@/types/dataTable';
 import { IoIosInformationCircle } from 'react-icons/io';
@@ -231,7 +233,7 @@ const AssetTableColumn = (
             }
           }}
           className="w-[80%] bg-white text-black">
-          {type === Action.SUPPLY
+          {type === Action.SUPPLY || type === Action.DEPOSIT
             ? 'Supply'
             : type === Action.WITHDRAW_SUPPLY || type === Action.WITHDRAW_DEPOSIT
             ? 'Migrate'
