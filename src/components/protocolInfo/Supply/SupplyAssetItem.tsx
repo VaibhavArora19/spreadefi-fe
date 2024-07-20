@@ -57,6 +57,26 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
     setShowBorrowModal(true);
   };
 
+  const borrowAndActionModalHandler = async () => {
+    if (!asset.chainId) return;
+
+    const tokens = await fetchList(asset.chainId);
+
+    const [filterFromToken] = tokens.filter(
+      (token) =>
+        ethers.utils.getAddress(token.address) === ethers.utils.getAddress(asset.assetAddress),
+    );
+
+    if (!filterFromToken) return;
+
+    dispatch(transactionPayloadActions.setStrategyName(asset.protocolName + '-'));
+    dispatch(transactionPayloadActions.setFromChain(asset.chainId));
+    dispatch(transactionPayloadActions.setFromToken(asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(filterFromToken.decimals));
+
+    setShowBorrowActionModal(true);
+  };
+
   return (
     <>
       <div className="flex items-center w-full p-3 rounded-md bg-[#242424]">
@@ -91,7 +111,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
               </button>
               <button
                 onClick={async () => {
-                  setShowBorrowActionModal(true);
+                  await borrowAndActionModalHandler();
                 }}
                 className=" py-2 w-[110px] text-xs rounded-md bg-white text-black hover:bg-gray-200">
                 Borrow & Action
@@ -136,6 +156,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
       {showBorrowActionModal ? (
         <BorrowAndActionModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowBorrowActionModal(false);
           }}
         />

@@ -1,8 +1,10 @@
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 import RepayModal from '@/components/popups/Repay/RepayModal';
+import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
 import { transactionPayloadActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
+import { ethers } from 'ethers';
 import Image from 'next/image';
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
@@ -15,9 +17,31 @@ type BorrowItemProps = {
 const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
   const [showBorrowActionModal, setShowBorrowActionModal] = useState(false);
   const [showRepayModal, setShowRepayModal] = useState(false);
-  const { address } = useAccount();
+
+  const { fetchList } = useFetchTokenListForChain();
   const { execute } = useExecuteTransactions();
+  const { address } = useAccount();
   const dispatch = useDispatch();
+
+  const borrowAndActionModalHandler = async () => {
+    if (!data.asset.chainId) return;
+
+    const tokens = await fetchList(data.asset.chainId);
+
+    const [filterFromToken] = tokens.filter(
+      (token) =>
+        ethers.utils.getAddress(token.address) === ethers.utils.getAddress(data.asset.assetAddress),
+    );
+
+    if (!filterFromToken) return;
+
+    dispatch(transactionPayloadActions.setStrategyName(data.asset.protocolName + '-'));
+    dispatch(transactionPayloadActions.setFromChain(data.asset.chainId));
+    dispatch(transactionPayloadActions.setFromToken(data.asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(filterFromToken.decimals));
+
+    setShowBorrowActionModal(true);
+  };
 
   const handleRepaySubmit = async () => {
     //!show modal here asking user to connect wallet
@@ -47,8 +71,8 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
           Repay
         </button>
         <button
-          onClick={() => {
-            setShowBorrowActionModal(true);
+          onClick={async () => {
+            await borrowAndActionModalHandler();
           }}
           className="bg-transparent text-white py-2 w-[120px] text-xs rounded-md border border-white hover:bg-white hover:text-black">
           Borrow & Action
@@ -58,6 +82,7 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
       {showBorrowActionModal ? (
         <BorrowAndActionModal
           onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
             setShowBorrowActionModal(false);
           }}
         />

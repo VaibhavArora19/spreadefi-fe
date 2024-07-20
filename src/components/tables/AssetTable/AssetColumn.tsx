@@ -26,7 +26,20 @@ const AssetTableColumn = (
   const dispatch = useAppDispatch();
   const { strategyName } = useTransactionPayloadStore();
 
-  const showBorrowSupplyModalHandler = () => {
+  const showBorrowSupplyModalHandler = (row: Row<TAssetTableItem>) => {
+    strategyName.split('-')[1] === ''
+      ? dispatch(
+          transactionPayloadActions.setStrategyName(strategyName + row.original.protocolName),
+        )
+      : dispatch(
+          transactionPayloadActions.setStrategyName(
+            strategyName.split('-')[0] + '-' + row.original.protocolName,
+          ),
+        );
+
+    dispatch(transactionPayloadActions.setToChain(row.original.chainId));
+    dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
+
     setShowBorrowSupplyModal ? setShowBorrowSupplyModal(true) : null;
   };
 
@@ -211,7 +224,7 @@ const AssetTableColumn = (
             if (type === Action.WITHDRAW_SUPPLY || type === Action.WITHDRAW_DEPOSIT) {
               showMigrateSupplyModalHandler(row);
             } else if (type === Action.BORROW_SUPPLY || type === Action.BORROW_DEPOSIT) {
-              showBorrowSupplyModalHandler();
+              showBorrowSupplyModalHandler(row);
             } else {
               showSupplyModalHandler(row);
             }
