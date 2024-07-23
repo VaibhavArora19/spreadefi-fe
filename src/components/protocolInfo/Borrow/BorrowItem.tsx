@@ -1,13 +1,15 @@
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 import RepayModal from '@/components/popups/Repay/RepayModal';
+import { networkConfig } from '@/config/network';
 import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
 import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
 import { ethers } from 'ethers';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { erc20Abi } from 'viem';
 import { useAccount } from 'wagmi';
 
 type BorrowItemProps = {
@@ -17,11 +19,29 @@ type BorrowItemProps = {
 const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
   const [showBorrowActionModal, setShowBorrowActionModal] = useState(false);
   const [showRepayModal, setShowRepayModal] = useState(false);
+  const [decimals, setDecimals] = useState('0');
 
   const { fetchList } = useFetchTokenListForChain();
   const { execute } = useExecuteTransactions();
   const { address } = useAccount();
   const dispatch = useDispatch();
+
+  useEffect(() => {
+    if (!data.asset || !data.asset.chainId) return;
+
+    async function getDecimals() {
+      //@ts-ignore
+      const provider = new ethers.providers.JsonRpcProvider(networkConfig[data.asset.chainId].rpc);
+
+      const contract = new ethers.Contract(data.asset.assetAddress, erc20Abi, provider);
+
+      const decimalPoints = await contract.decimals();
+
+      setDecimals(decimalPoints.toString());
+    }
+
+    getDecimals();
+  }, [data.asset]);
 
   const borrowAndActionModalHandler = async () => {
     if (!data.asset.chainId) return;
@@ -56,7 +76,11 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
         <Image src={'/assets/icons/tokens/cbeth.png'} height={22} width={25} alt="cbETH" />
         <p>{data.asset.assetSymbol}</p>
       </div>
-      <p className="flex-[0.21]">{data.currentVariableDebt.slice(0, 4)}</p>
+      <p className="flex-[0.21]">
+        {decimals !== '0'
+          ? ethers.utils.formatUnits(data.currentVariableDebt, decimals).substring(0, 7)
+          : 0}
+      </p>
       <p className="flex-[0.18]">{data.asset.assetBorrowApy.toFixed(2)}%</p>
       <div className="flex gap-4 flex-[0.37]">
         <button
