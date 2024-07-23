@@ -10,10 +10,11 @@ export const networkConfig = {
     Aave: {
       poolAddress: '0xA238Dd80C259a72e81d7e4664a9801593F98d1c5',
     },
+    Seamless: {
+      poolAddress: '0x8F44Fd754285aa6A2b8B9B97739B79746e0475a7',
+    },
   },
-  Seamless: {
-    poolAddress: '0x8F44Fd754285aa6A2b8B9B97739B79746e0475a7',
-  },
+
   '10': {
     rpc: process.env.NEXT_PUBLIC_OP_RPC,
     Aave: {
