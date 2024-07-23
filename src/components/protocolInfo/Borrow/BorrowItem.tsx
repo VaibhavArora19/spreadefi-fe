@@ -1,7 +1,7 @@
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 import RepayModal from '@/components/popups/Repay/RepayModal';
 import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
-import { transactionPayloadActions } from '@/redux/actions';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
 import { ethers } from 'ethers';
@@ -83,6 +83,8 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
         <BorrowAndActionModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowBorrowActionModal(false);
           }}
         />
@@ -92,6 +94,8 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
         <RepayModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowRepayModal(false);
           }}
           onSubmit={handleRepaySubmit}

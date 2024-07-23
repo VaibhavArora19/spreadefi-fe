@@ -30,16 +30,10 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
         />
         <PortfolioDetail
           label="Lend"
-          value={parseFloat(
-            formatUnits(portfolio?.totalCollateralBase || 0, 8),
-          )}
+          value={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8))}
           className="text-green-600 text-xl"
         />
-        <PortfolioDetail
-          label="Vaults"
-          value={18189.83}
-          className="text-yellow-500 text-xl"
-        />
+        <PortfolioDetail label="Vaults" value={' -'} className="text-yellow-500 text-xl" />
         <PortfolioDetail
           label="Borrowed"
           value={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))}

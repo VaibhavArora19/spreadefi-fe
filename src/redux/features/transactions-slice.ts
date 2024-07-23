@@ -11,6 +11,9 @@ const transactionsSlice = createSlice({
     setTransactions: (state, action) => {
       state.transactions = action.payload;
     },
+    resetState: (state) => {
+      state.transactions = [];
+    },
   },
 });
 

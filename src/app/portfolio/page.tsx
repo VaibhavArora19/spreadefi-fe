@@ -15,8 +15,10 @@ import { TProtocolName } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
+import { useAccount } from 'wagmi';
 
 const Portfolio = () => {
+  const { address } = useAccount();
   const searchParams = useSearchParams();
   const protocol = searchParams.get('protocol');
   const chain = searchParams.get('chain');
@@ -29,9 +31,9 @@ const Portfolio = () => {
   const [supplied, setSupplied] = useState<TAssetBalance[]>();
   const [borrowed, setBorrowed] = useState<TAssetBalance[]>();
 
-  const { data: balances } = useFetchTokenBalance('0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6');
+  const { data: balances } = useFetchTokenBalance(address);
 
-  const { data: portfolio } = useFetchWalletPortfolio('0x82f12c7032ffEBb69D3eD34e762C6903f1c599d6');
+  const { data: portfolio } = useFetchWalletPortfolio(address);
 
   useEffect(() => {
     if (balances) {
@@ -209,11 +211,11 @@ const Portfolio = () => {
           ) : (
             <div className="flex flex-col gap-3">
               <PositionItem
-                apy={12}
-                collateral={2312}
-                debt={1232}
+                apy={0}
+                collateral={' -'}
+                debt={' -'}
                 positionName="Vault Position 1"
-                ratio={12}
+                ratio={0}
                 protocolName={TProtocolName.Balancer}
                 chain="8453"
                 type={'vault'}
@@ -221,11 +223,11 @@ const Portfolio = () => {
               <PositionItem
                 chain="10"
                 protocolName={TProtocolName.COMPOUND}
-                apy={12}
-                collateral={2312}
-                debt={1232}
+                apy={0}
+                collateral={' -'}
+                debt={0}
                 positionName="Vault Position 2"
-                ratio={12}
+                ratio={0}
                 type={'vault'}
               />
             </div>

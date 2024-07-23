@@ -80,6 +80,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     address,
     strategyName,
     type,
+    receiveGasOnDestination,
   ]);
 
   useEffect(() => {

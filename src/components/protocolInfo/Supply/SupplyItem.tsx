@@ -1,14 +1,17 @@
 import MigrateActionsModal from '@/components/popups/MigrateModal/MigrateActionsModal';
 import WithdrawModal from '@/components/popups/Withdraw/WithdrawModal';
+import { networkConfig } from '@/config/network';
+import { assetNameToImage } from '@/constants/assetInfo';
 import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
-import { transactionPayloadActions } from '@/redux/actions';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
 import { ethers } from 'ethers';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
+import { erc20Abi } from 'viem';
 import { useAccount } from 'wagmi';
 
 type SupplyItemProps = {
@@ -18,6 +21,7 @@ type SupplyItemProps = {
 const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [showMigrateModal, setShowMigrateModal] = useState(false);
+  const [decimals, setDecimals] = useState('0');
 
   const { address } = useAccount();
   const dispatch = useDispatch();
@@ -27,6 +31,23 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
 
   const protocol = searchParams.get('protocol');
   const protocolChainId = searchParams.get('chain');
+
+  useEffect(() => {
+    if (!data.asset || !data.asset.chainId) return;
+
+    async function getDecimals() {
+      //@ts-ignore
+      const provider = new ethers.providers.JsonRpcProvider(networkConfig[data.asset.chainId].rpc);
+
+      const contract = new ethers.Contract(data.asset.assetAddress, erc20Abi, provider);
+
+      const decimalPoints = await contract.decimals();
+
+      setDecimals(decimalPoints.toString());
+    }
+
+    getDecimals();
+  }, [data.asset]);
 
   const handleSupplySubmit = async () => {
     //!show modal here asking user to connect wallet
@@ -81,10 +102,19 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
     <>
       <div className="flex items-center w-full">
         <div className="flex gap-[6px] flex-[0.21]">
-          <Image src={'/assets/icons/tokens/eth.png'} height={22} width={25} alt="ETH" />
+          <Image
+            src={assetNameToImage(data.asset.assetSymbol)}
+            height={22}
+            width={25}
+            alt={data.asset.assetSymbol}
+          />
           <p>{data.asset.assetSymbol}</p>
         </div>
-        <p className="flex-[0.21]">{data.currentATokenBalance.slice(0, 4)}</p>
+        <p className="flex-[0.21]">
+          {decimals !== '0'
+            ? ethers.utils.formatUnits(data.currentATokenBalance, decimals).substring(0, 8)
+            : 0}
+        </p>
         <p className="flex-[0.21]">{data.asset.assetSupplyApy.toFixed(2)}%</p>
         <div className="flex gap-4 flex-[0.35]">
           <button
@@ -106,6 +136,8 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
         <WithdrawModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowWithdrawModal(false);
           }}
           onSubmit={handleSupplySubmit}
@@ -116,6 +148,8 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
         <MigrateActionsModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowMigrateModal(false);
           }}
         />

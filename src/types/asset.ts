@@ -39,6 +39,7 @@ export type TAsset = {
   assetAddress: string;
   protocolName: TProtocolName;
   protocolType: string;
+  decimals?: number;
 };
 
 export type TAssetsResponse = {

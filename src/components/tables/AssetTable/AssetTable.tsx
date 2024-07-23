@@ -26,7 +26,7 @@ import {
 import React, { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useDispatch } from 'react-redux';
-import { transactionPayloadActions } from '@/redux/actions';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { Action } from '@/types/strategy';
 
 const AssetTable = ({
@@ -140,6 +140,8 @@ const AssetTable = ({
         <SupplyModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowSupplyModal(false);
           }}
           type={type as Action.SUPPLY | Action.DEPOSIT}

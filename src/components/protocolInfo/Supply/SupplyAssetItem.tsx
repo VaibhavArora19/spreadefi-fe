@@ -2,7 +2,7 @@ import BorrowModal from '@/components/popups/Borrow/BorrowModal';
 import SupplyModal from '@/components/popups/common/SupplyModal';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { useFetchTokenList, useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
-import { transactionPayloadActions } from '@/redux/actions';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { Action } from '@/types/strategy';
 import { ethers } from 'ethers';
@@ -137,6 +137,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         <SupplyModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowSupplyModal(false);
           }}
           type={Action.SUPPLY}
@@ -148,6 +150,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         <BorrowModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowBorrowModal(false);
           }}
           onSubmit={handleSupplyOrBorrowSubmit}
@@ -158,6 +162,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         <BorrowAndActionModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowBorrowActionModal(false);
           }}
         />

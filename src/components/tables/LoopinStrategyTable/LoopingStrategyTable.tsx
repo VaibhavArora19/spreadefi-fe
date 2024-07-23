@@ -25,7 +25,7 @@ import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSup
 import { useAccount } from 'wagmi';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { useDispatch } from 'react-redux';
-import { transactionPayloadActions } from '@/redux/actions';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 
 const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -107,6 +107,8 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
         <LeverageSupplyModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
             setShowSupplyModal(false);
           }}
           onSubmit={handleLeverageSubmit}

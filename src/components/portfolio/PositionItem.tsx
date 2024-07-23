@@ -1,9 +1,5 @@
 import { MdKeyboardArrowDown } from 'react-icons/md';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '../ui/collapsible';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../ui/collapsible';
 import { PositionCard } from './PositionCard';
 import { TokenDetails } from './TokenDetails';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
@@ -55,9 +51,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
         <div className="flex flex-col gap-2">
           <TokenDetails
             actionType={type}
-            tokens={
-              assets?.filter((value) => Number(value.currentATokenBalance) > 0)!
-            }
+            tokens={assets?.filter((value) => Number(value.currentATokenBalance) > 0)!}
             type="Supplied"
           />
 
@@ -66,8 +60,7 @@ const PositionItem: React.FC<PositionItemProps> = ({
               tokens={
                 assets?.filter(
                   (value) =>
-                    Number(value.currentStableDebt) > 0 ||
-                    Number(value.currentVariableDebt) > 0,
+                    Number(value.currentStableDebt) > 0 || Number(value.currentVariableDebt) > 0,
                 )!
               }
               type="Borrowed"

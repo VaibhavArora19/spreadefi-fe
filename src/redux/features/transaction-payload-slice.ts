@@ -10,6 +10,8 @@ const initialState: TTransactionPayload['txDetails'] & {
   fromChain: '',
   fromAmount: '',
   fromToken: '',
+  fundToken: '',
+  fundAmount: '',
   fromTokenDecimals: 0,
   toChain: '',
   toToken: '',

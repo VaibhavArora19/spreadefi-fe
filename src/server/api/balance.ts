@@ -2,9 +2,11 @@ import { axiosScout } from '@/config';
 import { BALANCES } from '@/constants/query';
 import { useQuery } from '@tanstack/react-query';
 
-export const useFetchWalletPortfolio = (address: string) => {
+export const useFetchWalletPortfolio = (address: string | undefined) => {
   const fetchWalletPortfolio = async () => {
     try {
+      if (!address) return;
+
       const { data } = await axiosScout.get('/portfolio/' + address);
 
       return data?.data;
@@ -16,15 +18,18 @@ export const useFetchWalletPortfolio = (address: string) => {
   return useQuery({
     queryKey: [BALANCES.PORTFOLIO],
     queryFn: fetchWalletPortfolio,
+    enabled: !!address,
     refetchOnWindowFocus: false,
-    refetchOnMount: 'always',
+    refetchOnMount: true,
     staleTime: 600000, //10 minutes
   });
 };
 
-export const useFetchTokenBalance = (address: string) => {
+export const useFetchTokenBalance = (address: string | undefined) => {
   const fetchTokenBalance = async () => {
     try {
+      if (!address) return;
+
       const { data } = await axiosScout.get('/balance/' + address);
 
       return data?.data;
@@ -36,8 +41,9 @@ export const useFetchTokenBalance = (address: string) => {
   return useQuery({
     queryKey: [BALANCES.BALANCE],
     queryFn: fetchTokenBalance,
+    enabled: !!address,
     refetchOnWindowFocus: false,
-    refetchOnMount: 'always',
+    refetchOnMount:true,
     staleTime: 600000, //10 minutes
   });
 };

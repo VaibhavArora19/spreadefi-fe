@@ -12,6 +12,9 @@ const tokensSlice = createSlice({
     setTokens: (state, action) => {
       state.tokens = action.payload;
     },
+    resetState: (state) => {
+      state.tokens = [];
+    },
   },
 });
 
