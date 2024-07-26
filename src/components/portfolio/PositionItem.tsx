@@ -51,7 +51,12 @@ const PositionItem: React.FC<PositionItemProps> = ({
         <div className="flex flex-col gap-2">
           <TokenDetails
             actionType={type}
-            tokens={assets?.filter((value) => Number(value.currentATokenBalance) > 0)!}
+            tokens={
+              assets?.filter(
+                (value) =>
+                  Number(value.currentATokenBalance) > 0 && value.asset.protocolType != 'Looping',
+              )!
+            }
             type="Supplied"
           />
 
@@ -60,7 +65,9 @@ const PositionItem: React.FC<PositionItemProps> = ({
               tokens={
                 assets?.filter(
                   (value) =>
-                    Number(value.currentStableDebt) > 0 || Number(value.currentVariableDebt) > 0,
+                    Number(value.currentStableDebt) > 0 ||
+                    (Number(value.currentVariableDebt) > 0 &&
+                      value.asset.protocolType != 'Looping'),
                 )!
               }
               type="Borrowed"
