@@ -134,17 +134,9 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
 
   return (
     <Modal className="w-[500px] p-5 ">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center pb-2 border-b-[0.5px] border-[#272727] mb-4">
         <p className="font-medium mb-2 text-lg capitalize">{type} Assets</p>
         <IoClose className="cursor-pointer text-lg" onClick={onClose} />
-      </div>
-
-      <div className="flex items-center gap-1 flex-wrap text-xs text-[#a8a8a8]  pb-4 border-b-[0.5px] border-[#272727] mb-4">
-        <p className="capitalize ">{type}</p>
-        <Image src={'/assets/icons/tokens/weth.png'} height={20} width={20} alt="WETH" />
-        <p>WETH on</p>
-        <Image src={'/assets/icons/protocols/aave.png'} height={20} width={20} alt="WETH" />
-        AAVE from any chain using any token!
       </div>
 
       <p className="text-xs text-[#707070] mb-1 ml-1">Amount</p>
