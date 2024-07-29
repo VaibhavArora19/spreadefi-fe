@@ -49,10 +49,13 @@ const Portfolio = () => {
 
       balances.filteredBalances.forEach((asset: TAssetBalance) => {
         if (asset.protocol.toLowerCase() == protocol.toLowerCase() && asset.chainId == chain) {
-          if (Number(asset.currentATokenBalance) > 0) {
+          if (BigInt(asset.currentATokenBalance) > BigInt('0')) {
             suppiled.push(asset);
           }
-          if (Number(asset.currentStableDebt) > 0 || Number(asset.currentVariableDebt) > 0) {
+          if (
+            BigInt(asset.currentStableDebt) > BigInt('0') ||
+            BigInt(asset.currentVariableDebt) > BigInt('0')
+          ) {
             borrowed.push(asset);
           }
         }

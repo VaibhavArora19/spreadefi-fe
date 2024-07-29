@@ -69,7 +69,7 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
               {type == 'Borrowed'
                 ? decimals[index]
                   ? ethers.utils.formatUnits(
-                      Number(token.currentStableDebt) + Number(token.currentVariableDebt),
+                      BigInt(token.currentStableDebt) + BigInt(token.currentVariableDebt),
                       decimals[index],
                     )
                   : 0
