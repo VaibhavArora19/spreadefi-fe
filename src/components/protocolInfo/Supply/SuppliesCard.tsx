@@ -16,9 +16,12 @@ const SuppliesCard: React.FC<SuppliesCardProps> = ({ data }) => {
           <p className="flex-[0.21]">Balance</p>
           <p className="flex-[0.21]">APY</p>
         </div>
-        {data.map((item: TAssetBalance, index: number) => {
-          return <SupplyItem key={index} data={item} />;
-        })}
+
+        <div className='space-y-3'>
+          {data.map((item: TAssetBalance, index: number) => {
+            return <SupplyItem key={index} data={item} />;
+          })}
+        </div>
       </div>
     </div>
   );
