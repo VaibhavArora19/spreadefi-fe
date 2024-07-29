@@ -143,16 +143,13 @@ const MigrateBorrow = ({
           onChange={(e) => dispatch(transactionPayloadActions.setFromAmount(e.target.value))}
           onWheel={(e) => (e.target as HTMLInputElement).blur()}
         />
-        <div className="flex items-center gap-4 text-xs p-4">
+        {/* <div className="flex items-center gap-4 text-xs p-4">
           <div className="flex items-center gap-2 py-3 px-4 rounded-md bg-[#111]">
             <Image src={'/assets/icons/tokens/cbeth.png'} height={20} width={20} alt="cbeth" />
 
-            {/**
-             *  token to be migrated - get it from table
-             *  */}
             <p className="text-sm">cbETH</p>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className="flex items-center gap-2 mt-2">
