@@ -14,6 +14,9 @@ import { useAccount, useCall } from 'wagmi';
 import { useTransactionsBuilder } from '@/server/api/transactions';
 import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
+import { Switch } from '@/components/ui/switch';
+import Slippage from './Slippage';
+import { IoMdSettings } from 'react-icons/io';
 
 type CommonActionModalProps = {
   type: Action.SUPPLY | Action.WITHDRAW | Action.REPAY | Action.BORROW | Action.DEPOSIT;
@@ -25,6 +28,8 @@ type ChangeOptions = 'amount' | 'chain' | 'token';
 
 const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, onSubmit }) => {
   const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
+  const [showSettings, setShowSettings] = useState(false);
+  const [tab, setTab] = useState('auto');
 
   const { address } = useAccount();
   const dispatch = useAppDispatch();
@@ -136,7 +141,16 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     <Modal className="w-[500px] p-5 ">
       <div className="flex justify-between items-center pb-2 border-b-[0.5px] border-[#272727] mb-4">
         <p className="font-medium mb-2 text-lg capitalize">{type} Assets</p>
-        <IoClose className="cursor-pointer text-lg" onClick={onClose} />
+        <div className="flex items-center gap-1 relative">
+          <IoMdSettings
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowSettings(!showSettings);
+            }}
+            className="cursor-pointer text-lg"
+          />
+          <IoClose onClick={onClose} className="cursor-pointer text-lg" />
+        </div>
       </div>
 
       <p className="text-xs text-[#707070] mb-1 ml-1">Amount</p>
@@ -167,7 +181,33 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
         </div>
       </div>
 
+      <div className="flex items-center gap-2 mt-2">
+        <p className="bg-[#282828] text-white p-2 rounded-md w-fit cursor-pointer text-center flex-[0.25] hover:bg-[#111]">
+          25%
+        </p>
+        <p className="bg-[#282828] text-white p-2 rounded-md w-fit cursor-pointer text-center flex-[0.25] hover:bg-[#111]">
+          50%
+        </p>
+        <p className="bg-[#282828] text-white p-2 rounded-md w-fit cursor-pointer text-center flex-[0.25] hover:bg-[#111]">
+          75%
+        </p>
+        <p className="bg-[#282828] text-white p-2 rounded-md w-fit cursor-pointer text-center flex-[0.25] hover:bg-[#111]">
+          100%
+        </p>
+      </div>
+
       <TransactionOverview />
+
+      {/* @Vaibhav add proper values */}
+      <div className="bg-[#1E1E1E] w-full mt-3 rounded-xl p-4 flex items-center justify-between">
+        <p className="text-sm">Arrival on gas</p>
+        <Switch
+          onCheckedChange={(checked) => {
+            dispatch(transactionPayloadActions.setReceiveGasOnDestination(checked));
+          }}
+          checked={receiveGasOnDestination}
+        />
+      </div>
 
       <Button
         className="w-full text-black bg-white mt-4 py-6 capitalize"
@@ -176,6 +216,8 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
         }}>
         {type}
       </Button>
+
+      {showSettings && <Slippage setTab={setTab} tab={tab} />}
     </Modal>
   );
 };
