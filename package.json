@@ -9,8 +9,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@0xsquid/sdk": "2.8.0-beta.0",
-    "@0xsquid/squid-types": "^0.1.61",
+    "@0xsquid/sdk": "^2.8.23",
+    "@0xsquid/squid-types": "^0.1.93",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.5",
     "@mui/material": "^5.15.19",
