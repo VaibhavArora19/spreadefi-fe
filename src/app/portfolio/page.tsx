@@ -1,5 +1,6 @@
 'use client';
 
+import LoopingPositionTable from '@/components/portfolio/looping-position/LoopingPositionTable';
 import PortfolioCard from '@/components/portfolio/PortfolioCard';
 import PositionItem from '@/components/portfolio/PositionItem';
 import AssetsToBorrowCard from '@/components/protocolInfo/Borrow/AssetsToBorrowCard';
@@ -10,7 +11,7 @@ import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
 import { TAsset } from '@/types/asset';
-import { TAssetBalance, TFormattedAsset, TFormattedAssetBalance } from '@/types/balance';
+import { TAssetBalance, TFormattedAssetBalance } from '@/types/balance';
 import { TProtocolName } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -181,37 +182,37 @@ const Portfolio = () => {
           <PortfolioCard portfolio={portfolio} />
 
           <div className="mt-10 mb-6">
-            <Tabs onValueChange={setTab} value={tab} className="w-[300px] dark">
-              <TabsList className="grid w-full grid-cols-2 bg-black">
+            <Tabs onValueChange={setTab} value={tab} className="w-fit dark">
+              <TabsList className="grid w-full grid-cols-3 bg-black">
                 <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
                 <TabsTrigger value="vault">Yield vaults</TabsTrigger>
+                <TabsTrigger value="loopingPositions">Looping Positions</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
           {/* Add collapsible from shadcn */}
 
-          {tab === 'lendBorrow' ? (
-            formattedBalances &&
-            portfolio && (
-              <div className="flex flex-col gap-3">
-                {formattedBalances.map((balance: TFormattedAssetBalance, index: number) => (
-                  <PositionItem
-                    key={index}
-                    chain={balance.chainId}
-                    protocolName={balance.protocol}
-                    apy={12}
-                    collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
-                    debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
-                    positionName={balance.protocol}
-                    ratio={12}
-                    type="lendBorrow"
-                    assets={balance.assets}
-                  />
-                ))}
-              </div>
-            )
-          ) : (
+          {tab === 'lendBorrow' && formattedBalances && portfolio && (
+            <div className="flex flex-col gap-3">
+              {formattedBalances.map((balance: TFormattedAssetBalance, index: number) => (
+                <PositionItem
+                  key={index}
+                  chain={balance.chainId}
+                  protocolName={balance.protocol}
+                  apy={12}
+                  collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
+                  debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
+                  positionName={balance.protocol}
+                  ratio={12}
+                  type="lendBorrow"
+                  assets={balance.assets}
+                />
+              ))}
+            </div>
+          )}
+
+          {tab === 'vault' && (
             <div className="flex flex-col gap-3">
               <PositionItem
                 apy={0}
@@ -233,6 +234,12 @@ const Portfolio = () => {
                 ratio={0}
                 type={'vault'}
               />
+            </div>
+          )}
+
+          {tab === 'loopingPositions' && (
+            <div className="flex flex-col gap-3">
+              <LoopingPositionTable />
             </div>
           )}
         </div>
