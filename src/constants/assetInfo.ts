@@ -45,6 +45,6 @@ export const assetNameToImage = (name: TAssetName | string) => {
     case TAssetName.USDBC:
       return '/assets/icons/tokens/usdbc.png';
     default:
-      return '/assets/icons/tokens/wbtc.png';
+      return '/assets/icons/tokens/yearn-v3.png';
   }
 };

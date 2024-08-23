@@ -1,8 +1,18 @@
 import Modal from '@/components/(ui)/Modal';
-import React from 'react';
+import { useTransactionStore } from '@/redux/hooks';
+import { TTransactionResponse } from '@/types/transaction';
+import { ethers } from 'ethers';
+import { isBytesLike } from 'ethers/lib/utils';
+import React, { useEffect, useState } from 'react';
 import { MdKeyboardArrowUp } from 'react-icons/md';
 
 interface FeeRowProps {
+  label: string;
+  amount: string;
+  usd: string;
+}
+
+interface Fee {
   label: string;
   amount: string;
   usd: string;
@@ -19,20 +29,75 @@ const FeeRow: React.FC<FeeRowProps> = ({ label, amount, usd }) => {
   );
 };
 
-const TransactionDetailsModal = ({ onClose }: { onClose: () => void }) => {
-  interface Fee {
-    label: string;
-    amount: string;
-    usd: string;
-  }
+const TransactionDetailsModal = ({
+  onClose,
+  squidTx,
+}: {
+  onClose: () => void;
+  squidTx: TTransactionResponse[number];
+}) => {
+  const [fees, setFees] = useState<Fee[] | null>([
+    { label: 'Gas-receiver fees', amount: '0.0', usd: '0.0' },
+    { label: 'Boost fee', amount: '0.0', usd: '0.0' },
+    { label: 'Gas fee', amount: '0.0', usd: '0.0' },
+    { label: 'Total', amount: '0.0', usd: '0.0' },
+  ]);
 
-  const fees: Fee[] = [
-    { label: 'Cross-chain gas fees', amount: '0.001', usd: '3.23' },
-    { label: 'Gas fee on destination chain', amount: '0.001', usd: '3.23' },
-    { label: 'Boost fee', amount: '0.001', usd: '3.23' },
-    { label: 'Expected gas refund', amount: '0.001', usd: '3.23' },
-    { label: 'Total', amount: '500', usd: '766.34' },
-  ];
+  useEffect(() => {
+    if (!squidTx || isBytesLike(squidTx.tx)) {
+      return;
+    }
+
+    const gasReceiverFee = {
+      amount: squidTx.tx.estimate.feeCosts[0]
+        ? ethers.utils.formatUnits(squidTx.tx.estimate.feeCosts[0].amount, 18).substring(0, 8)
+        : '0',
+      amountUsd: squidTx.tx.estimate.feeCosts[0] ? squidTx.tx.estimate.feeCosts[0].amountUsd : '0',
+    };
+
+    const boostFee = {
+      amount: squidTx.tx.estimate.feeCosts[1]
+        ? ethers.utils.formatUnits(squidTx.tx.estimate.feeCosts[1].amount, 18).substring(0, 8)
+        : '0',
+      amountUsd: squidTx.tx.estimate.feeCosts[0] ? squidTx.tx.estimate.feeCosts[1].amountUsd : '0',
+    };
+
+    const gasFee = {
+      amount: squidTx.tx.estimate.gasCosts[0]
+        ? ethers.utils.formatUnits(squidTx.tx.estimate.gasCosts[0].amount, 18).substring(0, 8)
+        : '0',
+      amountUsd: squidTx.tx.estimate.gasCosts[0] ? squidTx.tx.estimate.gasCosts[0].amountUsd : '0',
+    };
+
+    setFees([
+      {
+        label: 'Gas-receiver fees',
+        amount: gasReceiverFee.amount,
+        usd: gasReceiverFee.amountUsd,
+      },
+      {
+        label: 'Boost fee',
+        amount: boostFee.amount,
+        usd: boostFee.amountUsd,
+      },
+      {
+        label: 'Gas fee',
+        amount: gasFee.amount,
+        usd: gasFee.amountUsd,
+      },
+      {
+        label: 'Total',
+        amount: (Number(gasReceiverFee.amount) + Number(boostFee.amount) + Number(gasFee.amount))
+          .toString()
+          .substring(0, 8),
+        usd: (
+          Number(gasReceiverFee.amountUsd) +
+          Number(boostFee.amountUsd) +
+          Number(gasFee.amountUsd)
+        ).toString(),
+      },
+    ]);
+  }, [squidTx]);
 
   return (
     <Modal isBackdrop={false} className="w-[500px] p-5 h-[500px]">
@@ -49,9 +114,10 @@ const TransactionDetailsModal = ({ onClose }: { onClose: () => void }) => {
       <p className=" font-medium mb-3 mt-6 ">Fee breakdown</p>
 
       <div className="flex flex-col gap-1 pb-4 border-b-[0.5px] border-b-[#2a2a2a]">
-        {fees.map((fee, index) => (
-          <FeeRow key={index} label={fee.label} amount={fee.amount} usd={fee.usd} />
-        ))}
+        {fees &&
+          fees.map((fee, index) => (
+            <FeeRow key={index} label={fee.label} amount={fee.amount} usd={fee.usd} />
+          ))}
       </div>
 
       <div className="mt-6">

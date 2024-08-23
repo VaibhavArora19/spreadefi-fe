@@ -9,6 +9,7 @@ export const useFetchWalletPortfolio = (address: string | undefined) => {
 
       const { data } = await axiosScout.get('/portfolio/' + address);
 
+      console.log('data is', data);
       return data?.data;
     } catch (error: any) {
       console.error('error: ', error);
@@ -43,7 +44,7 @@ export const useFetchTokenBalance = (address: string | undefined) => {
     queryFn: fetchTokenBalance,
     enabled: !!address,
     refetchOnWindowFocus: false,
-    refetchOnMount:true,
+    refetchOnMount: true,
     staleTime: 600000, //10 minutes
   });
 };

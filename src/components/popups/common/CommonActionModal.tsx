@@ -96,7 +96,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
   useEffect(() => {
     const debouncedFunction = setTimeout(() => {
       prepareTransactionPayload();
-    }, 5000);
+    }, 1500);
 
     return () => clearTimeout(debouncedFunction);
   }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage, tab, receiveGasOnDestination]);

@@ -77,12 +77,15 @@ export const useTransactionsBuilder = (transactionPayload: TTransactionPayload |
         txPayload.txDetails.fundAmount = transactionPayload?.txDetails.fromAmount;
       }
 
+      dispatch(transactionsActions.setLoading(true));
+
       const { data } = await axiosCompass.post<TApiResponse<TTransactionResponse>>(
         '/transaction/prepare',
         txPayload,
       );
 
       dispatch(transactionsActions.setTransactions(data.data));
+      dispatch(transactionsActions.setLoading(false));
 
       console.log('Transactions built sucessfully...', data);
       return data;
