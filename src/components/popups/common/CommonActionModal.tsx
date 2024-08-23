@@ -43,6 +43,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     toToken,
     toChain,
     receiveGasOnDestination,
+    slippage,
   } = useTransactionPayloadStore();
 
   const { data } = useTransactionsBuilder(transactionPayload);
@@ -74,6 +75,8 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
       },
     };
 
+    if (slippage !== 0 && tab === 'custom') payload.txDetails.slippage = slippage;
+
     setTransactionPayload(payload);
   }, [
     fromAmount,
@@ -86,15 +89,17 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     strategyName,
     type,
     receiveGasOnDestination,
+    tab,
+    slippage,
   ]);
 
   useEffect(() => {
     const debouncedFunction = setTimeout(() => {
       prepareTransactionPayload();
-    }, 5000);
+    }, 1500);
 
     return () => clearTimeout(debouncedFunction);
-  }, [fromAmount, fromToken, fromChain, toToken, toChain]);
+  }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage, tab, receiveGasOnDestination]);
 
   const changeHandler = async (
     option: ChangeOptions,

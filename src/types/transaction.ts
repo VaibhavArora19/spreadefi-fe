@@ -29,10 +29,10 @@ export type TTransactionResponse = {
   to: string;
   type: Action;
   tx:
-    | BytesLike
     | {
         estimate: Estimate;
         transactionRequest?: SquidData;
         params: RouteRequest;
-      };
+      }
+    | BytesLike;
 }[];

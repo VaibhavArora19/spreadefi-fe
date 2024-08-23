@@ -5,6 +5,7 @@ import { sleep } from './sleep';
 import { squidConfig } from '@/config/squid';
 import { isBytesLike } from 'ethers/lib/utils';
 import { TransactionResponse } from '@0xsquid/sdk/dist/types';
+import axios from 'axios';
 
 export const executeSquidTransaction = async (
   signer: ethers.providers.JsonRpcSigner,
@@ -17,6 +18,30 @@ export const executeSquidTransaction = async (
   const tx = (await squid.executeRoute({ signer, route })) as TransactionResponse;
 
   await tx.wait();
+};
+
+export const executePortalsTransaction = async (
+  signer: ethers.providers.JsonRpcSigner,
+  url: string,
+) => {
+  try {
+    const response = await axios.get(url, {
+      headers: {
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_PORTALS_URL}`,
+      },
+    });
+
+    const tx = await signer.sendTransaction({
+      to: response.data.tx.to,
+      data: response.data.tx.data,
+      gasLimit: '500000',
+    });
+
+    await tx.wait();
+  } catch (error: any) {
+    console.log('error ', error);
+    throw new Error(error);
+  }
 };
 
 export const executeTransaction = async (
@@ -41,6 +66,8 @@ export const executeTransaction = async (
 
   if (transaction.type === Action.SQUID) {
     await executeSquidTransaction(signer, transaction.tx);
+  } else if (transaction.type === Action.PORTALS) {
+    await executePortalsTransaction(signer, transaction.tx as string);
   } else {
     const tx = {
       to: transaction.to,

@@ -27,13 +27,19 @@ const Slippage: React.FC<SlippageProps> = ({ setTab, tab }) => {
 
       {tab === 'custom' && (
         <div className="flex items-center gap-2 mt-2 ">
-          <p className="p-2 bg-[#27272A] rounded-md flex-[0.33] text-center cursor-pointer hover:bg-[#1e1e1e]">
+          <p
+            className="p-2 bg-[#27272A] rounded-md flex-[0.33] text-center cursor-pointer hover:bg-[#1e1e1e]"
+            onClick={() => dispatch(transactionPayloadActions.setSlippage(0.5))}>
             0.5%
           </p>
-          <p className="p-2 bg-[#27272A] rounded-md  flex-[0.33] text-center cursor-pointer hover:bg-[#1e1e1e]">
+          <p
+            className="p-2 bg-[#27272A] rounded-md  flex-[0.33] text-center cursor-pointer hover:bg-[#1e1e1e]"
+            onClick={() => dispatch(transactionPayloadActions.setSlippage(1.5))}>
             1.5%
           </p>
-          <p className="p-2 bg-[#27272A] rounded-md  flex-[0.33] text-center cursor-pointer hover:bg-[#1e1e1e]">
+          <p
+            className="p-2 bg-[#27272A] rounded-md  flex-[0.33] text-center cursor-pointer hover:bg-[#1e1e1e]"
+            onClick={() => dispatch(transactionPayloadActions.setSlippage(3))}>
             3%
           </p>
         </div>
