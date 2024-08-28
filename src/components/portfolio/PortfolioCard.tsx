@@ -6,6 +6,7 @@ type PortfolioCardProps = {
   portfolio: {
     totalCollateralBase: any;
     totalDebtBase: any;
+    totalYieldBalance: any;
     totalBalanceUSD: any;
   };
 };
@@ -18,8 +19,11 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
         <PortfolioDetail
           label="Net worth"
           value={
-            parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8)) -
-            parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))
+            portfolio
+              ? parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8)) +
+                portfolio?.totalYieldBalance -
+                parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))
+              : 0
           }
           className="text-white text-4xl"
         />
@@ -33,7 +37,11 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
           value={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8))}
           className="text-green-600 text-xl"
         />
-        <PortfolioDetail label="Vaults" value={' -'} className="text-yellow-500 text-xl" />
+        <PortfolioDetail
+          label="Vaults"
+          value={portfolio?.totalYieldBalance}
+          className="text-yellow-500 text-xl"
+        />
         <PortfolioDetail
           label="Borrowed"
           value={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))}
@@ -44,7 +52,7 @@ const PortfolioCard: React.FC<PortfolioCardProps> = ({ portfolio }) => {
       <div className="px-6 pb-6 pt-2 ">
         <DividedBar
           borrowed={parseFloat(formatUnits(portfolio?.totalDebtBase || 0, 8))}
-          vault={18000}
+          vault={portfolio?.totalYieldBalance}
           wallet={parseFloat(formatUnits(portfolio?.totalBalanceUSD || 0, 8))}
           lend={parseFloat(formatUnits(portfolio?.totalCollateralBase || 0, 8))}
         />

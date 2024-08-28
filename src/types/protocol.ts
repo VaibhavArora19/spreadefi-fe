@@ -10,3 +10,9 @@ export enum TProtocolName {
   HOPBEEFY = 'hop beefy',
   YEARN_V3 = 'yearn-v3',
 }
+
+export enum ProtocolType {
+  LENDING = 'Lending',
+  YIELD = 'Yield',
+  LOOPING = 'Looping',
+}

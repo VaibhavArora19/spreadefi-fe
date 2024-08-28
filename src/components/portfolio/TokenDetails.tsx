@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Button } from '../ui/button';
 import { assetNameToImage } from '@/constants/assetInfo';
-import { TFormattedAsset } from '@/types/balance';
+import { TFormattedAsset, TLendingAsset, TYieldAsset } from '@/types/balance';
 import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { networkConfig } from '@/config/network';
@@ -69,17 +69,25 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
               {type == 'Borrowed'
                 ? decimals[index]
                   ? ethers.utils.formatUnits(
-                      BigInt(token.currentStableDebt) + BigInt(token.currentVariableDebt),
+                      BigInt((token as TFormattedAsset & TLendingAsset).currentStableDebt) +
+                        BigInt((token as TFormattedAsset & TLendingAsset).currentVariableDebt),
                       decimals[index],
                     )
                   : 0
                 : decimals[index]
-                ? ethers.utils
-                    .formatUnits(token.currentATokenBalance, decimals[index])
-                    .substring(0, 7)
+                ? (token as TFormattedAsset & TLendingAsset).currentATokenBalance
+                  ? ethers.utils
+                      .formatUnits(
+                        (token as TFormattedAsset & TLendingAsset).currentATokenBalance,
+                        decimals[index],
+                      )
+                      .substring(0, 7)
+                  : '-'
                 : 0}
             </p>
-            <p className="flex-[0.33] text-center">{' -'}</p>
+            <p className="flex-[0.33] text-center">
+              {(token as TFormattedAsset & TYieldAsset)?.balanceUSD}
+            </p>
 
             {actionType === 'vault' ? (
               <Button className=" text-black bg-white py-2 capitalize flex-[0.15]">Supply</Button>

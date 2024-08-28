@@ -6,7 +6,7 @@ import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { TProtocolName } from '@/types/protocol';
 import { TAsset } from '@/types/asset';
-import { TFormattedAsset } from '@/types/balance';
+import { TFormattedAsset, TLendingAsset, TYieldAsset } from '@/types/balance';
 
 type PositionItemProps = {
   positionName: string;
@@ -54,7 +54,9 @@ const PositionItem: React.FC<PositionItemProps> = ({
             tokens={
               assets?.filter(
                 (value) =>
-                  Number(value.currentATokenBalance) > 0 && value.asset.protocolType != 'Looping',
+                  Number((value as TFormattedAsset & TLendingAsset).currentATokenBalance) > 0 ||
+                  (Number((value as TFormattedAsset & TYieldAsset).balanceUSD) > 0 &&
+                    value.asset.protocolType != 'Looping'),
               )!
             }
             type="Supplied"
@@ -65,8 +67,8 @@ const PositionItem: React.FC<PositionItemProps> = ({
               tokens={
                 assets?.filter(
                   (value) =>
-                    Number(value.currentStableDebt) > 0 ||
-                    (Number(value.currentVariableDebt) > 0 &&
+                    Number((value as TFormattedAsset & TLendingAsset).currentStableDebt) > 0 ||
+                    (Number((value as TFormattedAsset & TLendingAsset).currentVariableDebt) > 0 &&
                       value.asset.protocolType != 'Looping'),
                 )!
               }
