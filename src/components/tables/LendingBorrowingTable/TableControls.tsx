@@ -5,7 +5,7 @@ import { Table } from '@tanstack/react-table';
 
 type TableControlsProps = {
   table: Table<TableItem>;
-  type: 'lendBorrow' | 'vault' | 'looping';
+  type: 'lendBorrow' | 'yield' | 'looping';
 };
 
 const TableControls: React.FC<TableControlsProps> = ({ table, type }) => {

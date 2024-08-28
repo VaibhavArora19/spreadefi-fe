@@ -28,7 +28,7 @@ const DividedBar = ({
           className="bg-green-500 h-full cursor-pointer"></div>
       </Tooltip>
 
-      <Tooltip title={`Vault - $${vault.toLocaleString('en')} `}>
+      <Tooltip title={`Vault - $${vault?.toLocaleString('en')} `}>
         <div
           style={{ width: `${(vault / total) * 100}%` }}
           className="bg-yellow-500 h-full cursor-pointer"></div>

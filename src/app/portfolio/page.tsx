@@ -10,8 +10,13 @@ import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
 import { TAsset } from '@/types/asset';
-import { TAssetBalance, TFormattedAsset, TFormattedAssetBalance } from '@/types/balance';
-import { TProtocolName } from '@/types/protocol';
+import {
+  TAssetBalance,
+  TFormattedAsset,
+  TFormattedAssetBalance,
+  TYieldAsset,
+} from '@/types/balance';
+import { ProtocolType, TProtocolName } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
@@ -23,13 +28,15 @@ const Portfolio = () => {
   const protocol = searchParams.get('protocol');
   const chain = searchParams.get('chain');
   const [tab, setTab] = useState('lendBorrow');
-  const [formattedBalances, setFormattedBalances] = useState<TFormattedAssetBalance[]>();
+  // const [formattedBalances, setFormattedBalances] = useState<TFormattedAssetBalance[]>();
   const [assets, setAssets] = useState<TAsset[]>();
   const [ethDerivatives, setEthDerivatives] = useState<TAsset[]>([]);
   const [btcDerivatives, setBtcDerivatives] = useState<TAsset[]>([]);
   const [remaining, setRemaining] = useState<TAsset[]>([]);
   const [supplied, setSupplied] = useState<TAssetBalance[]>();
   const [borrowed, setBorrowed] = useState<TAssetBalance[]>();
+  const [lendingBalances, setLendingBalances] = useState<TFormattedAssetBalance[]>();
+  const [yieldBalances, setYieldBalances] = useState<TFormattedAssetBalance[]>();
 
   const { data: balances } = useFetchTokenBalance(address);
 
@@ -95,27 +102,50 @@ const Portfolio = () => {
   }, [assets, protocol, chain]);
 
   function formatData(data: TAssetBalance[]) {
-    const formattedData: TFormattedAssetBalance[] = [];
+    const lendingTokens: TFormattedAssetBalance[] = [];
+    const yieldTokens: TFormattedAssetBalance[] = [];
 
-    data.forEach((item: TAssetBalance) => {
-      const { protocol, chainId, ...rest } = item;
+    data.forEach((d) => {
+      const { protocol, chainId, ...rest } = d;
 
-      let existingEntry = formattedData.find(
-        (entry: TFormattedAssetBalance) => entry.protocol === protocol && entry.chainId === chainId,
-      );
+      if (
+        d.asset.protocolType === ProtocolType.LENDING ||
+        d.asset.protocolType === ProtocolType.LOOPING
+      ) {
+        const existingProtocol = lendingTokens.find(
+          (protocol) =>
+            protocol.protocol === d.asset.protocolName && protocol.chainId === d.asset.chainId,
+        );
 
-      if (existingEntry) {
-        existingEntry.assets.push(rest);
+        if (existingProtocol) {
+          existingProtocol.assets.push(rest);
+        } else {
+          lendingTokens.push({
+            protocol,
+            chainId,
+            assets: [rest],
+          });
+        }
       } else {
-        formattedData.push({
-          protocol,
-          chainId,
-          assets: [rest],
-        });
+        const existingProtocol = yieldTokens.find(
+          (protocol) =>
+            protocol.protocol === d.asset.protocolName && protocol.chainId === d.asset.chainId,
+        );
+
+        if (existingProtocol) {
+          existingProtocol.assets.push(rest);
+        } else {
+          yieldTokens.push({
+            protocol,
+            chainId,
+            assets: [rest],
+          });
+        }
       }
     });
 
-    setFormattedBalances(formattedData);
+    setLendingBalances(lendingTokens);
+    setYieldBalances(yieldTokens);
   }
 
   function getCollateralAnddebt(protocolName: string, chainId: string, index: number) {
@@ -136,6 +166,18 @@ const Portfolio = () => {
     } else {
       return 0;
     }
+  }
+
+  function getTotalCollateralForVault(index: number) {
+    let totalCollateral = 0;
+
+    if (!yieldBalances) return;
+
+    yieldBalances[index].assets.forEach(
+      (asset) => (totalCollateral += (asset as TFormattedAsset & TYieldAsset).balanceUSD),
+    );
+
+    return totalCollateral;
   }
 
   return (
@@ -191,50 +233,45 @@ const Portfolio = () => {
 
           {/* Add collapsible from shadcn */}
 
-          {tab === 'lendBorrow' ? (
-            formattedBalances &&
-            portfolio && (
-              <div className="flex flex-col gap-3">
-                {formattedBalances.map((balance: TFormattedAssetBalance, index: number) => (
-                  <PositionItem
-                    key={index}
-                    chain={balance.chainId}
-                    protocolName={balance.protocol}
-                    apy={12}
-                    collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
-                    debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
-                    positionName={balance.protocol}
-                    ratio={12}
-                    type="lendBorrow"
-                    assets={balance.assets}
-                  />
-                ))}
-              </div>
-            )
-          ) : (
-            <div className="flex flex-col gap-3">
-              <PositionItem
-                apy={0}
-                collateral={' -'}
-                debt={' -'}
-                positionName="Vault Position 1"
-                ratio={0}
-                protocolName={TProtocolName.Balancer}
-                chain="8453"
-                type={'vault'}
-              />
-              <PositionItem
-                chain="10"
-                protocolName={TProtocolName.COMPOUND}
-                apy={0}
-                collateral={' -'}
-                debt={0}
-                positionName="Vault Position 2"
-                ratio={0}
-                type={'vault'}
-              />
-            </div>
-          )}
+          {tab === 'lendBorrow'
+            ? lendingBalances &&
+              portfolio && (
+                <div className="flex flex-col gap-3">
+                  {lendingBalances.map((balance: TFormattedAssetBalance, index: number) => (
+                    <PositionItem
+                      key={index}
+                      chain={balance.chainId}
+                      protocolName={balance.protocol}
+                      apy={12}
+                      collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
+                      debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
+                      positionName={balance.protocol}
+                      ratio={12}
+                      type="lendBorrow"
+                      assets={balance.assets}
+                    />
+                  ))}
+                </div>
+              )
+            : yieldBalances &&
+              portfolio && (
+                <div className="flex flex-col gap-3">
+                  {yieldBalances.map((balance: TFormattedAssetBalance, index: number) => (
+                    <PositionItem
+                      key={index}
+                      apy={12}
+                      collateral={getTotalCollateralForVault(index) || '-'}
+                      debt={'-'}
+                      positionName={balance.protocol}
+                      ratio={0}
+                      protocolName={balance.protocol}
+                      chain={balance.chainId}
+                      type={'vault'}
+                      assets={balance.assets}
+                    />
+                  ))}
+                </div>
+              )}
         </div>
       )}
     </div>
