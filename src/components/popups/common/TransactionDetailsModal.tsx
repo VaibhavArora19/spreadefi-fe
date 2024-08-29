@@ -100,7 +100,7 @@ const TransactionDetailsModal = ({
   }, [squidTx]);
 
   return (
-    <Modal isBackdrop={false} className="w-[500px] p-5 h-[500px]">
+    <Modal isBackdrop={false} className="w-[500px] p-5 h-[550px]">
       <div className="flex justify-between items-center pb-4 mb-4 border-b-[0.5px] border-b-[#2a2a2a]">
         <p className="text-center w-full">Fee details</p>
         <MdKeyboardArrowUp onClick={onClose} className="cursor-pointer text-xl" />

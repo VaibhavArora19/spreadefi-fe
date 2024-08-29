@@ -15,8 +15,8 @@ const AssetPage = () => {
     <div className="w-full">
       <AssetTable type={Action.DEPOSIT} assetData={assetData?.vaultTableData} />
       <div>
-        <p className="mt-6">You can also deposit ETH derivatives here</p>
-        <EthDerivativesTable />
+        {/* <p className="mt-6">You can also deposit ETH derivatives here</p>
+        <EthDerivativesTable /> */}
       </div>
     </div>
   );

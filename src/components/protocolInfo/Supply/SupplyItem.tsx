@@ -13,6 +13,8 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { erc20Abi } from 'viem';
 import { useAccount } from 'wagmi';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type SupplyItemProps = {
   data: { asset: TAsset; currentATokenBalance: string };
@@ -58,7 +60,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
 
   const migrateModalHandler = async () => {
     //! add some warning here
-    if (!protocolChainId) return;
+    if (!protocolChainId) {
+      toast.error('ChainId not found!');
+      return;
+    }
 
     const tokens = await fetchList(protocolChainId);
     const [filterFromToken] = tokens.filter(
@@ -67,7 +72,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
     );
 
     //!add some error here
-    if (!filterFromToken) return;
+    if (!filterFromToken) {
+      toast.error('Some error occurred!');
+      return;
+    }
 
     dispatch(transactionPayloadActions.setStrategyName((protocol + '-').trim()));
     dispatch(transactionPayloadActions.setFromChain(protocolChainId));
@@ -79,7 +87,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
 
   const withdrawModalHandler = async () => {
     //! add some warning here
-    if (!protocolChainId) return;
+    if (!protocolChainId) {
+      toast.error('ChainId not found');
+      return;
+    }
 
     const tokens = await fetchList(protocolChainId);
     const [filterFromToken] = tokens.filter(
@@ -88,7 +99,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
     );
 
     //!add some error here
-    if (!filterFromToken) return;
+    if (!filterFromToken) {
+      toast.error('Some error occurred!');
+      return;
+    }
 
     protocol && dispatch(transactionPayloadActions.setStrategyName(protocol));
     protocolChainId && dispatch(transactionPayloadActions.setFromChain(protocolChainId));
@@ -154,6 +168,8 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
           }}
         />
       ) : null}
+
+      <ToastContainer theme="dark" />
     </>
   );
 };

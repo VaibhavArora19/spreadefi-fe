@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React from 'react';
@@ -10,13 +11,15 @@ const Navbar = () => {
   return (
     <nav className=" bg-[#090909] flex justify-between items-center text-sm py-2 px-8 border-b-[0.5px] border-[#272727] fixed w-full  z-10">
       <ul className="flex items-center gap-8">
-        <p
+        {/* <p
           className="cursor-pointer"
           onClick={() => {
             router.push('/');
           }}>
           Logo
-        </p>
+        </p> */}
+
+        <Image src={'/assets/icons/logo.webp'} height={22} width={25} alt="Spreadefi" />
         <Link href={'/'}>lend</Link>
         <Link href={'/'}>borrow</Link>
         <Link href={'/portfolio'}>portfolio</Link>

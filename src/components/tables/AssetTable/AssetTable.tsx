@@ -97,7 +97,7 @@ const AssetTable = ({
 
   return (
     <>
-      <div className="flex items-center py-4 justify-between">
+      <div className="flex items-center py-4 justify-between relative">
         <Input
           placeholder="Search token by name"
           value={(table.getColumn('assetSymbol')?.getFilterValue() as string) ?? ''}

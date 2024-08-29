@@ -12,6 +12,8 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAccount } from 'wagmi';
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 type SupplyAssetItemProps = {
   asset: TAsset;
@@ -38,7 +40,10 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
 
   const borrowModalHandler = async () => {
     //!add some warning here
-    if (!asset.chainId) return;
+    if (!asset.chainId) {
+      toast.error('ChainId not found!');
+      return;
+    }
 
     const tokens = await fetchList(asset.chainId);
     const [filterFromToken] = tokens.filter(
@@ -47,7 +52,10 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
     );
 
     //!add some error here
-    if (!filterFromToken) return;
+    if (!filterFromToken) {
+      toast.error('Some error occured!');
+      return;
+    }
 
     dispatch(transactionPayloadActions.setStrategyName(asset.protocolName));
     dispatch(transactionPayloadActions.setFromChain(asset.chainId));
@@ -168,6 +176,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
           }}
         />
       ) : null}
+
+      <ToastContainer theme="dark" />
     </>
   );
 };
