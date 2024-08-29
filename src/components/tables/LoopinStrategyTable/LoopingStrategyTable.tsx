@@ -26,6 +26,9 @@ import { useAccount } from 'wagmi';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { useDispatch } from 'react-redux';
 import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
+import { walletActions } from '@/redux/features/wallet-slice';
+import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
+import { useWalletStore } from '@/redux/hooks';
 
 const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -39,6 +42,7 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
 
   const router = useRouter();
   const dispatch = useDispatch();
+  const { isConnected } = useWalletStore();
 
   const {
     chainFilters,
@@ -52,7 +56,7 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
 
   const table = useReactTable({
     data: filteredData || [],
-    columns: LoopingStrategyColum(setShowSupplyModal),
+    columns: LoopingStrategyColum(setShowSupplyModal, filteredData),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -70,7 +74,10 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
 
   const handleLeverageSubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };
@@ -113,6 +120,8 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
           onSubmit={handleLeverageSubmit}
         />
       ) : null}
+
+      {!isConnected && <ConnectWallet />}
     </div>
   );
 };

@@ -14,6 +14,7 @@ import { useAccount } from 'wagmi';
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { walletActions } from '@/redux/features/wallet-slice';
 
 type SupplyAssetItemProps = {
   asset: TAsset;
@@ -33,7 +34,10 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
 
   const handleSupplyOrBorrowSubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };

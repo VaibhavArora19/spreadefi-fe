@@ -1,5 +1,6 @@
 'use client';
 
+import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
 import PortfolioCard from '@/components/portfolio/PortfolioCard';
 import PositionItem from '@/components/portfolio/PositionItem';
 import AssetsToBorrowCard from '@/components/protocolInfo/Borrow/AssetsToBorrowCard';
@@ -8,6 +9,7 @@ import ProtocolOverview from '@/components/protocolInfo/ProtocolOverview';
 import AssetsToSupplyCard from '@/components/protocolInfo/Supply/AssetsToSupplyCard';
 import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useWalletStore } from '@/redux/hooks';
 import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
 import { TAsset } from '@/types/asset';
 import {
@@ -41,6 +43,8 @@ const Portfolio = () => {
   const { data: balances } = useFetchTokenBalance(address);
 
   const { data: portfolio } = useFetchWalletPortfolio(address);
+  const { isConnected } = useWalletStore();
+
 
   useEffect(() => {
     if (balances) {
@@ -274,6 +278,8 @@ const Portfolio = () => {
               )}
         </div>
       )}
+
+      {!isConnected && <ConnectWallet />}
     </div>
   );
 };

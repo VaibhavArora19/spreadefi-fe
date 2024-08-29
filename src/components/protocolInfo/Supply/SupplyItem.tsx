@@ -15,6 +15,7 @@ import { erc20Abi } from 'viem';
 import { useAccount } from 'wagmi';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { walletActions } from '@/redux/features/wallet-slice';
 
 type SupplyItemProps = {
   data: { asset: TAsset; currentATokenBalance: string };
@@ -53,7 +54,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
 
   const handleSupplySubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };

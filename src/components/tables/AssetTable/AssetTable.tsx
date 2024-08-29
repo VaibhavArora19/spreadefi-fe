@@ -28,6 +28,9 @@ import { useAccount } from 'wagmi';
 import { useDispatch } from 'react-redux';
 import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { Action } from '@/types/strategy';
+import { walletActions } from '@/redux/features/wallet-slice';
+import { useWalletStore } from '@/redux/hooks';
+import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
 
 const AssetTable = ({
   assetData,
@@ -64,6 +67,7 @@ const AssetTable = ({
   const dispatch = useDispatch();
 
   const { execute } = useExecuteTransactions();
+  const { isConnected } = useWalletStore();
 
   const table = useReactTable({
     data: filteredData,
@@ -90,7 +94,10 @@ const AssetTable = ({
 
   const handleSupplySubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };
@@ -156,6 +163,8 @@ const AssetTable = ({
           type={type as Action.BORROW_DEPOSIT | Action.BORROW_SUPPLY}
         />
       ) : null}
+
+      {!isConnected && <ConnectWallet />}
     </>
   );
 };

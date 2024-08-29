@@ -16,6 +16,7 @@ import { useExecuteTransactions, useTransactionsBuilder } from '@/server/api/tra
 import { TTransactionPayload } from '@/types/transaction';
 import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
+import { walletActions } from '@/redux/features/wallet-slice';
 
 const MigrateBorrow = ({
   onClose,
@@ -54,7 +55,9 @@ const MigrateBorrow = ({
 
   const handleTransactionSubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address){
+      dispatch(walletActions.setIsConnected(false))
+    } 
 
     const data = await execute();
   };

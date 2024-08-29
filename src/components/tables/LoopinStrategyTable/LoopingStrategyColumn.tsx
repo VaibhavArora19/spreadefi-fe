@@ -11,14 +11,24 @@ import { Button } from '@/components/ui/button';
 import MultiplierSlider from './MultiplierSlider';
 import { useDispatch } from 'react-redux';
 import { transactionPayloadActions } from '@/redux/actions';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 const LoopingStrategyColum = (
   setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
+  data: any[],
 ): ColumnDef<TLoopinStrategyTableItem>[] => {
   const dispatch = useDispatch();
 
   const [multipliers, setMultipliers] = useState<{ [key: string]: number }>({});
+
+  useEffect(() => {
+    const initialMultipliers = data.reduce((acc, item, index) => {
+      acc[index] = 10;
+      return acc;
+    }, {});
+
+    setMultipliers(initialMultipliers);
+  }, [data]);
 
   const handleMultiplierChange = (id: string, value: number) => {
     setMultipliers((prev) => ({ ...prev, [id]: value }));
@@ -159,10 +169,12 @@ const LoopingStrategyColum = (
       accessorKey: 'multiplier',
       header: 'Multiplier',
       cell: ({ row }) => (
-        <MultiplierSlider
-          value={multipliers[row.id] || 30}
-          onChange={(value) => handleMultiplierChange(row.id, value)}
-        />
+        <>
+          <MultiplierSlider
+            value={multipliers[row.id]}
+            onChange={(value) => handleMultiplierChange(row.id, value)}
+          />
+        </>
       ),
     },
     {
