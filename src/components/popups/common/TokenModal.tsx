@@ -4,8 +4,9 @@ import Modal from '@/components/(ui)/Modal';
 import { useFetchTokenList } from '@/hooks/useFetchTokenList';
 import { Action } from '@/types/strategy';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IoClose } from 'react-icons/io5';
+import { useAccount } from 'wagmi';
 
 type TokenItemProps = {
   token: {
@@ -13,6 +14,7 @@ type TokenItemProps = {
     logo: string | undefined;
     balance: number;
     address: string;
+    balanceUSD: number;
     decimals: number;
   };
   onClose: () => void;
@@ -42,7 +44,7 @@ const TokenItem: React.FC<TokenItemProps> = ({ token, onClose, onSelect }) => {
       {token.balance ? (
         <div className="flex flex-col ">
           <p className="font-medium text-sm text-right">{token.balance}</p>
-          <p className="text-xs text-[#707070] text-right mt-1">$12.34</p>
+          <p className="text-xs text-[#707070] text-right mt-1">${token.balanceUSD}</p>
         </div>
       ) : null}
     </div>
@@ -64,7 +66,12 @@ const TokenModal = ({
   }) => void;
   type: Action;
 }) => {
-  const { data: tokens } = useFetchTokenList(type);
+  const { address } = useAccount();
+  const { data: tokens, refetch } = useFetchTokenList(type);
+
+  useEffect(() => {
+    refetch();
+  }, [address]);
 
   return (
     <Modal
@@ -82,11 +89,12 @@ const TokenModal = ({
               onSelect={onSelect}
               onClose={onClose}
               token={{
-                tokenName: token.name,
+                tokenName: token.symbol,
                 logo: token.logoURI,
-                balance: 0,
+                balance: token?.balance || 0,
                 address: token.address,
                 decimals: token.decimals,
+                balanceUSD: token?.balanceUSD || 0,
               }}
               key={token.address}
             />

@@ -1,7 +1,7 @@
 import { Token } from '@0xsquid/squid-types';
 import { createSlice } from '@reduxjs/toolkit';
 
-const initialState: { tokens: Token[] } = {
+const initialState: { tokens: Array<Token & { balance?: number; balanceUSD?: number }> } = {
   tokens: [],
 };
 
