@@ -37,16 +37,19 @@ const DetailPanel: React.FC<DetailPanelProps> = ({
         <DetailSection label="Ratio" value={`${ratio}%`} />
         <DetailSection label="APY" value={`${apy}%`} />
       </div>
-      <Button
-        onClick={(e) => {
-          e.stopPropagation();
-          type === 'lendBorrow' &&
-            router.push(`/portfolio?protocol=${positionName}&chain=${chainId}`);
-        }}
-        className="w-[150px] bg-inherit text-white border border-white  mr-2 py-5 flex gap-2 items-center hover:bg-white hover:text-black">
-        View more
-        <MdOutlineArrowOutward />
-      </Button>
+
+      {type === 'lendBorrow' && (
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            type === 'lendBorrow' &&
+              router.push(`/portfolio?protocol=${positionName}&chain=${chainId}`);
+          }}
+          className="w-[150px] bg-inherit text-white border border-white  mr-2 py-5 flex gap-2 items-center hover:bg-white hover:text-black">
+          View more
+          <MdOutlineArrowOutward />
+        </Button>
+      )}
     </div>
   );
 };

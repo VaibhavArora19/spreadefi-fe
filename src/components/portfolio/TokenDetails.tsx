@@ -6,6 +6,17 @@ import { useCallback, useEffect, useState } from 'react';
 import { ethers } from 'ethers';
 import { networkConfig } from '@/config/network';
 import { erc20Abi } from 'viem';
+import MigrateActionsModal from '../popups/MigrateModal/MigrateActionsModal';
+import WithdrawModal from '../popups/Withdraw/WithdrawModal';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
+import { useDispatch } from 'react-redux';
+import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
+import { toast, ToastContainer } from 'react-toastify';
+import { useSearchParams } from 'next/navigation';
+import { walletActions } from '@/redux/features/wallet-slice';
+import { useExecuteTransactions } from '@/server/api/transactions';
+import { useAccount } from 'wagmi';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface TokenDetailsProps {
   tokens?: TFormattedAsset[];
@@ -15,6 +26,20 @@ interface TokenDetailsProps {
 
 export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, actionType }) => {
   const [decimals, setDecimals] = useState<Array<string>>([]);
+  const [showMigrateModal, setShowMigrateModal] = useState<boolean>(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState<boolean>(false);
+
+  const { address } = useAccount();
+  const dispatch = useDispatch();
+  const { fetchList } = useFetchTokenListForChain();
+  const { execute } = useExecuteTransactions();
+  const searchParams = useSearchParams();
+
+  //! This needs to be changed @vaibhav
+  const protocol = searchParams.get('protocol');
+  const protocolChainId = searchParams.get('chain');
+
+  const data: any = {}; // @vaibhav
 
   const getDecimals = useCallback(async () => {
     if (!tokens) return;
@@ -38,6 +63,43 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
     setDecimals(decimalArray);
   }, [tokens]);
 
+  const withdrawModalHandler = async () => {
+    //! add some warning here
+    if (!protocolChainId) {
+      toast.error('ChainId not found');
+      return;
+    }
+
+    const tokens = await fetchList(protocolChainId);
+    const [filterFromToken] = tokens.filter(
+      (token) =>
+        ethers.utils.getAddress(token.address) === ethers.utils.getAddress(data.asset.assetAddress),
+    );
+
+    //!add some error here
+    if (!filterFromToken) {
+      toast.error('Some error occurred!');
+      return;
+    }
+
+    protocol && dispatch(transactionPayloadActions.setStrategyName(protocol));
+    protocolChainId && dispatch(transactionPayloadActions.setFromChain(protocolChainId));
+    dispatch(transactionPayloadActions.setFromToken(data.asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(filterFromToken.decimals));
+
+    setShowWithdrawModal(true);
+  };
+
+  const handleSupplySubmit = async () => {
+    //!show modal here asking user to connect wallet
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
+
+    const data = await execute();
+  };
+
   useEffect(() => {
     if (!tokens) return;
 
@@ -50,7 +112,7 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
         <p className="flex-[0.25]">{type}</p>
         <p className="flex-[0.33] text-center">Amount</p>
         <p className="flex-[0.33] text-center">USD Value</p>
-        {actionType === 'vault' ? <p className="flex-[0.19] text-[#2c2c2c]">.</p> : null}
+        {actionType === 'vault' ? <p className="flex-[0.30] text-[#2c2c2c]">.</p> : null}
       </div>
       {tokens &&
         tokens.map((token, index) => (
@@ -90,10 +152,50 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
             </p>
 
             {actionType === 'vault' ? (
-              <Button className=" text-black bg-white py-2 capitalize flex-[0.15]">Supply</Button>
+              <div className="flex items-center gap-3 self-end">
+                <Button
+                  onClick={() => {
+                    setShowMigrateModal(true);
+                  }}
+                  className=" text-black bg-white py-2 capitalize flex-[0.15]">
+                  Migrate
+                </Button>
+                <Button
+                  onClick={async () => {
+                    await withdrawModalHandler();
+                  }}
+                  className=" text-black bg-white py-2 capitalize flex-[0.15]">
+                  Withdraw
+                </Button>
+              </div>
             ) : null}
           </div>
         ))}
+
+      {showMigrateModal ? (
+        <MigrateActionsModal
+          onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
+            setShowMigrateModal(false);
+          }}
+        />
+      ) : null}
+
+      {showWithdrawModal ? (
+        <WithdrawModal
+          onClose={() => {
+            dispatch(transactionPayloadActions.resetState());
+            dispatch(transactionsActions.resetState());
+            dispatch(tokensActions.resetState());
+            setShowWithdrawModal(false);
+          }}
+          onSubmit={handleSupplySubmit}
+        />
+      ) : null}
+
+      <ToastContainer theme="dark" />
     </div>
   );
 };
