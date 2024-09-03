@@ -121,7 +121,7 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
       <div className="flex items-center w-full">
         <div className="flex gap-[6px] flex-[0.21]">
           <Image
-            src={assetNameToImage(data.asset.assetSymbol)}
+            src={assetNameToImage(data.asset.assetSymbol, data.asset.protocolName)}
             height={22}
             width={25}
             alt={data.asset.assetSymbol}

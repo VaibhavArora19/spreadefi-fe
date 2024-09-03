@@ -19,12 +19,20 @@ import { useAccount } from 'wagmi';
 import 'react-toastify/dist/ReactToastify.css';
 
 interface TokenDetailsProps {
+  protocolName: string;
+  chain: string;
   tokens?: TFormattedAsset[];
   type: 'Supplied' | 'Borrowed';
   actionType?: 'vault' | 'lendBorrow';
 }
 
-export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, actionType }) => {
+export const TokenDetails: React.FC<TokenDetailsProps> = ({
+  protocolName,
+  chain,
+  tokens,
+  type,
+  actionType,
+}) => {
   const [decimals, setDecimals] = useState<Array<string>>([]);
   const [showMigrateModal, setShowMigrateModal] = useState<boolean>(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState<boolean>(false);
@@ -34,10 +42,6 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
   const { fetchList } = useFetchTokenListForChain();
   const { execute } = useExecuteTransactions();
   const searchParams = useSearchParams();
-
-  //! This needs to be changed @vaibhav
-  const protocol = searchParams.get('protocol');
-  const protocolChainId = searchParams.get('chain');
 
   const data: any = {}; // @vaibhav
 
@@ -63,29 +67,31 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
     setDecimals(decimalArray);
   }, [tokens]);
 
-  const withdrawModalHandler = async () => {
+  const migrateModalHandler = async (token: any) => {
     //! add some warning here
-    if (!protocolChainId) {
+    if (!chain) {
+      toast.error('ChainId not found!');
+      return;
+    }
+
+    dispatch(transactionPayloadActions.setStrategyName((protocolName + '-').trim()));
+    dispatch(transactionPayloadActions.setFromChain(chain));
+    dispatch(transactionPayloadActions.setFromToken(token.asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(token.asset.assetDecimals));
+
+    setShowMigrateModal(true);
+  };
+
+  const withdrawModalHandler = async (token: any) => {
+    //! add some warning here
+    if (!chain) {
       toast.error('ChainId not found');
       return;
     }
-
-    const tokens = await fetchList(protocolChainId);
-    const [filterFromToken] = tokens.filter(
-      (token) =>
-        ethers.utils.getAddress(token.address) === ethers.utils.getAddress(data.asset.assetAddress),
-    );
-
-    //!add some error here
-    if (!filterFromToken) {
-      toast.error('Some error occurred!');
-      return;
-    }
-
-    protocol && dispatch(transactionPayloadActions.setStrategyName(protocol));
-    protocolChainId && dispatch(transactionPayloadActions.setFromChain(protocolChainId));
-    dispatch(transactionPayloadActions.setFromToken(data.asset.assetAddress));
-    dispatch(transactionPayloadActions.setFromTokenDecimals(filterFromToken.decimals));
+    protocolName && dispatch(transactionPayloadActions.setStrategyName(protocolName));
+    chain && dispatch(transactionPayloadActions.setFromChain(chain));
+    dispatch(transactionPayloadActions.setFromToken(token.asset.assetAddress));
+    dispatch(transactionPayloadActions.setFromTokenDecimals(token.asset.assetDecimals));
 
     setShowWithdrawModal(true);
   };
@@ -119,7 +125,7 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
           <div key={index} className="flex p-3 bg-[#404040] m-1 rounded-md items-center">
             <div className="flex items-center flex-[0.25] gap-2">
               <Image
-                src={assetNameToImage(token.asset.assetSymbol)}
+                src={assetNameToImage(token.asset.assetSymbol, token.asset.protocolName)}
                 height={30}
                 width={30}
                 alt="Token Icon"
@@ -154,15 +160,15 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({ tokens, type, action
             {actionType === 'vault' ? (
               <div className="flex items-center gap-3 self-end">
                 <Button
-                  onClick={() => {
-                    setShowMigrateModal(true);
+                  onClick={async () => {
+                    await migrateModalHandler(token);
                   }}
                   className=" text-black bg-white py-2 capitalize flex-[0.15]">
                   Migrate
                 </Button>
                 <Button
                   onClick={async () => {
-                    await withdrawModalHandler();
+                    await withdrawModalHandler(token);
                   }}
                   className=" text-black bg-white py-2 capitalize flex-[0.15]">
                   Withdraw

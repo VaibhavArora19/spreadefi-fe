@@ -162,7 +162,7 @@ const LendingBorrowingColumn = (
     cell: ({ row }) => (
       <Button
         onClick={() => {
-          router?.push(`/lend/${row.original.assetSymbol}`);
+          router?.push(`/lend/${encodeURIComponent(row.original.assetSymbol)}`);
         }}
         className="w-full bg-white text-black">
         View

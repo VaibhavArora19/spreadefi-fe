@@ -1,6 +1,17 @@
 import { TAssetName } from '@/types/asset';
+import { TProtocolName } from '@/types/protocol';
 
-export const assetNameToImage = (name: TAssetName | string) => {
+export const assetNameToImage = (
+  name: TAssetName | string,
+  protocolName?: TProtocolName | string,
+) => {
+  switch (protocolName) {
+    case TProtocolName.YEARN_V3:
+      return '/assets/icons/tokens/yearn-v3.png';
+    case TProtocolName.PENDLE:
+      return '/assets/icons/tokens/pendle.png';
+  }
+
   switch (name.toLowerCase()) {
     case TAssetName.WETH:
       return '/assets/icons/tokens/weth.png';

@@ -49,36 +49,40 @@ export const executeTransaction = async (
   signer: ethers.providers.JsonRpcSigner,
   transaction: TTransactionResponse[number],
 ) => {
-  let currentChain = chainId;
+  try {
+    let currentChain = chainId;
 
-  //* Switch chains if the user is not desired chain
-  if (currentChain !== Number(transaction.chain)) {
-    //@ts-ignore
-    await ethereum.request({
-      method: 'wallet_switchEthereumChain',
-      params: [{ chainId: '0x' + Number(transaction.chain).toString(16) }],
-    });
+    //* Switch chains if the user is not desired chain
+    if (currentChain !== Number(transaction.chain)) {
+      //@ts-ignore
+      await ethereum.request({
+        method: 'wallet_switchEthereumChain',
+        params: [{ chainId: '0x' + Number(transaction.chain).toString(16) }],
+      });
 
-    currentChain = Number(transaction.chain);
+      currentChain = Number(transaction.chain);
 
-    await sleep(500);
+      await sleep(500);
+    }
+
+    if (transaction.type === Action.SQUID) {
+      await executeSquidTransaction(signer, transaction.tx);
+    } else if (transaction.type === Action.PORTALS) {
+      await executePortalsTransaction(signer, transaction.tx as string);
+    } else {
+      const tx = {
+        to: transaction.to,
+        data: transaction.tx as string,
+        gasLimit: '500000',
+      };
+
+      const txResponse = await signer.sendTransaction(tx);
+
+      await txResponse.wait();
+    }
+
+    await sleep(1000);
+  } catch (error: any) {
+    console.error(error);
   }
-
-  if (transaction.type === Action.SQUID) {
-    await executeSquidTransaction(signer, transaction.tx);
-  } else if (transaction.type === Action.PORTALS) {
-    await executePortalsTransaction(signer, transaction.tx as string);
-  } else {
-    const tx = {
-      to: transaction.to,
-      data: transaction.tx as string,
-      gasLimit: '500000',
-    };
-
-    const txResponse = await signer.sendTransaction(tx);
-
-    await txResponse.wait();
-  }
-
-  await sleep(1000);
 };

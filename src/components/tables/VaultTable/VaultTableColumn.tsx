@@ -16,7 +16,7 @@ const VaultTableColumn = (router?: AppRouterInstance): ColumnDef<TVaultTableItem
     cell: ({ row }) => (
       <div className="flex items-center gap-2">
         <Image
-          src={assetNameToImage(row.getValue('assetSymbol'))}
+          src={assetNameToImage(row.getValue('assetSymbol'), row.original.protocolNames[0])}
           height={25}
           width={25}
           alt="weth"
@@ -104,7 +104,7 @@ const VaultTableColumn = (router?: AppRouterInstance): ColumnDef<TVaultTableItem
     cell: ({ row }) => (
       <Button
         onClick={() => {
-          router?.push(`/vault/${row.original.assetSymbol}`);
+          router?.push(`/vault/${encodeURIComponent(row.original.assetSymbol)}`);
         }}
         className="w-[50%] bg-white text-black">
         View

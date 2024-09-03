@@ -12,7 +12,6 @@ export const protocolNameToImage = (name: TProtocolName) => {
       return '/assets/icons/protocols/nile.png';
     case TProtocolName.HOP:
       return '/assets/icons/protocols/hop.webp';
-    case TProtocolName.HOP:
     case TProtocolName.HOPBEEFY:
       return '/assets/icons/protocols/hop.webp';
     case TProtocolName.BEEFY:
@@ -23,6 +22,8 @@ export const protocolNameToImage = (name: TProtocolName) => {
       return '/assets/icons/protocols/zerolend.svg';
     case TProtocolName.YEARN_V3:
       return '/assets/icons/protocols/yearn-v3.jpeg';
+    case TProtocolName.PENDLE:
+      return '/assets/icons/protocols/pendle.png';
     default:
       return '';
   }

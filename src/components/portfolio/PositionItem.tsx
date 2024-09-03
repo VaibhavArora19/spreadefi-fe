@@ -30,55 +30,61 @@ const PositionItem: React.FC<PositionItemProps> = ({
   protocolName,
   type,
   assets,
-}) => (
-  <div className="w-full bg-[#181818] p-4 pb-3 rounded-md">
-    <Collapsible>
-      <CollapsibleTrigger className="w-full h-full">
-        <PositionCard
-          iconSrc={protocolNameToImage(protocolName)}
-          chainIconSrc={CHAIN_CONFIG[chain].chainImageUrl}
-          positionName={positionName}
-          collateral={collateral}
-          debt={debt}
-          ratio={ratio}
-          apy={apy}
-          type={type}
-          chainId={chain}
-        />
-        <MdKeyboardArrowDown className="text-center text-white w-full mt-2 text-xl" />
-      </CollapsibleTrigger>
-      <CollapsibleContent>
-        <div className="flex flex-col gap-2">
-          <TokenDetails
-            actionType={type}
-            tokens={
-              assets?.filter(
-                (value) =>
-                  Number((value as TFormattedAsset & TLendingAsset).currentATokenBalance) > 0 ||
-                  (Number((value as TFormattedAsset & TYieldAsset).balanceUSD) > 0 &&
-                    value.asset.protocolType != 'Looping'),
-              )!
-            }
-            type="Supplied"
+}) => {
+  return (
+    <div className="w-full bg-[#181818] p-4 pb-3 rounded-md">
+      <Collapsible>
+        <CollapsibleTrigger className="w-full h-full">
+          <PositionCard
+            iconSrc={protocolNameToImage(protocolName)}
+            chainIconSrc={CHAIN_CONFIG[chain].chainImageUrl}
+            positionName={positionName}
+            collateral={collateral}
+            debt={debt}
+            ratio={ratio}
+            apy={apy}
+            type={type}
+            chainId={chain}
           />
-
-          {type !== 'vault' ? (
+          <MdKeyboardArrowDown className="text-center text-white w-full mt-2 text-xl" />
+        </CollapsibleTrigger>
+        <CollapsibleContent>
+          <div className="flex flex-col gap-2">
             <TokenDetails
+              protocolName={protocolName}
+              chain={chain}
+              actionType={type}
               tokens={
                 assets?.filter(
                   (value) =>
-                    Number((value as TFormattedAsset & TLendingAsset).currentStableDebt) > 0 ||
-                    (Number((value as TFormattedAsset & TLendingAsset).currentVariableDebt) > 0 &&
+                    Number((value as TFormattedAsset & TLendingAsset).currentATokenBalance) > 0 ||
+                    (Number((value as TFormattedAsset & TYieldAsset).balanceUSD) > 0 &&
                       value.asset.protocolType != 'Looping'),
                 )!
               }
-              type="Borrowed"
+              type="Supplied"
             />
-          ) : null}
-        </div>
-      </CollapsibleContent>
-    </Collapsible>
-  </div>
-);
+
+            {type !== 'vault' ? (
+              <TokenDetails
+                protocolName={protocolName}
+                chain={chain}
+                tokens={
+                  assets?.filter(
+                    (value) =>
+                      Number((value as TFormattedAsset & TLendingAsset).currentStableDebt) > 0 ||
+                      (Number((value as TFormattedAsset & TLendingAsset).currentVariableDebt) > 0 &&
+                        value.asset.protocolType != 'Looping'),
+                  )!
+                }
+                type="Borrowed"
+              />
+            ) : null}
+          </div>
+        </CollapsibleContent>
+      </Collapsible>
+    </div>
+  );
+};
 
 export default PositionItem;

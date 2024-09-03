@@ -9,6 +9,7 @@ export enum TProtocolName {
   BEEFY = 'beefy',
   HOPBEEFY = 'hop beefy',
   YEARN_V3 = 'yearn-v3',
+  PENDLE = 'pendle',
 }
 
 export enum ProtocolType {

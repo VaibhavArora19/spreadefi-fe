@@ -94,7 +94,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
       <div className="flex items-center w-full p-3 rounded-md bg-[#242424]">
         <div className="flex gap-[6px] flex-[0.25]">
           <Image
-            src={assetNameToImage(asset?.assetSymbol)}
+            src={assetNameToImage(asset?.assetSymbol, asset?.protocolName)}
             height={22}
             width={25}
             alt={asset?.assetSymbol}

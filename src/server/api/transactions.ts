@@ -67,14 +67,20 @@ export const useTransactionsBuilder = (transactionPayload: TTransactionPayload |
         transactionPayload?.action === Action.WITHDRAW_DEPOSIT ||
         transactionPayload?.action === Action.WITHDRAW_SUPPLY
       ) {
-        const aTokenAddress = await findATokenAddress(
-          transactionPayload?.strategyName as StrategyName,
-          transactionPayload?.txDetails.fromToken as string,
-          transactionPayload?.txDetails.fromChain as string,
-        );
+        //!this check should move to backend later on
+        try {
+          const aTokenAddress = await findATokenAddress(
+            transactionPayload?.strategyName as StrategyName,
+            transactionPayload?.txDetails.fromToken as string,
+            transactionPayload?.txDetails.fromChain as string,
+          );
 
-        txPayload.txDetails.fundToken = aTokenAddress;
-        txPayload.txDetails.fundAmount = transactionPayload?.txDetails.fromAmount;
+          txPayload.txDetails.fundToken = aTokenAddress;
+          txPayload.txDetails.fundAmount = transactionPayload?.txDetails.fromAmount;
+        } catch (err) {
+          console.log('A Token not found, possibly protocol is not fork of aave');
+          console.log('err:', err);
+        }
       }
 
       dispatch(transactionsActions.setLoading(true));
