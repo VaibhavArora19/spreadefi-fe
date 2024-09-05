@@ -109,11 +109,7 @@ const TransactionOverview = () => {
             <div className="flex  items-center justify-between text-gray-300">
               <p>Minimum recieved</p>
               <p>
-                {!isLoading &&
-                squidTx &&
-                typeof squidTx.tx === 'object' &&
-                squidTx.tx !== null &&
-                'estimate' in squidTx.tx
+                {!isLoading && squidTx && !isBytesLike(squidTx.tx)
                   ? (squidTx.tx?.estimate).toAmountMinUSD + '$'
                   : fromAmount}
               </p>

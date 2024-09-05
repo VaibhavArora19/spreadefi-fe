@@ -12,7 +12,7 @@ import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
 import { useAppDispatch, useTransactionPayloadStore } from '@/redux/hooks';
 import { transactionPayloadActions } from '@/redux/actions';
-import { Action } from '@/types/strategy';
+import { Action, StrategyName } from '@/types/strategy';
 
 const AssetTableColumn = (
   type:
@@ -47,7 +47,7 @@ const AssetTableColumn = (
   };
 
   const showMigrateSupplyModalHandler = (row: Row<TAssetTableItem>) => {
-    strategyName.split('-')[1] === ''
+    strategyName.split('-')[1] === '' || strategyName === StrategyName.YEARN_V3 + '-'
       ? dispatch(
           transactionPayloadActions.setStrategyName(strategyName + row.original.protocolName),
         )
@@ -77,7 +77,7 @@ const AssetTableColumn = (
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
           <Image
-            src={assetNameToImage(row.getValue('assetSymbol'))}
+            src={assetNameToImage(row.getValue('assetSymbol'), row.original.protocolName)}
             height={25}
             width={25}
             alt="weth"

@@ -2,7 +2,6 @@ export enum StrategyName {
   AAVE = 'Aave',
   SEAMLESS = 'Seamless',
   ZEROLEND = 'Zerolend',
-  PENDLE = 'Pendle',
   AAVE_SEAMLESS = 'Aave-Seamless',
   SEAMLESS_AAVE = 'Seamless-Aave',
   AAVE_ZEROLEND = 'Aave-Zerolend',
@@ -15,6 +14,8 @@ export enum StrategyName {
   LOOPING_ZEROLEND = 'Looping-Zerolend',
   HOP_BEEFY = 'Hop-Beefy',
   AAAVE_HOP_BEEFY = 'Aave-Hop-Beefy',
+  YEARN_V3 = 'yearn-v3',
+  PENDLE = 'pendle',
 }
 
 export enum Action {

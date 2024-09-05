@@ -9,6 +9,7 @@ import { IoClose } from 'react-icons/io5';
 const MigrateActionsVaultTable = ({
   onClose,
   type,
+  protocolName,
 }: {
   onClose: () => void;
   type:
@@ -17,11 +18,12 @@ const MigrateActionsVaultTable = ({
     | Action.BORROW_SUPPLY
     | Action.WITHDRAW_DEPOSIT
     | Action.SUPPLY;
+  protocolName?: string;
 }) => {
   const searchParams = useSearchParams();
-  const protocol = searchParams.get('protocol');
+  const protocol = searchParams.get('protocol') ?? protocolName;
 
-  const { data, isLoading } = useFetchFilterAsset(protocol, 'Yield');
+  const { data, isLoading } = useFetchFilterAsset(protocol as string, 'Yield');
 
   return (
     <Modal onClose={onClose} className="bg-[#0f0f0f] p-6 w-[80%] h-[80vh] overflow-scroll">

@@ -6,7 +6,13 @@ import MigrateActionsLendingTable from './MigrateActionsLendingTable';
 import MigrateActionsVaultTable from './MigrateActionsVaultTable';
 import { Action } from '@/types/strategy';
 
-const MigrateActionsModal = ({ onClose }: { onClose: () => void }) => {
+const MigrateActionsModal = ({
+  onClose,
+  protocolName,
+}: {
+  onClose: () => void;
+  protocolName?: string;
+}) => {
   const [showLendingTable, setShowLendingTable] = useState(false);
   const [showVaultTable, setShowVaultTable] = useState(false);
 
@@ -41,6 +47,7 @@ const MigrateActionsModal = ({ onClose }: { onClose: () => void }) => {
 
       {showLendingTable ? (
         <MigrateActionsLendingTable
+          {...(protocolName && { protocolName: protocolName })}
           type={Action.WITHDRAW_SUPPLY}
           onClose={() => {
             setShowLendingTable(false);
@@ -50,6 +57,7 @@ const MigrateActionsModal = ({ onClose }: { onClose: () => void }) => {
 
       {showVaultTable ? (
         <MigrateActionsVaultTable
+          {...(protocolName && { protocolName: protocolName })}
           type={Action.WITHDRAW_DEPOSIT}
           onClose={() => {
             setShowVaultTable(false);
