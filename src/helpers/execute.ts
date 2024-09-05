@@ -1,5 +1,5 @@
 import { Action } from '@/types/strategy';
-import { ethers, BytesLike } from 'ethers';
+import { ethers } from 'ethers';
 import { TTransactionResponse } from '@/types/transaction';
 import { sleep } from './sleep';
 import { squidConfig } from '@/config/squid';
@@ -39,7 +39,7 @@ export const executePortalsTransaction = async (
 
     await tx.wait();
   } catch (error: any) {
-    console.log('error ', error);
+    console.log('error ', error.response.data.message);
     throw new Error(error);
   }
 };
@@ -84,5 +84,6 @@ export const executeTransaction = async (
     await sleep(1000);
   } catch (error: any) {
     console.error(error);
+    throw new Error(error);
   }
 };

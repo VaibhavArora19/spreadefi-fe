@@ -11,6 +11,7 @@ import { IoClose } from 'react-icons/io5';
 const MigrateActionsLendingTable = ({
   onClose,
   type,
+  protocolName,
 }: {
   onClose: () => void;
   type:
@@ -19,11 +20,12 @@ const MigrateActionsLendingTable = ({
     | Action.WITHDRAW_DEPOSIT
     | Action.BORROW_SUPPLY
     | Action.BORROW_DEPOSIT;
+  protocolName?: string;
 }) => {
   const searchParams = useSearchParams();
-  const protocol = searchParams.get('protocol');
+  const protocol = searchParams.get('protocol') ?? protocolName;
 
-  const { data, isLoading } = useFetchFilterAsset(protocol, 'Lending');
+  const { data, isLoading } = useFetchFilterAsset(protocol as string, 'Lending');
 
   useLockBodyScroll(true);
   return (

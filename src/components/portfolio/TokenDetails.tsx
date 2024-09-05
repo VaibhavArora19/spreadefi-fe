@@ -10,9 +10,7 @@ import MigrateActionsModal from '../popups/MigrateModal/MigrateActionsModal';
 import WithdrawModal from '../popups/Withdraw/WithdrawModal';
 import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { useDispatch } from 'react-redux';
-import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
 import { toast, ToastContainer } from 'react-toastify';
-import { useSearchParams } from 'next/navigation';
 import { walletActions } from '@/redux/features/wallet-slice';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { useAccount } from 'wagmi';
@@ -39,11 +37,7 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({
 
   const { address } = useAccount();
   const dispatch = useDispatch();
-  const { fetchList } = useFetchTokenListForChain();
   const { execute } = useExecuteTransactions();
-  const searchParams = useSearchParams();
-
-  const data: any = {}; // @vaibhav
 
   const getDecimals = useCallback(async () => {
     if (!tokens) return;
@@ -186,6 +180,7 @@ export const TokenDetails: React.FC<TokenDetailsProps> = ({
             dispatch(tokensActions.resetState());
             setShowMigrateModal(false);
           }}
+          protocolName={protocolName}
         />
       ) : null}
 

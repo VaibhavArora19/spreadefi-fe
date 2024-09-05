@@ -74,7 +74,11 @@ const MigrateTransactionOverview = ({
             <div className="rounded-md relative">
               {/* Protocol & chain on which position is already there */}
               <Image
-                src={protocolNameToImage(strategyName.split('-')[0] as TProtocolName)}
+                src={
+                  strategyName.includes('yearn-v3')
+                    ? ''
+                    : protocolNameToImage(strategyName.split('-')[0] as TProtocolName)
+                }
                 height={25}
                 width={25}
                 alt="AAVE"
@@ -94,9 +98,13 @@ const MigrateTransactionOverview = ({
             <div className="rounded-md relative">
               {/* Protocol & chain on which new position to take */}
               <Image
-                src={protocolNameToImage(
-                  strategyName.split('-').slice(1).join('-') as TProtocolName,
-                )}
+                src={
+                  strategyName.includes('yearn-v3')
+                    ? ''
+                    : protocolNameToImage(
+                        strategyName.split('-').slice(1).join('-') as TProtocolName,
+                      )
+                }
                 height={25}
                 width={25}
                 alt="AAVE"
