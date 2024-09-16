@@ -10,6 +10,8 @@ export const assetNameToImage = (
       return '/assets/icons/tokens/yearn-v3.png';
     case TProtocolName.PENDLE:
       return '/assets/icons/tokens/pendle.png';
+    case TProtocolName.BEEFY:
+      return '/assets/icons/tokens/beefy.png';
   }
 
   switch (name.toLowerCase()) {

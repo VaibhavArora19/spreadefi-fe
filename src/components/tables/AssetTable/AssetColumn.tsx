@@ -47,6 +47,7 @@ const AssetTableColumn = (
   };
 
   const showMigrateSupplyModalHandler = (row: Row<TAssetTableItem>) => {
+    //!There is an error here while migrating because of yearn-v3
     strategyName.split('-')[1] === '' || strategyName === StrategyName.YEARN_V3 + '-'
       ? dispatch(
           transactionPayloadActions.setStrategyName(strategyName + row.original.protocolName),

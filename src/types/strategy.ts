@@ -16,6 +16,13 @@ export enum StrategyName {
   AAAVE_HOP_BEEFY = 'Aave-Hop-Beefy',
   YEARN_V3 = 'yearn-v3',
   PENDLE = 'pendle',
+  YEARN_V3_PENDLE = 'yearn-v3-pendle',
+  PENDLE_YEARN_V3 = 'pendle-yearn-v3',
+  BEEFY = 'beefy',
+  YEARN_V3_BEEFY = 'yearn-v3-beefy',
+  PENDLE_BEEFY = 'pendle-beefy',
+  BEEFY_YEARN_V3 = 'beefy-yearn-v3',
+  BEEFY_PENDLE = 'beefy-pendle',
 }
 
 export enum Action {
