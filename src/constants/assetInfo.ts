@@ -12,6 +12,8 @@ export const assetNameToImage = (
       return '/assets/icons/tokens/pendle.png';
     case TProtocolName.BEEFY:
       return '/assets/icons/tokens/beefy.png';
+    case TProtocolName.HARVEST_FINANCE:
+      return '/assets/icons/tokens/harvest.png';
   }
 
   switch (name.toLowerCase()) {

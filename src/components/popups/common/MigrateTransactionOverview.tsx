@@ -75,7 +75,7 @@ const MigrateTransactionOverview = ({
               {/* Protocol & chain on which position is already there */}
               <Image
                 src={
-                  strategyName.includes('yearn-v3')
+                  strategyName.includes('yearn-v3') || strategyName.includes('harvest-finance')
                     ? ''
                     : protocolNameToImage(strategyName.split('-')[0] as TProtocolName)
                 }
@@ -99,7 +99,7 @@ const MigrateTransactionOverview = ({
               {/* Protocol & chain on which new position to take */}
               <Image
                 src={
-                  strategyName.includes('yearn-v3')
+                  strategyName.includes('yearn-v3') || strategyName.includes('harvest-finance')
                     ? ''
                     : protocolNameToImage(
                         strategyName.split('-').slice(1).join('-') as TProtocolName,

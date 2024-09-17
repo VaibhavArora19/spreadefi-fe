@@ -10,6 +10,7 @@ export enum TProtocolName {
   HOPBEEFY = 'hop beefy',
   YEARN_V3 = 'yearn-v3',
   PENDLE = 'pendle',
+  HARVEST_FINANCE = 'harvest-finance',
 }
 
 export enum ProtocolType {

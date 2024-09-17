@@ -45,7 +45,6 @@ const Portfolio = () => {
   const { data: portfolio } = useFetchWalletPortfolio(address);
   const { isConnected } = useWalletStore();
 
-
   useEffect(() => {
     if (balances) {
       formatData(balances.filteredBalances);
