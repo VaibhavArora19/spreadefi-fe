@@ -26,6 +26,12 @@ export const protocolNameToImage = (name: TProtocolName) => {
       return '/assets/icons/protocols/pendle.png';
     case TProtocolName.HARVEST_FINANCE:
       return '/assets/icons/protocols/harvest.png';
+    case TProtocolName.YEARN:
+      return '/assets/icons/protocols/yearn-v3.jpeg';
+    case TProtocolName.STARGATE:
+      return '/assets/icons/protocols/stargate.png';
+    case TProtocolName.BENQI:
+      return '/assets/icons/protocols/benqi.png';
     default:
       return '';
   }

@@ -25,6 +25,14 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainName: 'Polygon',
     chainImageUrl: '/assets/icons/chains/polygon.png',
   },
+  '250': {
+    chainName: 'Fantom',
+    chainImageUrl: '/assets/icons/chains/fantom.png',
+  },
+  '43114': {
+    chainName: 'Avalanche',
+    chainImageUrl: '/assets/icons/chains/avalanche.png',
+  },
 };
 
 export const chainList = [
@@ -63,5 +71,17 @@ export const chainList = [
     chainName: 'Polygon mainnet',
     shortName: 'Polygon',
     logo: '/assets/icons/chains/polygon.png',
+  },
+  {
+    chainId: 250,
+    chainName: 'Fantom mainnet',
+    shortName: 'Fantom',
+    logo: '/assets/icons/chains/fantom.png',
+  },
+  {
+    chainId: 43114,
+    chainName: 'Avalanche mainnet',
+    shortName: 'Avalanche',
+    logo: '/assets/icons/chains/avalanche.png',
   },
 ];
