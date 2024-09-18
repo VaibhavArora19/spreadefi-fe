@@ -33,4 +33,10 @@ export const networkConfig = {
   '137': {
     rpc: process.env.NEXT_PUBLIC_POLYGON_RPC,
   },
+  '250': {
+    rpc: process.env.NEXT_PUBLIC_FANTOM_RPC,
+  },
+  '43114': {
+    rpc: process.env.NEXT_PUBLIC_AVALANCHE_RPC,
+  },
 };

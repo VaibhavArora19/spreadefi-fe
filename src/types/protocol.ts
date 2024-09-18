@@ -11,6 +11,9 @@ export enum TProtocolName {
   YEARN_V3 = 'yearn-v3',
   PENDLE = 'pendle',
   HARVEST_FINANCE = 'harvest-finance',
+  YEARN = 'yearn',
+  STARGATE = 'stargate',
+  BENQI = 'benqi',
 }
 
 export enum ProtocolType {
