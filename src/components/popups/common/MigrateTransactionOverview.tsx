@@ -9,7 +9,7 @@ import { Action } from '@/types/strategy';
 import { IoIosArrowDown } from 'react-icons/io';
 import TransactionDetailsModal from './TransactionDetailsModal';
 import Loader from '@/components/(ui)/Loader';
-import { TTransactionResponse } from '@/types/transaction';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
 import { ethers } from 'ethers';
 import { isBytesLike } from 'ethers/lib/utils';
 
@@ -38,18 +38,18 @@ const MigrateTransactionOverview = ({
 
         const unformattedFees =
           BigInt(
-            squidTransaction.tx.estimate.feeCosts[0]
-              ? squidTransaction.tx.estimate.feeCosts[0]?.amount
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]?.amount
               : '0',
           ) +
           BigInt(
-            squidTransaction.tx.estimate.feeCosts[1]
-              ? squidTransaction.tx.estimate.feeCosts[1]?.amount
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]?.amount
               : '0',
           ) +
           BigInt(
-            squidTransaction.tx.estimate.gasCosts[0]
-              ? squidTransaction.tx.estimate.gasCosts[0]?.amount
+            (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]?.amount
               : '0',
           );
 

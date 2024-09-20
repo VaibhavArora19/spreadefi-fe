@@ -5,7 +5,7 @@ import { FaLongArrowAltRight } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import TransactionDetailsModal from './TransactionDetailsModal';
 import Loader from '@/components/(ui)/Loader';
-import { TTransactionResponse } from '@/types/transaction';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
 import { Action } from '@/types/strategy';
 import { ethers } from 'ethers';
 import { isBytesLike } from 'ethers/lib/utils';
@@ -26,18 +26,18 @@ const TransactionOverview = () => {
 
         const unformattedFees =
           BigInt(
-            squidTransaction.tx.estimate.feeCosts[0]
-              ? squidTransaction.tx.estimate.feeCosts[0]?.amount
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]?.amount
               : '0',
           ) +
           BigInt(
-            squidTransaction.tx.estimate.feeCosts[1]
-              ? squidTransaction.tx.estimate.feeCosts[1]?.amount
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]?.amount
               : '0',
           ) +
           BigInt(
-            squidTransaction.tx.estimate.gasCosts[0]
-              ? squidTransaction.tx.estimate.gasCosts[0]?.amount
+            (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]?.amount
               : '0',
           );
 
@@ -110,7 +110,7 @@ const TransactionOverview = () => {
               <p>Minimum recieved</p>
               <p>
                 {!isLoading && squidTx && !isBytesLike(squidTx.tx)
-                  ? (squidTx.tx?.estimate).toAmountMinUSD + '$'
+                  ? ((squidTx.tx as SquidRoute)?.estimate).toAmountMinUSD + '$'
                   : fromAmount}
               </p>
             </div>
