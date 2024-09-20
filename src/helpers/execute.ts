@@ -1,15 +1,17 @@
 import { Action } from '@/types/strategy';
 import { ethers } from 'ethers';
-import { TTransactionResponse } from '@/types/transaction';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
 import { sleep } from './sleep';
 import { squidConfig } from '@/config/squid';
 import { isBytesLike } from 'ethers/lib/utils';
 import { TransactionResponse } from '@0xsquid/sdk/dist/types';
 import axios from 'axios';
+import { lifiConfig } from '@/config/lifi';
+import { executeRoute, Route } from '@lifi/sdk';
 
 export const executeSquidTransaction = async (
   signer: ethers.providers.JsonRpcSigner,
-  route: TTransactionResponse[number]['tx'],
+  route: SquidRoute,
 ) => {
   if (isBytesLike(route)) return;
 
@@ -44,6 +46,12 @@ export const executePortalsTransaction = async (
   }
 };
 
+export const executeLifiTransaction = async (chainId: number, route: Route) => {
+  await lifiConfig(chainId);
+
+  const executedRoute = await executeRoute(route);
+};
+
 export const executeTransaction = async (
   chainId: number,
   signer: ethers.providers.JsonRpcSigner,
@@ -66,7 +74,9 @@ export const executeTransaction = async (
     }
 
     if (transaction.type === Action.SQUID) {
-      await executeSquidTransaction(signer, transaction.tx);
+      await executeSquidTransaction(signer, transaction.tx as SquidRoute);
+    } else if (transaction.type === Action.LIFI) {
+      await executeLifiTransaction(chainId, transaction.tx as Route);
     } else if (transaction.type === Action.PORTALS) {
       await executePortalsTransaction(signer, transaction.tx as string);
     } else {

@@ -1,6 +1,6 @@
 import Modal from '@/components/(ui)/Modal';
 import { useTransactionStore } from '@/redux/hooks';
-import { TTransactionResponse } from '@/types/transaction';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
 import { ethers } from 'ethers';
 import { isBytesLike } from 'ethers/lib/utils';
 import React, { useEffect, useState } from 'react';
@@ -49,24 +49,36 @@ const TransactionDetailsModal = ({
     }
 
     const gasReceiverFee = {
-      amount: squidTx.tx.estimate.feeCosts[0]
-        ? ethers.utils.formatUnits(squidTx.tx.estimate.feeCosts[0].amount, 18).substring(0, 8)
+      amount: (squidTx.tx as SquidRoute).estimate.feeCosts[0]
+        ? ethers.utils
+            .formatUnits((squidTx.tx as SquidRoute).estimate.feeCosts[0].amount, 18)
+            .substring(0, 8)
         : '0',
-      amountUsd: squidTx.tx.estimate.feeCosts[0] ? squidTx.tx.estimate.feeCosts[0].amountUsd : '0',
+      amountUsd: (squidTx.tx as SquidRoute).estimate.feeCosts[0]
+        ? (squidTx.tx as SquidRoute).estimate.feeCosts[0].amountUsd
+        : '0',
     };
 
     const boostFee = {
-      amount: squidTx.tx.estimate.feeCosts[1]
-        ? ethers.utils.formatUnits(squidTx.tx.estimate.feeCosts[1].amount, 18).substring(0, 8)
+      amount: (squidTx.tx as SquidRoute).estimate.feeCosts[1]
+        ? ethers.utils
+            .formatUnits((squidTx.tx as SquidRoute).estimate.feeCosts[1].amount, 18)
+            .substring(0, 8)
         : '0',
-      amountUsd: squidTx.tx.estimate.feeCosts[0] ? squidTx.tx.estimate.feeCosts[1].amountUsd : '0',
+      amountUsd: (squidTx.tx as SquidRoute).estimate.feeCosts[0]
+        ? (squidTx.tx as SquidRoute).estimate.feeCosts[1].amountUsd
+        : '0',
     };
 
     const gasFee = {
-      amount: squidTx.tx.estimate.gasCosts[0]
-        ? ethers.utils.formatUnits(squidTx.tx.estimate.gasCosts[0].amount, 18).substring(0, 8)
+      amount: (squidTx.tx as SquidRoute).estimate.gasCosts[0]
+        ? ethers.utils
+            .formatUnits((squidTx.tx as SquidRoute).estimate.gasCosts[0].amount, 18)
+            .substring(0, 8)
         : '0',
-      amountUsd: squidTx.tx.estimate.gasCosts[0] ? squidTx.tx.estimate.gasCosts[0].amountUsd : '0',
+      amountUsd: (squidTx.tx as SquidRoute).estimate.gasCosts[0]
+        ? (squidTx.tx as SquidRoute).estimate.gasCosts[0].amountUsd
+        : '0',
     };
 
     setFees([
