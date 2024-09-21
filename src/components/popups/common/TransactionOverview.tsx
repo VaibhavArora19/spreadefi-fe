@@ -1,15 +1,57 @@
-import { protocolNameToImage } from '@/constants/prorocolInfo';
-import { TProtocolName } from '@/types/protocol';
+import { useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import { IoIosArrowDown } from 'react-icons/io';
 import TransactionDetailsModal from './TransactionDetailsModal';
 import Loader from '@/components/(ui)/Loader';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
+import { Action } from '@/types/strategy';
+import { ethers } from 'ethers';
+import { isBytesLike } from 'ethers/lib/utils';
 
 const TransactionOverview = () => {
-  const [isLoading, setIsLoading] = useState(false); // @vaibhav - I dont know kaha load ho rha hai, toh ye dekh lena
   const [showTxDetailsModal, setShowTxDetailsModal] = useState(false);
+  const [squidTx, setSquidTx] = useState<TTransactionResponse[number] | null>(null);
+  const [fees, setFees] = useState<string | null>(null);
+  const { isLoading, transactions } = useTransactionStore();
+  const { fromAmount } = useTransactionPayloadStore();
+
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const squidTransaction = transactions.find((tx) => tx.type === Action.SQUID);
+
+      if (squidTransaction && !isBytesLike(squidTransaction.tx)) {
+        setSquidTx(squidTransaction);
+
+        const unformattedFees =
+          BigInt(
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]?.amount
+              : '0',
+          ) +
+          BigInt(
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]?.amount
+              : '0',
+          ) +
+          BigInt(
+            (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]?.amount
+              : '0',
+          );
+
+        setFees(ethers.utils.formatUnits(unformattedFees, 18).substring(0, 7));
+      } else {
+        setSquidTx(null);
+        setFees(null);
+      }
+    } else {
+      setSquidTx(null);
+      setFees(null);
+    }
+  }, [transactions]);
+
   return (
     <>
       <p className="text-xs text-[#707070] mb-1 ml-1 mt-4">Transaction Overview</p>
@@ -66,14 +108,18 @@ const TransactionOverview = () => {
 
             <div className="flex  items-center justify-between text-gray-300">
               <p>Minimum recieved</p>
-              <p>0.002 ETH</p>
+              <p>
+                {!isLoading && squidTx && !isBytesLike(squidTx.tx)
+                  ? ((squidTx.tx as SquidRoute)?.estimate).toAmountMinUSD + '$'
+                  : fromAmount}
+              </p>
             </div>
 
             <div className="flex  items-center justify-between text-gray-300">
               <p>Estimated fee</p>
 
               <div className="flex items-center gap-2">
-                <p>0.001 ETH</p>
+                <p>{!isLoading && fees ? fees : '0'} ETH</p>
                 <IoIosArrowDown
                   onClick={() => {
                     setShowTxDetailsModal(true);
@@ -86,8 +132,9 @@ const TransactionOverview = () => {
         )}
       </div>
 
-      {showTxDetailsModal ? (
+      {!isLoading && squidTx && showTxDetailsModal ? (
         <TransactionDetailsModal
+          squidTx={squidTx}
           onClose={() => {
             setShowTxDetailsModal(false);
           }}

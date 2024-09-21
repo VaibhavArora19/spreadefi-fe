@@ -13,6 +13,9 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { erc20Abi } from 'viem';
 import { useAccount } from 'wagmi';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { walletActions } from '@/redux/features/wallet-slice';
 
 type SupplyItemProps = {
   data: { asset: TAsset; currentATokenBalance: string };
@@ -51,14 +54,20 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
 
   const handleSupplySubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };
 
   const migrateModalHandler = async () => {
     //! add some warning here
-    if (!protocolChainId) return;
+    if (!protocolChainId) {
+      toast.error('ChainId not found!');
+      return;
+    }
 
     const tokens = await fetchList(protocolChainId);
     const [filterFromToken] = tokens.filter(
@@ -67,7 +76,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
     );
 
     //!add some error here
-    if (!filterFromToken) return;
+    if (!filterFromToken) {
+      toast.error('Some error occurred!');
+      return;
+    }
 
     dispatch(transactionPayloadActions.setStrategyName((protocol + '-').trim()));
     dispatch(transactionPayloadActions.setFromChain(protocolChainId));
@@ -79,7 +91,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
 
   const withdrawModalHandler = async () => {
     //! add some warning here
-    if (!protocolChainId) return;
+    if (!protocolChainId) {
+      toast.error('ChainId not found');
+      return;
+    }
 
     const tokens = await fetchList(protocolChainId);
     const [filterFromToken] = tokens.filter(
@@ -88,7 +103,10 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
     );
 
     //!add some error here
-    if (!filterFromToken) return;
+    if (!filterFromToken) {
+      toast.error('Some error occurred!');
+      return;
+    }
 
     protocol && dispatch(transactionPayloadActions.setStrategyName(protocol));
     protocolChainId && dispatch(transactionPayloadActions.setFromChain(protocolChainId));
@@ -103,7 +121,7 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
       <div className="flex items-center w-full">
         <div className="flex gap-[6px] flex-[0.21]">
           <Image
-            src={assetNameToImage(data.asset.assetSymbol)}
+            src={assetNameToImage(data.asset.assetSymbol, data.asset.protocolName)}
             height={22}
             width={25}
             alt={data.asset.assetSymbol}
@@ -154,6 +172,8 @@ const SupplyItem: React.FC<SupplyItemProps> = ({ data }) => {
           }}
         />
       ) : null}
+
+      <ToastContainer theme="dark" />
     </>
   );
 };

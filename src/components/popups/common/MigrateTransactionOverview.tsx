@@ -1,14 +1,17 @@
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
-import { useTransactionPayloadStore } from '@/redux/hooks';
+import { useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
 import { TProtocolName } from '@/types/protocol';
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaLongArrowAltRight } from 'react-icons/fa';
 import { Action } from '@/types/strategy';
 import { IoIosArrowDown } from 'react-icons/io';
 import TransactionDetailsModal from './TransactionDetailsModal';
 import Loader from '@/components/(ui)/Loader';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
+import { ethers } from 'ethers';
+import { isBytesLike } from 'ethers/lib/utils';
 
 const MigrateTransactionOverview = ({
   type,
@@ -20,8 +23,46 @@ const MigrateTransactionOverview = ({
     | Action.BORROW_DEPOSIT;
 }) => {
   const { strategyName, fromChain, toChain } = useTransactionPayloadStore();
-  const [isLoading, setIsLoading] = useState(false); // @vaibhav - I dont know kaha load ho rha hai, toh ye dekh lena
+  const { isLoading } = useTransactionStore();
   const [showTxDetailsModal, setShowTxDetailsModal] = useState(false);
+  const [squidTx, setSquidTx] = useState<TTransactionResponse[number] | null>(null);
+  const [fees, setFees] = useState<string | null>(null);
+  const { transactions } = useTransactionStore();
+
+  useEffect(() => {
+    if (transactions.length > 0) {
+      const squidTransaction = transactions.find((tx) => tx.type === Action.SQUID);
+
+      if (squidTransaction && !isBytesLike(squidTransaction.tx)) {
+        setSquidTx(squidTransaction);
+
+        const unformattedFees =
+          BigInt(
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[0]?.amount
+              : '0',
+          ) +
+          BigInt(
+            (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]
+              ? (squidTransaction.tx as SquidRoute).estimate.feeCosts[1]?.amount
+              : '0',
+          ) +
+          BigInt(
+            (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]
+              ? (squidTransaction.tx as SquidRoute).estimate.gasCosts[0]?.amount
+              : '0',
+          );
+
+        setFees(ethers.utils.formatUnits(unformattedFees, 18).substring(0, 7));
+      } else {
+        setSquidTx(null);
+        setFees(null);
+      }
+    } else {
+      setSquidTx(null);
+      setFees(null);
+    }
+  }, [transactions]);
 
   return (
     <>
@@ -33,7 +74,11 @@ const MigrateTransactionOverview = ({
             <div className="rounded-md relative">
               {/* Protocol & chain on which position is already there */}
               <Image
-                src={protocolNameToImage(strategyName.split('-')[0] as TProtocolName)}
+                src={
+                  strategyName.includes('yearn-v3') || strategyName.includes('harvest-finance')
+                    ? ''
+                    : protocolNameToImage(strategyName.split('-')[0] as TProtocolName)
+                }
                 height={25}
                 width={25}
                 alt="AAVE"
@@ -53,7 +98,13 @@ const MigrateTransactionOverview = ({
             <div className="rounded-md relative">
               {/* Protocol & chain on which new position to take */}
               <Image
-                src={protocolNameToImage(strategyName.split('-')[1] as TProtocolName)}
+                src={
+                  strategyName.includes('yearn-v3') || strategyName.includes('harvest-finance')
+                    ? ''
+                    : protocolNameToImage(
+                        strategyName.split('-').slice(1).join('-') as TProtocolName,
+                      )
+                }
                 height={25}
                 width={25}
                 alt="AAVE"
@@ -91,7 +142,7 @@ const MigrateTransactionOverview = ({
             <p>Estimated fee</p>
 
             <div className="flex items-center gap-2">
-              <p>0.001 ETH</p>
+              <p>{fees ? fees : 0} ETH</p>
               <IoIosArrowDown
                 onClick={() => {
                   setShowTxDetailsModal(true);
@@ -103,11 +154,12 @@ const MigrateTransactionOverview = ({
         )}
       </div>
 
-      {showTxDetailsModal ? (
+      {!isLoading && squidTx && showTxDetailsModal ? (
         <TransactionDetailsModal
           onClose={() => {
             setShowTxDetailsModal(false);
           }}
+          squidTx={squidTx}
         />
       ) : null}
     </>

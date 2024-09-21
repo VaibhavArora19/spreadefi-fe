@@ -23,8 +23,20 @@ export const networkConfig = {
   },
   '59144': {
     rpc: process.env.NEXT_PUBLIC_LINEA_RPC,
-    Linea: {
+    Zerolend: {
       poolAddress: '0x2f9bB73a8e98793e26Cb2F6C4ad037BDf1C6B269',
     },
+  },
+  '56': {
+    rpc: process.env.NEXT_PUBLIC_BSC_RPC,
+  },
+  '137': {
+    rpc: process.env.NEXT_PUBLIC_POLYGON_RPC,
+  },
+  '250': {
+    rpc: process.env.NEXT_PUBLIC_FANTOM_RPC,
+  },
+  '43114': {
+    rpc: process.env.NEXT_PUBLIC_AVALANCHE_RPC,
   },
 };

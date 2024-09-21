@@ -1,6 +1,7 @@
 import { Action, StrategyName } from './strategy';
 import { BytesLike } from 'ethers';
 import { Estimate, RouteRequest, SquidData } from '@0xsquid/squid-types';
+import { Route } from '@lifi/sdk';
 
 export type TSquidQuotePayload = {
   fromChain: string;
@@ -24,15 +25,15 @@ export type TTransactionPayload = {
   };
 };
 
+export type SquidRoute = {
+  estimate: Estimate;
+  transactionRequest?: SquidData;
+  params: RouteRequest;
+};
+
 export type TTransactionResponse = {
   chain: string;
   to: string;
   type: Action;
-  tx:
-    | BytesLike
-    | {
-        estimate: Estimate;
-        transactionRequest?: SquidData;
-        params: RouteRequest;
-      };
+  tx: Route | SquidRoute | BytesLike;
 }[];

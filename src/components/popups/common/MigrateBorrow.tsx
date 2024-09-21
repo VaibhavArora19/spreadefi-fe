@@ -8,7 +8,7 @@ import useLockBodyScroll from '@/hooks/useLockBodyScroll';
 import { Switch } from '@/components/ui/switch';
 import MigrateTransactionOverview from './MigrateTransactionOverview';
 import Slippage from './Slippage';
-import { useTransactionPayloadStore } from '@/redux/hooks';
+import { useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
 import { Action } from '@/types/strategy';
 import { useDispatch } from 'react-redux';
 import { transactionPayloadActions } from '@/redux/actions';
@@ -16,6 +16,7 @@ import { useExecuteTransactions, useTransactionsBuilder } from '@/server/api/tra
 import { TTransactionPayload } from '@/types/transaction';
 import { useAccount } from 'wagmi';
 import { ethers } from 'ethers';
+import { walletActions } from '@/redux/features/wallet-slice';
 
 const MigrateBorrow = ({
   onClose,
@@ -42,6 +43,7 @@ const MigrateBorrow = ({
   const dispatch = useDispatch();
   const { address } = useAccount();
   const { execute } = useExecuteTransactions();
+  const { isLoading } = useTransactionStore();
 
   useLockBodyScroll(true);
 
@@ -53,7 +55,9 @@ const MigrateBorrow = ({
 
   const handleTransactionSubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address){
+      dispatch(walletActions.setIsConnected(false))
+    } 
 
     const data = await execute();
   };
@@ -112,7 +116,7 @@ const MigrateBorrow = ({
   }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage, receiveGasOnDestination, tab]);
 
   return (
-    <Modal className="w-[500px] p-5 ">
+    <Modal className="w-[500px] p-5">
       <div className="flex justify-between items-center mb-4">
         <p className="font-medium text-lg capitalize">
           {type === Action.BORROW_SUPPLY || type === Action.BORROW_DEPOSIT
@@ -180,6 +184,7 @@ const MigrateBorrow = ({
       </div>
 
       <Button
+        disabled={isLoading}
         type="button"
         onClick={handleTransactionSubmit}
         className="w-full text-black bg-white mt-4 py-6 capitalize">

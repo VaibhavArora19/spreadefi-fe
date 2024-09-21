@@ -16,9 +16,17 @@ export type TFormattedAssetBalance = {
   chainId: string;
 };
 
-export type TFormattedAsset = {
-  asset: TAsset;
+export type TLendingAsset = {
   currentATokenBalance: string;
   currentStableDebt: string;
   currentVariableDebt: string;
 };
+
+export type TYieldAsset = {
+  balance: number;
+  balanceUSD: number;
+};
+
+export type TFormattedAsset = {
+  asset: TAsset;
+} & (TLendingAsset | TYieldAsset);

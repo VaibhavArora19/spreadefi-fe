@@ -1,6 +1,21 @@
 import { TAssetName } from '@/types/asset';
+import { TProtocolName } from '@/types/protocol';
 
-export const assetNameToImage = (name: TAssetName | string) => {
+export const assetNameToImage = (
+  name: TAssetName | string,
+  protocolName?: TProtocolName | string,
+) => {
+  switch (protocolName) {
+    case TProtocolName.YEARN_V3:
+      return '/assets/icons/tokens/yearn-v3.png';
+    case TProtocolName.PENDLE:
+      return '/assets/icons/tokens/pendle.png';
+    case TProtocolName.BEEFY:
+      return '/assets/icons/tokens/beefy.png';
+    case TProtocolName.HARVEST_FINANCE:
+      return '/assets/icons/tokens/harvest.png';
+  }
+
   switch (name.toLowerCase()) {
     case TAssetName.WETH:
       return '/assets/icons/tokens/weth.png';
@@ -45,6 +60,6 @@ export const assetNameToImage = (name: TAssetName | string) => {
     case TAssetName.USDBC:
       return '/assets/icons/tokens/usdbc.png';
     default:
-      return '/assets/icons/tokens/wbtc.png';
+      return '/assets/icons/tokens/yearn-v3.png';
   }
 };

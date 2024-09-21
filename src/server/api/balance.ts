@@ -20,7 +20,7 @@ export const useFetchWalletPortfolio = (address: string | undefined) => {
     queryFn: fetchWalletPortfolio,
     enabled: !!address,
     refetchOnWindowFocus: false,
-    refetchOnMount: true,
+    refetchOnMount: false,
     staleTime: 600000, //10 minutes
   });
 };
@@ -43,7 +43,7 @@ export const useFetchTokenBalance = (address: string | undefined) => {
     queryFn: fetchTokenBalance,
     enabled: !!address,
     refetchOnWindowFocus: false,
-    refetchOnMount:true,
+    refetchOnMount: false,
     staleTime: 600000, //10 minutes
   });
 };

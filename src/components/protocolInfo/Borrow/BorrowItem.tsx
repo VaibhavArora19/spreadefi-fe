@@ -3,6 +3,7 @@ import RepayModal from '@/components/popups/Repay/RepayModal';
 import { networkConfig } from '@/config/network';
 import { useFetchTokenListForChain } from '@/hooks/useFetchTokenList';
 import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
+import { walletActions } from '@/redux/features/wallet-slice';
 import { useExecuteTransactions } from '@/server/api/transactions';
 import { TAsset } from '@/types/asset';
 import { ethers } from 'ethers';
@@ -65,7 +66,10 @@ const BorrowItem: React.FC<BorrowItemProps> = ({ data }) => {
 
   const handleRepaySubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };

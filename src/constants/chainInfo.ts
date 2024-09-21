@@ -17,6 +17,22 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainName: 'Linea',
     chainImageUrl: '/assets/icons/chains/linea.png',
   },
+  '56': {
+    chainName: 'Binance Smart Chain',
+    chainImageUrl: '/assets/icons/chains/bsc.png',
+  },
+  '137': {
+    chainName: 'Polygon',
+    chainImageUrl: '/assets/icons/chains/polygon.png',
+  },
+  '250': {
+    chainName: 'Fantom',
+    chainImageUrl: '/assets/icons/chains/fantom.png',
+  },
+  '43114': {
+    chainName: 'Avalanche',
+    chainImageUrl: '/assets/icons/chains/avalanche.png',
+  },
 };
 
 export const chainList = [
@@ -43,5 +59,29 @@ export const chainList = [
     chainName: 'Linea mainnet',
     shortName: 'Linea',
     logo: '/assets/icons/chains/linea.png',
+  },
+  {
+    chainId: 56,
+    chainName: 'Binance Smart Chain',
+    shortName: 'Bsc',
+    logo: '/assets/icons/chains/bsc.png',
+  },
+  {
+    chainId: 137,
+    chainName: 'Polygon mainnet',
+    shortName: 'Polygon',
+    logo: '/assets/icons/chains/polygon.png',
+  },
+  {
+    chainId: 250,
+    chainName: 'Fantom mainnet',
+    shortName: 'Fantom',
+    logo: '/assets/icons/chains/fantom.png',
+  },
+  {
+    chainId: 43114,
+    chainName: 'Avalanche mainnet',
+    shortName: 'Avalanche',
+    logo: '/assets/icons/chains/avalanche.png',
   },
 ];

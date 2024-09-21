@@ -12,6 +12,9 @@ import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
 import { useAccount } from 'wagmi';
 import BorrowAndActionModal from '@/components/popups/Borrow&Action/BorrowAndActionModal';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { walletActions } from '@/redux/features/wallet-slice';
 
 type SupplyAssetItemProps = {
   asset: TAsset;
@@ -31,14 +34,20 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
 
   const handleSupplyOrBorrowSubmit = async () => {
     //!show modal here asking user to connect wallet
-    if (!address) return;
+    if (!address) {
+      dispatch(walletActions.setIsConnected(false));
+      return;
+    }
 
     const data = await execute();
   };
 
   const borrowModalHandler = async () => {
     //!add some warning here
-    if (!asset.chainId) return;
+    if (!asset.chainId) {
+      toast.error('ChainId not found!');
+      return;
+    }
 
     const tokens = await fetchList(asset.chainId);
     const [filterFromToken] = tokens.filter(
@@ -47,7 +56,10 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
     );
 
     //!add some error here
-    if (!filterFromToken) return;
+    if (!filterFromToken) {
+      toast.error('Some error occured!');
+      return;
+    }
 
     dispatch(transactionPayloadActions.setStrategyName(asset.protocolName));
     dispatch(transactionPayloadActions.setFromChain(asset.chainId));
@@ -82,7 +94,7 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
       <div className="flex items-center w-full p-3 rounded-md bg-[#242424]">
         <div className="flex gap-[6px] flex-[0.25]">
           <Image
-            src={assetNameToImage(asset?.assetSymbol)}
+            src={assetNameToImage(asset?.assetSymbol, asset?.protocolName)}
             height={22}
             width={25}
             alt={asset?.assetSymbol}
@@ -168,6 +180,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
           }}
         />
       ) : null}
+
+      <ToastContainer theme="dark" />
     </>
   );
 };

@@ -34,7 +34,7 @@ interface MultiplierSliderProps {
   onChange: (value: number) => void;
 }
 
-const MultiplierSlider: React.FC<MultiplierSliderProps> = ({ value, onChange }) => {
+const MultiplierSlider: React.FC<MultiplierSliderProps> = ({ value = 0, onChange }) => {
   return (
     <div className="w-48 pr-4">
       <WhiteSlider

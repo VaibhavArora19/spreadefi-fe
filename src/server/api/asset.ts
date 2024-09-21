@@ -32,7 +32,7 @@ export const useFetchAssets = () => {
 export const useFetchAssetBySymbol = (assetSymbol: string) => {
   const fetchAssetsBySymbol = async () => {
     try {
-      const { data } = await axiosScout.get(`/asset/symbol/${assetSymbol}`);
+      const { data } = await axiosScout.get(`/asset/symbol?symbol=${assetSymbol}`);
 
       const lendingTableData = data.data.filter((asset: any) => asset.protocolType === 'Lending');
 

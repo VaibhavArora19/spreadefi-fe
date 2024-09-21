@@ -6,7 +6,7 @@ import { IoClose } from 'react-icons/io5';
 import TransactionOverview from './TransactionOverview';
 import TokenSelector from './TokenSelector';
 import ChainsSelector from './ChainsSelector';
-import { useAppDispatch, useTransactionPayloadStore } from '@/redux/hooks';
+import { useAppDispatch, useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
 import { tokensActions, transactionPayloadActions } from '@/redux/actions';
 import { TTransactionPayload } from '@/types/transaction';
 import { Action } from '@/types/strategy';
@@ -30,6 +30,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
   const [transactionPayload, setTransactionPayload] = useState<TTransactionPayload | null>(null);
   const [showSettings, setShowSettings] = useState(false);
   const [tab, setTab] = useState('auto');
+  const { isLoading } = useTransactionStore();
 
   const { address } = useAccount();
   const dispatch = useAppDispatch();
@@ -43,6 +44,7 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     toToken,
     toChain,
     receiveGasOnDestination,
+    slippage,
   } = useTransactionPayloadStore();
 
   const { data } = useTransactionsBuilder(transactionPayload);
@@ -74,6 +76,8 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
       },
     };
 
+    if (slippage !== 0 && tab === 'custom') payload.txDetails.slippage = slippage;
+
     setTransactionPayload(payload);
   }, [
     fromAmount,
@@ -86,15 +90,17 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
     strategyName,
     type,
     receiveGasOnDestination,
+    tab,
+    slippage,
   ]);
 
   useEffect(() => {
     const debouncedFunction = setTimeout(() => {
       prepareTransactionPayload();
-    }, 5000);
+    }, 1500);
 
     return () => clearTimeout(debouncedFunction);
-  }, [fromAmount, fromToken, fromChain, toToken, toChain]);
+  }, [fromAmount, fromToken, fromChain, toToken, toChain, slippage, tab, receiveGasOnDestination]);
 
   const changeHandler = async (
     option: ChangeOptions,
@@ -210,7 +216,8 @@ const CommonActionModal: React.FC<CommonActionModalProps> = ({ type, onClose, on
       </div>
 
       <Button
-        className="w-full text-black bg-white mt-4 py-6 capitalize"
+        disabled={isLoading}
+        className="w-full text-black bg-white mt-4 py-6 capitalize disabled:cursor-not-allowed"
         onClick={() => {
           onSubmit();
         }}>
