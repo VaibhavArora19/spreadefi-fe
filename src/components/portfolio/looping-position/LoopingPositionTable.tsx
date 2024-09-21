@@ -16,8 +16,13 @@ import ModifyLeverageModal from './ModifyLeverageModal';
 import { useState } from 'react';
 import ClosePositionModal from './ClosePositionModal';
 import IncreaseDecreaseModal from './IncreaseDecreaseModal';
+import { TLoopingPosition, TLoopingPositionsResponse } from '@/types/looping-positions';
 
-const LoopingPositionTable = () => {
+interface LoopingPositionTableProps {
+  loopingPositions: TLoopingPositionsResponse;
+}
+
+const LoopingPositionTable = ({ loopingPositions }: LoopingPositionTableProps) => {
   const [showModifyLeverageModal, setShowModifyLeverageModal] = useState(false);
   const [showClosePositionModal, setShowClosePositionModal] = useState(false);
   const [showIncreaseDecreaseModal, setShowIncreaseDecreaseModal] = useState(false);
@@ -34,6 +39,8 @@ const LoopingPositionTable = () => {
     setShowIncreaseDecreaseModal((prev) => !prev);
   }
 
+  console.log('loopingPositions', loopingPositions);
+
   return (
     <>
       <Table className="w-full">
@@ -48,6 +55,73 @@ const LoopingPositionTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody className="border-none">
+          {!!loopingPositions.length &&
+            loopingPositions?.map(
+              ({
+                id,
+                baseToken,
+                quoteToken,
+                chain,
+                market,
+                swapMarket,
+                pair,
+                liquidationThreshold,
+                maxLeverage,
+                roe,
+                currentPrice,
+                liquidationPrice,
+                liquidationBuffer,
+                activeStatus,
+              }: TLoopingPosition) => (
+                <TableRow key={id} className="border-none cursor-pointer hover:bg-[#131313]">
+                  <TableCell className="py-4 max-w-[120px] font-light">
+                    <div className="flex items-center gap-2">
+                      <Image className="w-10" src={aave} alt="logo" />
+                      <div className="space-y-1">
+                        <div>
+                          {pair} on {market}
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div>{chain}</div>
+                          <Image className="w-4" src={op} alt="logo" />
+                        </div>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-4 max-w-[120px] font-light">0.0015 ETH</TableCell>
+                  <TableCell className="py-4 max-w-[120px] font-light">0.0015 ETH</TableCell>
+                  <TableCell className="py-4 max-w-[120px] font-light">{roe}</TableCell>
+                  <TableCell className="py-4 max-w-[120px] font-light">
+                    {liquidationBuffer}
+                  </TableCell>
+                  <TableCell className="py-4 max-w-[120px] font-light">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="outline" className="ml-auto border-none bg-[#27272A]">
+                          Edit <FaEdit className="ml-2 h-4 w-4 cursor-pointer" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                          onClick={handleModifyLeverageModal}
+                          className="capitalize">
+                          Modify Leverage
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={handleIncreaseDecreaseModal}
+                          className="capitalize">
+                          Increase/Decrease
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={handleClosePositionModal} className="capitalize">
+                          Close position
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ),
+            )}
+
           <TableRow className="border-none cursor-pointer hover:bg-[#131313]">
             <TableCell className="py-4 max-w-[120px] font-light">
               <div className="flex items-center gap-2">

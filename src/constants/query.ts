@@ -17,3 +17,7 @@ export enum TRANSACTIONS {
 export enum TOKENS {
   FETCH_LIST = 'FETCH_TOKEN_LIST',
 }
+
+export enum LOOPING_POSITIONS {
+  FETCH = 'LOOPING_POSITIONS',
+}
