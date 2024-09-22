@@ -12,7 +12,6 @@ import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWalletStore } from '@/redux/hooks';
 import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
-import { useFetchLoopingPositions } from '@/server/api/looping-positions';
 import { TAsset } from '@/types/asset';
 import {
   TAssetBalance,
@@ -20,7 +19,6 @@ import {
   TFormattedAssetBalance,
   TYieldAsset,
 } from '@/types/balance';
-import { TLoopingPosition, TLoopingPositionsResponse } from '@/types/looping-positions';
 import { ProtocolType, TProtocolName } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
@@ -44,7 +42,6 @@ const Portfolio = () => {
   const [yieldBalances, setYieldBalances] = useState<TFormattedAssetBalance[]>();
 
   const { data: balances } = useFetchTokenBalance(address);
-  const { data: loopingPositions } = useFetchLoopingPositions();
 
   const { data: portfolio } = useFetchWalletPortfolio(address);
   const { isConnected } = useWalletStore();
@@ -283,9 +280,9 @@ const Portfolio = () => {
         </div>
       )}
 
-      {!!loopingPositions?.length && tab === 'loopingPositions' && (
+      {tab === 'loopingPositions' && (
         <div className="flex flex-col gap-3">
-          <LoopingPositionTable loopingPositions={loopingPositions || []} />
+          <LoopingPositionTable data={[]} />
         </div>
       )}
 

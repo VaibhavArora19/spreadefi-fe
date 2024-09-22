@@ -9,13 +9,14 @@ import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/Loopin
 import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs';
 import { useState } from 'react';
 import { useFetchAssetByProtocolType, useFetchAssets } from '@/server/api/asset';
+import { useFetchLoopingStrategies } from '@/server/api/looping-strategies';
 
 const Home = () => {
   const { address } = useAccount();
   // const { data: portfolio } = useFetchWalletPortfolio(address as string);
   const { data: portfolio } = useFetchWalletPortfolio(address);
   const { data, isLoading, isError, error } = useFetchAssets();
-  const { data: loopingData } = useFetchAssetByProtocolType('Looping');
+  const { data: loopingData } = useFetchLoopingStrategies();
 
   const [tab, setTab] = useState<string>('lendBorrow');
 
@@ -56,7 +57,7 @@ const Home = () => {
       </Tabs>
 
       {tab === 'loopingStrategy' ? (
-        <LoopingStrategyTable loopingTableData={loopingData} />
+        <LoopingStrategyTable loopingTableData={loopingData || []} />
       ) : (
         <LendingBorrowingTable
           data={data}

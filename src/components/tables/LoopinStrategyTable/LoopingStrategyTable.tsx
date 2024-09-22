@@ -1,26 +1,22 @@
 'use client';
 
+import React, { useState } from 'react';
 import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { Table } from '@/components/ui/table';
-import { useState } from 'react';
-
-import { useRouter } from 'next/navigation';
 import ChainFilterDropdown from '../LendingBorrowingTable/ChainFilterDropdown';
 import ProtocolFilterDropdown from '../LendingBorrowingTable/ProtocolFilterDropdown';
 import LendingBorrowingHeader from '../LendingBorrowingTable/LendingBorrowingHeader';
 import LendingBorrowingTableBody from '../LendingBorrowingTable/LendingBorrowingTableBody';
 import TableControls from '../LendingBorrowingTable/TableControls';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
-import LoopingStrategyColum from './LoopingStrategyColumn';
 import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
 import { useAccount } from 'wagmi';
 import { useExecuteTransactions } from '@/server/api/transactions';
@@ -29,8 +25,13 @@ import { tokensActions, transactionPayloadActions, transactionsActions } from '@
 import { walletActions } from '@/redux/features/wallet-slice';
 import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
 import { useWalletStore } from '@/redux/hooks';
+import LoopingStrategyColumn from './LoopingStrategyColumn';
 
-const LoopingStrategyTable = ({ loopingTableData }: any) => {
+interface LoopingStrategyTableProps {
+  loopingTableData: any[];
+}
+
+const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTableData }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -40,7 +41,6 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
   const { address } = useAccount();
   const { execute } = useExecuteTransactions();
 
-  const router = useRouter();
   const dispatch = useDispatch();
   const { isConnected } = useWalletStore();
 
@@ -54,9 +54,11 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
     filteredData,
   } = useFilterDataAssetTable({ assetData: loopingTableData });
 
+  const columns = LoopingStrategyColumn(setShowSupplyModal, filteredData);
+
   const table = useReactTable({
-    data: filteredData || [],
-    columns: LoopingStrategyColum(setShowSupplyModal, filteredData),
+    data: filteredData,
+    columns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
@@ -73,7 +75,6 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
   });
 
   const handleLeverageSubmit = async () => {
-    //!show modal here asking user to connect wallet
     if (!address) {
       dispatch(walletActions.setIsConnected(false));
       return;
@@ -81,9 +82,6 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
 
     const data = await execute();
   };
-
-  //   if (isLoading) return <div>Loading...</div>;
-  //   if (isError) return <div>Error: {error.message}</div>;
 
   return (
     <div className="w-full">
@@ -108,8 +106,7 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
           <LendingBorrowingTableBody table={table} />
         </Table>
       </div>
-
-      {showSupplyModal ? (
+      {showSupplyModal && (
         <LeverageSupplyModal
           onClose={() => {
             dispatch(transactionPayloadActions.resetState());
@@ -119,8 +116,7 @@ const LoopingStrategyTable = ({ loopingTableData }: any) => {
           }}
           onSubmit={handleLeverageSubmit}
         />
-      ) : null}
-
+      )}
       {!isConnected && <ConnectWallet />}
     </div>
   );

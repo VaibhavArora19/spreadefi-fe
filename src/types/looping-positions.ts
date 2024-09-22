@@ -1,4 +1,4 @@
-export type TLoopingPosition = {
+export type TLoopingStrategy = {
   id: string;
   baseToken: string;
   quoteToken: string;
@@ -14,5 +14,3 @@ export type TLoopingPosition = {
   liquidationBuffer: number;
   activeStatus: boolean;
 };
-
-export type TLoopingPositionsResponse = Array<TLoopingPosition>;

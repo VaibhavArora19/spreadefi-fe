@@ -1,221 +1,190 @@
-import { ColumnDef, Row } from '@tanstack/react-table';
-import { TableItem, TAssetTableItem, TLoopinStrategyTableItem } from '@/types/dataTable';
+import React from 'react';
+import { ColumnDef } from '@tanstack/react-table';
 import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
-import { assetNameToImage } from '@/constants/assetInfo';
 import { CaretSortIcon } from '@radix-ui/react-icons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { CHAIN_CONFIG } from '@/constants/chainInfo';
-import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { Button } from '@/components/ui/button';
-import MultiplierSlider from './MultiplierSlider';
 import { useDispatch } from 'react-redux';
 import { transactionPayloadActions } from '@/redux/actions';
-import { useEffect, useState } from 'react';
+import { assetNameToImage } from '@/constants/assetInfo';
+import { CHAIN_CONFIG, chainList } from '@/constants/chainInfo';
+import { protocolNameToImage } from '@/constants/prorocolInfo';
+import { TProtocolName } from '@/types/protocol';
+import { TLoopingStrategy } from '@/types/looping-positions';
 
-const LoopingStrategyColum = (
+const LoopingStrategyColumn = (
   setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
-  data: any[],
-): ColumnDef<TLoopinStrategyTableItem>[] => {
+  data: TLoopingStrategy[],
+): ColumnDef<TLoopingStrategy>[] => {
   const dispatch = useDispatch();
 
-  const [multipliers, setMultipliers] = useState<{ [key: string]: number }>({});
-
-  useEffect(() => {
-    const initialMultipliers = data.reduce((acc, item, index) => {
-      acc[index] = 10;
-      return acc;
-    }, {});
-
-    setMultipliers(initialMultipliers);
-  }, [data]);
-
-  const handleMultiplierChange = (id: string, value: number) => {
-    setMultipliers((prev) => ({ ...prev, [id]: value }));
-  };
-
-  const showSupplyModalHandler = (row: Row<TLoopinStrategyTableItem>) => {
-    dispatch(transactionPayloadActions.setStrategyName(row.original.protocolName + '-Looping'));
-    dispatch(transactionPayloadActions.setToChain(row.original.chainId));
-    dispatch(transactionPayloadActions.setToToken(row.original.assetAddress));
-    dispatch(transactionPayloadActions.setLeverage(multipliers[row.id]));
-    setShowSupplyModal ? setShowSupplyModal(true) : null;
+  const showSupplyModalHandler = (row: TLoopingStrategy) => {
+    dispatch(transactionPayloadActions.setStrategyName(`${row.market}-Looping`));
+    dispatch(transactionPayloadActions.setToChain(row.chain));
+    dispatch(transactionPayloadActions.setToToken(row.baseToken));
+    dispatch(transactionPayloadActions.setLeverage(row.maxLeverage));
+    setShowSupplyModal(true);
   };
 
   return [
     {
-      accessorKey: 'assetSymbol',
+      accessorKey: 'pair',
       header: 'Asset',
+      cell: ({ row }) => {
+        const [baseAsset, quoteAsset] = row.original.pair.split('/');
+        return (
+          <div className="flex items-center gap-1">
+            <Image
+              src={assetNameToImage(baseAsset)}
+              height={20}
+              width={20}
+              alt={baseAsset}
+              className="rounded-full"
+            />
+            <Image
+              src={assetNameToImage(quoteAsset)}
+              height={20}
+              width={20}
+              alt={quoteAsset}
+              className="rounded-full"
+            />
+            <p className="ml-2">{row.original.pair}</p>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'chain',
+      header: 'Chain',
+      cell: ({ row }) => {
+        const chainInfo = chainList.find((chain) => chain.shortName === row.original.chain);
+        return (
+          <div className="flex -space-x-1 ">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Image
+                    className="hover:scale-110"
+                    src={chainInfo?.logo || ''}
+                    height={25}
+                    width={25}
+                    alt={row.original.chain}
+                  />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="bg-[#1e1e1e] text-white">{row.original.chain}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'market',
+      header: 'Protocol',
+      cell: ({ row }) => {
+        const protocolImage = protocolNameToImage(row.original.market as TProtocolName);
+        return (
+          <div className="flex -space-x-1">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  {protocolImage ? (
+                    <Image
+                      className="hover:scale-110"
+                      src={protocolImage}
+                      height={25}
+                      width={25}
+                      alt={row.original.market}
+                    />
+                  ) : (
+                    <div className="w-[25px] h-[25px] bg-gray-300 rounded-full flex items-center justify-center">
+                      {row.original.market.charAt(0)}
+                    </div>
+                  )}
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="bg-[#1e1e1e] text-white">{row.original.market}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'maxLeverage',
+      header: () => (
+        <div className="flex gap-1 items-center">
+          Max Leverage
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <IoIosInformationCircle className="cursor-pointer" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="bg-[#1e1e1e] text-white">Maximum leverage available for this asset</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      ),
+      cell: ({ row }) => <div>{row.original.maxLeverage.toFixed(2)}x</div>,
+    },
+    {
+      accessorKey: 'roe',
+      header: ({ column }) => (
+        <div
+          className="flex gap-1 items-center w-[100px]"
+          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
+          ROE
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <IoIosInformationCircle className="cursor-pointer" />
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="bg-[#1e1e1e] text-white">Return on Equity at max leverage</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
+        </div>
+      ),
       cell: ({ row }) => (
-        <div className="flex items-center gap-1">
-          <Image
-            src={assetNameToImage(row.getValue('assetSymbol'))}
-            height={20}
-            width={20}
-            alt="weth"
-            className="rounded-full"
-          />
-          <Image
-            src={assetNameToImage('weth')}
-            height={20}
-            width={20}
-            alt="weth"
-            className="rounded-full"
-          />
-
-          <p className="ml-2">
-            {row.getValue('assetSymbol')} / {'WETH'}{' '}
-          </p>
+        <div className="lowercase bg-green-500/10 px-4 py-1 border-[1px] text-xs border-green-900 rounded-full w-fit text-green-500">
+          <p>{row.original.roe.toFixed(2)}%</p>
         </div>
       ),
     },
     {
-      accessorKey: 'chainIds',
-      header: 'Chains',
-      cell: ({ row }) => (
-        <div className="flex -space-x-1 ">
+      accessorKey: 'liquidationBuffer',
+      header: () => (
+        <div className="flex gap-1 items-center">
+          Liquidation Buffer
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <Image
-                  className="hover:scale-110"
-                  src={CHAIN_CONFIG[row.original.chainId].chainImageUrl}
-                  height={25}
-                  width={25}
-                  alt={CHAIN_CONFIG[row.original.chainId].chainName}
-                />
+                <IoIosInformationCircle className="cursor-pointer" />
               </TooltipTrigger>
               <TooltipContent>
                 <p className="bg-[#1e1e1e] text-white">
-                  {CHAIN_CONFIG[row.original.chainId].chainName}
+                  Percentage difference between current price and liquidation price
                 </p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
       ),
+      cell: ({ row }) => <div>{row.original.liquidationBuffer.toFixed(2)}%</div>,
     },
     {
-      accessorKey: 'protocolName',
-      header: 'Protocols',
-      cell: ({ row }) => (
-        <div className="flex -space-x-1">
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <Image
-                  className="hover:scale-110"
-                  src={protocolNameToImage(row.original.protocolName)}
-                  height={25}
-                  width={25}
-                  alt={row.original.protocolName}
-                />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">{row.original.protocolName}</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'points',
-      header: () => {
-        return (
-          <div className="flex gap-1 items-center">
-            Points
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <IoIosInformationCircle className="cursor-pointer" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="bg-[#1e1e1e] text-white">
-                    Points rewarded for supplying tokens in this particular asset pool
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          </div>
-        );
-      },
-
-      cell: ({ row }) => (
-        <div className="flex gap-3 flex-wrap overflow-hidden text-ellipsis w-full">
-          {row.original.points.length > 0 ? (
-            row.original.points.map((point, index) => (
-              <TooltipProvider key={index}>
-                <Tooltip>
-                  <TooltipTrigger>
-                    <div className="px-4 py-1 bg-green-700/20 text-green-400 rounded-md text-xs ">
-                      {point}
-                    </div>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    <p className="bg-[#1e1e1e] text-white">{point}</p>
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            ))
-          ) : (
-            <div className="text-center align-center">-</div>
-          )}
-        </div>
-      ),
-    },
-
-    {
-      accessorKey: 'multiplier',
-      header: 'Multiplier',
-      cell: ({ row }) => (
-        <>
-          <MultiplierSlider
-            value={multipliers[row.id]}
-            onChange={(value) => handleMultiplierChange(row.id, value)}
-          />
-        </>
-      ),
-    },
-    {
-      accessorKey: 'APY',
-      header: ({ column }) => {
-        return (
-          <div
-            className="flex gap-1 items-center w-[100px]"
-            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-            APY
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <IoIosInformationCircle className="cursor-pointer" />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="bg-[#1e1e1e] text-white">
-                    APY of selected multiplier for that protocol
-                  </p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-            <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
-          </div>
-        );
-      },
-      cell: ({ row }) => (
-        <div className="lowercase flex gap-2 items-center w-[100px]">
-          <p>{row.original.apy} </p>
-        </div>
-      ),
-    },
-
-    {
-      accessorKey: 'view',
-      header: '',
+      id: 'actions',
       cell: ({ row }) => (
         <Button
-          onClick={() => {
-            showSupplyModalHandler(row);
-          }}
+          onClick={() => showSupplyModalHandler(row.original)}
           className="w-[80%] bg-white text-black">
           Supply
         </Button>
@@ -224,4 +193,4 @@ const LoopingStrategyColum = (
   ];
 };
 
-export default LoopingStrategyColum;
+export default LoopingStrategyColumn;
