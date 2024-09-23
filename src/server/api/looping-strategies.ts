@@ -21,3 +21,23 @@ export const useFetchLoopingStrategies = () => {
     refetchOnWindowFocus: false,
   });
 };
+
+export const useFetchLoopingStrategyById = (strategyId: string, enabled?: boolean) => {
+  const fetchPositionById = async () => {
+    try {
+      const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(`/strategy/${strategyId}`);
+
+      return data;
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
+  };
+
+  return useQuery({
+    queryKey: [LOOPING_STRATEGY.FETCH_BY_ID],
+    queryFn: fetchPositionById,
+    staleTime: Infinity,
+    refetchOnWindowFocus: false,
+    enabled,
+  });
+};

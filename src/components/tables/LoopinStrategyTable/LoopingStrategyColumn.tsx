@@ -4,7 +4,7 @@ import { IoIosInformationCircle } from 'react-icons/io';
 import Image from 'next/image';
 import { CaretSortIcon } from '@radix-ui/react-icons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { useDispatch } from 'react-redux';
 import { transactionPayloadActions } from '@/redux/actions';
 import { assetNameToImage } from '@/constants/assetInfo';
@@ -12,6 +12,8 @@ import { CHAIN_CONFIG, chainList } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
 import { TProtocolName } from '@/types/protocol';
 import { TLoopingStrategy } from '@/types/looping-positions';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
 
 const LoopingStrategyColumn = (
   setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
@@ -183,11 +185,11 @@ const LoopingStrategyColumn = (
     {
       id: 'actions',
       cell: ({ row }) => (
-        <Button
-          onClick={() => showSupplyModalHandler(row.original)}
-          className="w-[80%] bg-white text-black">
-          Supply
-        </Button>
+        <Link
+          href={`/looping/${row.original.id}`}
+          className={cn(buttonVariants({ variant: 'default' }), 'w-[80%] bg-white text-black')}>
+          Create Position
+        </Link>
       ),
     },
   ];
