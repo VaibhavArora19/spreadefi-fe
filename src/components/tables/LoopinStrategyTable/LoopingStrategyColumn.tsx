@@ -163,7 +163,7 @@ const LoopingStrategyColumn = (
       accessorKey: 'liquidationBuffer',
       header: () => (
         <div className="flex gap-1 items-center">
-          Liquidation Buffer
+          Liq. Buffer
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>

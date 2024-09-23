@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   ColumnFiltersState,
   SortingState,
@@ -8,6 +8,7 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getSortedRowModel,
+  getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
 import { Table } from '@/components/ui/table';
@@ -26,6 +27,8 @@ import { walletActions } from '@/redux/features/wallet-slice';
 import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
 import { useWalletStore } from '@/redux/hooks';
 import LoopingStrategyColumn from './LoopingStrategyColumn';
+import { Button } from '@/components/ui/button';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
 interface LoopingStrategyTableProps {
   loopingTableData: any[];
@@ -37,6 +40,7 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = useState({});
   const [showSupplyModal, setShowSupplyModal] = useState(false);
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 10 });
 
   const { address } = useAccount();
   const { execute } = useExecuteTransactions();
@@ -64,13 +68,16 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
       columnVisibility,
       rowSelection,
+      pagination,
     },
   });
 
@@ -106,6 +113,27 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
           <LendingBorrowingTableBody table={table} />
         </Table>
       </div>
+      {!!loopingTableData.length && (
+        <div className="flex items-center justify-center py-4">
+          <div className="flex items-center gap-3">
+            <Button
+              variant="default"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}>
+              <IoIosArrowBack className="size-5" />
+            </Button>
+            <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+              Page {table.getState().pagination.pageIndex + 1} of {table.getPageCount()}
+            </div>
+            <Button
+              variant="default"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}>
+              <IoIosArrowForward className="size-5" />
+            </Button>
+          </div>
+        </div>
+      )}
       {showSupplyModal && (
         <LeverageSupplyModal
           onClose={() => {
