@@ -14,3 +14,31 @@ export type TLoopingStrategy = {
   liquidationBuffer: number;
   activeStatus: boolean;
 };
+
+export type TLoopingStrategyQuotePayload = {
+  marginType: 'quote' | 'base';
+  marginAmount: number;
+  positionType: 'long' | 'short';
+  leverage: number;
+  userAddress: string;
+};
+
+export interface TCreatePositionPayload {
+  userAddress: string;
+  tokenId: number;
+  proxyAddress: string;
+  strategyId: string;
+  marginType: 'base' | 'quote';
+  positionType: 'long' | 'short';
+  marginAmount: number;
+  leverage: number;
+  entryPrice: number;
+}
+
+export type TQuoteData = {
+  entryPrice: number;
+  tx: {
+    to: string;
+    data: string;
+  };
+};
