@@ -3,6 +3,7 @@ const SCOUT_SERVER_URL = process.env.NEXT_PUBLIC_SCOUT_SERVER_URL;
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  reactStrictMode: false,
   images: {
     domains: [
       'raw.githubusercontent.com',

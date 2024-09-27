@@ -59,6 +59,8 @@ export const assetNameToImage = (
       return '/assets/icons/tokens/seam.png';
     case TAssetName.USDBC:
       return '/assets/icons/tokens/usdbc.png';
+    case TAssetName.WEETH:
+      return '/assets/icons/tokens/weeth.png';
     default:
       return '/assets/icons/tokens/yearn-v3.png';
   }

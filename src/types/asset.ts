@@ -22,6 +22,7 @@ export enum TAssetName {
   FRAX = 'frax',
   DEGEN = 'degen',
   ARB = 'arb',
+  WEETH = 'weeth',
 }
 
 export type TBalance = {
