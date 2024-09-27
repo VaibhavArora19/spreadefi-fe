@@ -92,9 +92,16 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
     if (!quoteData || !userWalletAddress) return;
 
     try {
+      if (quoteData.txs.approveTx) {
+        await executeTransaction({
+          to: quoteData.txs.approveTx?.to,
+          data: quoteData.txs.approveTx?.data,
+        });
+      }
+
       const txResult = await executeTransaction({
-        to: quoteData.tx.to,
-        data: quoteData.tx.data,
+        to: quoteData.txs.tx.to,
+        data: quoteData.txs.tx.data,
       });
 
       const tokenId = Number(txResult.tokenId);

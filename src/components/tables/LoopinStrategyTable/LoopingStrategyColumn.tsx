@@ -21,14 +21,6 @@ const LoopingStrategyColumn = (
 ): ColumnDef<TLoopingStrategy>[] => {
   const dispatch = useDispatch();
 
-  const showSupplyModalHandler = (row: TLoopingStrategy) => {
-    dispatch(transactionPayloadActions.setStrategyName(`${row.market}-Looping`));
-    dispatch(transactionPayloadActions.setToChain(row.chain));
-    dispatch(transactionPayloadActions.setToToken(row.baseToken));
-    dispatch(transactionPayloadActions.setLeverage(row.maxLeverage));
-    setShowSupplyModal(true);
-  };
-
   return [
     {
       accessorKey: 'pair',

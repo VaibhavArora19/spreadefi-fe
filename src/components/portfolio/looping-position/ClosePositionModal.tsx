@@ -1,127 +1,163 @@
-import React from 'react';
-import op from '../../../../public/assets/icons/chains/op.png';
+import React, { useState } from 'react';
 import Modal from '@/components/(ui)/Modal';
 import { IoClose } from 'react-icons/io5';
 import Image from 'next/image';
-import { Slider } from '@/components/ui/slider';
-import { MdOutlineArrowRight } from 'react-icons/md';
-import { ArrowRightIcon } from '@radix-ui/react-icons';
+import { GearIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
+import {
+  useExecuteTransaction,
+  useFetchUserCreatedPositionById,
+  useModifyLoopingPosition,
+  useUpdateLoopingPositionEntry,
+} from '@/server/api/looping-strategies';
+import {
+  TUserLoopingPosition,
+  MarginType,
+  TModifyPositionPayload,
+} from '@/types/looping-positions';
+import { assetNameToImage } from '@/constants/assetInfo';
+import { useAccount } from 'wagmi';
 
-const ClosePositionModal = ({
-  onClose,
-  onSubmit,
-}: {
+interface ClosePositionModalProps {
   onClose: () => void;
   onSubmit: () => void;
-}) => {
-  return (
-    <Modal className="w-[500px] p-5 space-y-4">
-      <div className="flex justify-between items-start pb-2 border-b-[0.5px] border-[#272727] mb-4">
-        <div className="flex items-center gap-2">
-          <div className="space-y-1">
-            <div>wstETH</div>
-            <div className="flex items-center gap-2">
-              <Image className="w-4" src={op} alt="logo" />
-              <div className="text-sm">Aave v3</div>
-            </div>
-          </div>
+  position: TUserLoopingPosition;
+}
+
+const ClosePositionModal = ({ onClose, onSubmit, position }: ClosePositionModalProps) => {
+  const { address: userWalletAddress } = useAccount();
+  const { data: positionData, isLoading, error } = useFetchUserCreatedPositionById(position.id);
+  const { mutateAsync: modifyPosition } = useModifyLoopingPosition(position.id);
+  const { mutateAsync: updatePositionInDb, isPending: isUpdatingPositionInDb } =
+    useUpdateLoopingPositionEntry(position.id);
+  const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
+    useExecuteTransaction();
+
+  const [isClosing, setIsClosing] = useState(false);
+
+  if (!positionData) return null;
+
+  const getTokenByMarginType = (pair: string, marginType: MarginType): string => {
+    const [baseToken, quoteToken] = pair.split('/');
+    return marginType === 'base' ? baseToken : quoteToken;
+  };
+
+  const handleClosePosition = async () => {
+    if (!userWalletAddress) return;
+
+    setIsClosing(true);
+    try {
+      const closePositionPayload: TModifyPositionPayload = {
+        modifyType: 'close',
+      };
+      const quoteDataResult = await modifyPosition(closePositionPayload);
+
+      if (quoteDataResult?.txs.tx) {
+        if (quoteDataResult.txs.approveTx) {
+          await executeTransaction({
+            to: quoteDataResult.txs.approveTx.to,
+            data: quoteDataResult.txs.approveTx.data,
+          });
+        }
+
+        await executeTransaction({
+          to: quoteDataResult.txs.tx.to,
+          data: quoteDataResult.txs.tx.data,
+        });
+
+        await updatePositionInDb({
+          modifyType: 'close',
+        });
+
+        onSubmit(); // Notify parent component that the position has been closed
+      }
+    } catch (error) {
+      console.error('Error closing position:', error);
+    } finally {
+      setIsClosing(false);
+    }
+  };
+
+  const renderPairInfo = () => {
+    const [baseToken, quoteToken] = positionData.Strategy.pair.split('/');
+    return (
+      <div className="flex items-center gap-2">
+        <div className="flex items-center -space-x-1.5">
+          <Image
+            src={assetNameToImage(baseToken)}
+            height={36}
+            width={36}
+            alt={baseToken}
+            className="rounded-full"
+          />
+          <Image
+            src={assetNameToImage(quoteToken)}
+            height={36}
+            width={36}
+            alt={quoteToken}
+            className="rounded-full"
+          />
         </div>
+        <p className="ml-2">{positionData.Strategy.pair}</p>
+      </div>
+    );
+  };
+
+  const renderPositionInfo = () => {
+    const marginToken = getTokenByMarginType(positionData.Strategy.pair, positionData.marginType);
+    return (
+      <div className="space-y-3 border-b border-gray-600 pb-3">
+        <InfoItem label="Margin" value={`${positionData.marginAmount.toFixed(2)} ${marginToken}`} />
+        <InfoItem label="Position Type" value={`${positionData.positionType}`} />
+        <InfoItem label="Entry Price" value={positionData.entryPrice.toFixed(3)} />
+        <InfoItem label="Liquidation Price" value={positionData.liquidationPrice.toFixed(2)} />
+        <InfoItem
+          label="Liquidation Buffer"
+          value={`${positionData.liquidationBuffer.toFixed(2)}%`}
+        />
+        <InfoItem label="ROE" value={`${positionData.roe.toFixed(2)}%`} />
+      </div>
+    );
+  };
+
+  return (
+    <Modal className="w-10/12 md:w-[600px] p-5 space-y-4">
+      {isLoading && <div>Loading...</div>}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-2">{renderPairInfo()}</div>
         <div className="flex items-center gap-1 relative">
           <IoClose onClick={onClose} className="cursor-pointer text-lg" />
         </div>
       </div>
       <div>
         <div className="space-y-4 py-2">
-          <div className="relative">
-            <input
-              type="number"
-              placeholder="Order size"
-              className="text-lg text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-2 w-full overflow-hidden"
-              onWheel={(e) => (e.target as HTMLInputElement).blur()}
-            />
-            <span className="text-gray-400 absolute right-4 top-2.5">wstETH</span>
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-400">Leverage</span>
-              <span className="text-gray-300">2.4x</span>
-            </div>
-            <Slider defaultValue={[33]} max={100} step={1} className="w-full" />
-          </div>
-          <div className="border-b border-gray-600 pb-3 space-y-3">
-            <div className="flex items-end justify-between">
-              <div className="w-6/12 flex items-end justify-between">
-                <div>
-                  <div className="text-sm text-gray-400">Size:</div>
-                  <div className="text-green-500">+0.054</div>
-                </div>
-                <ArrowRightIcon className="size-5" />
-              </div>
-              <div className="text-green-500">+0.054</div>
-            </div>
-            <div className="flex items-end justify-between">
-              <div className="w-6/12 flex items-end justify-between">
-                <div>
-                  <div className="text-sm text-gray-400">Margin:</div>
-                  <div className="text-gray-50">19.82%</div>
-                </div>
-                <ArrowRightIcon className="size-5" />
-              </div>
-
-              <div className="text-gray-50">
-                19.82% <span className="text-sm text-gray-400">{`(5%)`}</span>
-              </div>
-            </div>
-            <div className="flex items-end justify-between">
-              <div className="w-6/12 flex items-end justify-between">
-                <div>
-                  <div className="text-sm text-gray-400">Entry Price:</div>
-                  <div className="text-gray-50">1.121232</div>
-                </div>
-                <ArrowRightIcon className="size-5" />
-              </div>
-              <div className="text-gray-50">1.121232</div>
-            </div>
-            <div className="flex items-end justify-between">
-              <div className="w-6/12 flex items-end justify-between">
-                <div>
-                  <div className="text-sm text-gray-400">Liquidation Price:</div>
-                  <div className="text-gray-50">0.9121232</div>
-                </div>
-                <ArrowRightIcon className="size-5" />
-              </div>
-
-              <div className="text-gray-50">0.9121232</div>
-            </div>
-            <div className="flex items-end justify-between">
-              <div className="w-6/12 flex items-end justify-between">
-                <div>
-                  <div className="text-sm text-gray-400">ROE:</div>
-                  <div className="text-gray-50">+10.82%</div>
-                </div>
-                <ArrowRightIcon className="size-5" />
-              </div>
-
-              <div className="text-gray-50">19.80%</div>
-            </div>
-          </div>
+          {renderPositionInfo()}
           <div className="flex items-center justify-between">
-            <div className="text-gray-500">Exit Price</div>
-            <div>1.5454</div>
+            <div className="text-gray-500">Current Price</div>
+            <div>{positionData.currentPrice.toFixed(3)}</div>
           </div>
-          <div className="flex items-center justify-between">
-            <div className="text-gray-50">Slippage Tolerance</div>
-            {/* todo: add edit option here */}
-            <div>0.4%</div>
-          </div>
-          <Button className="w-full text-black bg-white py-2 capitalize flex-[0.15]">
-            Close Position
+
+          <Button
+            onClick={handleClosePosition}
+            disabled={isClosing || isUpdatingPositionInDb || isExecutingTransaction}
+            className="w-full bg-red-500 text-white py-2 capitalize flex justify-center">
+            {isClosing || isUpdatingPositionInDb || isExecutingTransaction ? (
+              <GearIcon className="animate-spin size-4" />
+            ) : (
+              'Close Position'
+            )}
           </Button>
         </div>
       </div>
     </Modal>
   );
 };
+
+const InfoItem = ({ label, value }: { label: string; value: string | number }) => (
+  <div className="flex items-end justify-between">
+    <div className="text-sm text-gray-400">{label}:</div>
+    <div className="text-gray-50">{value}</div>
+  </div>
+);
 
 export default ClosePositionModal;
