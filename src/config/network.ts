@@ -39,4 +39,10 @@ export const networkConfig = {
   '43114': {
     rpc: process.env.NEXT_PUBLIC_AVALANCHE_RPC,
   },
+  '534352': {
+    rpc: process.env.NEXT_PUBLIC_SCROLL_RPC,
+    Aave: {
+      poolAddress: '0x11fCfe756c05AD438e312a7fd934381537D3cFfe',
+    },
+  },
 };

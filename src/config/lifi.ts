@@ -1,6 +1,6 @@
 import { arbitrum, avalanche, base, bsc, fantom, linea, optimism, polygon } from 'viem/chains';
 import { ChainId, createConfig, EVM } from '@lifi/sdk';
-import { Chain, createWalletClient, http } from 'viem';
+import { Chain, createWalletClient, getAddress, http } from 'viem';
 import { walletClient } from './viem';
 
 export const lifiConfig = async (currentChain: number) => {
@@ -19,6 +19,7 @@ export const lifiConfig = async (currentChain: number) => {
       [ChainId.POL]: [process.env.NEXT_PUBLIC_POLYGON_RPC as string],
       [ChainId.LNA]: [process.env.NEXT_PUBLIC_LINEA_RPC as string],
       [ChainId.BSC]: [process.env.NEXT_PUBLIC_BSC_RPC as string],
+      [ChainId.SCL]: [process.env.NEXT_PUBLIC_SCROLL_RPC as string],
     },
     providers: [
       EVM({
@@ -26,7 +27,7 @@ export const lifiConfig = async (currentChain: number) => {
         switchChain: async (chainId) =>
           // Switch chain by creating a new wallet client
           createWalletClient({
-            account,
+            account: account,
             chain: chains.find((chain) => chain.id == chainId) as Chain,
             transport: http(),
           }),

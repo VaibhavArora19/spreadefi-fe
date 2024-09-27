@@ -33,6 +33,10 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainName: 'Avalanche',
     chainImageUrl: '/assets/icons/chains/avalanche.png',
   },
+  '534352': {
+    chainName: 'Scroll',
+    chainImageUrl: '/assets/icons/chains/scroll.png',
+  },
 };
 
 export const chainList = [
@@ -83,5 +87,11 @@ export const chainList = [
     chainName: 'Avalanche mainnet',
     shortName: 'Avalanche',
     logo: '/assets/icons/chains/avalanche.png',
+  },
+  {
+    chainId: 534352,
+    chainName: 'Scroll Mainnet',
+    shortName: 'Scroll',
+    logo: '/assets/icons/chains/scroll.png',
   },
 ];
