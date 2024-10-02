@@ -11,6 +11,7 @@ import {
   fantom,
   avalanche,
   scroll,
+  blast,
 } from 'wagmi/chains';
 
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_ID;
@@ -25,7 +26,18 @@ const metadata = {
 };
 
 // Create wagmiConfig
-const chains = [base, arbitrum, optimism, linea, bsc, polygon, fantom, avalanche, scroll] as const;
+const chains = [
+  base,
+  arbitrum,
+  optimism,
+  linea,
+  bsc,
+  polygon,
+  fantom,
+  avalanche,
+  scroll,
+  blast,
+] as const;
 export const config = defaultWagmiConfig({
   chains,
   projectId,

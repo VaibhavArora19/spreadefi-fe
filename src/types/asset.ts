@@ -23,6 +23,7 @@ export enum TAssetName {
   DEGEN = 'degen',
   ARB = 'arb',
   WEETH = 'weeth',
+  USDB = 'usdb',
 }
 
 export type TBalance = {
