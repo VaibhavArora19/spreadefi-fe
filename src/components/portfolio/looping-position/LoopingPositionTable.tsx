@@ -151,7 +151,7 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
       accessorKey: 'positionType',
       header: ({ column }) => (
         <div
-          className="w-[100px]"
+          className="w-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
           Position Type
         </div>
@@ -191,7 +191,7 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
       accessorKey: 'roe',
       header: ({ column }) => (
         <div
-          className="flex gap-1 items-center w-[100px]"
+          className="flex gap-1 items-center w-auto"
           onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
           ROE
           <TooltipProvider>
@@ -242,23 +242,25 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
     {
       id: 'actions',
       cell: ({ row }) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="outline" className="ml-auto border-none bg-[#27272A]">
-              Edit <FaEdit className="ml-2 h-4 w-4 cursor-pointer" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onClick={() => setActiveModal({ type: 'modify', position: row.original })}>
-              Modify
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => setActiveModal({ type: 'close', position: row.original })}>
-              Close position
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        <div className="w-fit">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="ml-auto border-none bg-[#27272A]">
+                Edit <FaEdit className="ml-2 h-4 w-4 cursor-pointer" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onClick={() => setActiveModal({ type: 'modify', position: row.original })}>
+                Modify
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => setActiveModal({ type: 'close', position: row.original })}>
+                Close position
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
       ),
     },
   ];
@@ -277,7 +279,7 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
 
   return (
     <>
-      <Table className="w-full">
+      <Table className="w-full md:w-[95%] mx-auto">
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id} className="border-b border-[#1e1e1e]">
@@ -295,7 +297,7 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
           {table.getRowModel().rows.map((row) => (
             <TableRow key={row.id} className="border-none cursor-pointer hover:bg-[#131313]">
               {row.getVisibleCells().map((cell) => (
-                <TableCell key={cell.id} className="py-4 max-w-[120px] font-light">
+                <TableCell key={cell.id} className="py-4 w-fit font-light">
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </TableCell>
               ))}

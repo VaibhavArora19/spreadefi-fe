@@ -1,5 +1,5 @@
-export type PositionType = 'long' | 'short';
-export type MarginType = 'base' | 'quote';
+export type PositionType = 'Long' | 'Short';
+export type MarginType = 'Base' | 'Quote';
 export type Status = 'Open' | 'Close';
 export type ModifyType = 'add' | 'remove' | 'close';
 
@@ -11,13 +11,19 @@ export type TLoopingStrategy = {
   market: string;
   swapMarket: string;
   pair: string;
-  liquidationThreshold: number;
-  maxLeverage: number;
+  liquidationThreshold: number | null;
+  maxLeverage: number | null;
   roe: number;
   currentPrice: number;
   liquidationPrice: number;
   liquidationBuffer: number;
   activeStatus: boolean;
+  positionType: PositionType | null;
+  apr?: number;
+  apy?: number;
+  borrowingRate?: number;
+  lendingRate?: number;
+  interestRate?: number;
 };
 
 export type TLoopingStrategyQuotePayload = {

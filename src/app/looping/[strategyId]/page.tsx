@@ -9,7 +9,11 @@ export default function LoopingStrategyPage() {
   const path = usePathname();
   const strategyId = path.split('/')[2];
   const triggerQuery = !!strategyId;
-  const { data, isLoading, isError } = useFetchLoopingStrategyById(strategyId, triggerQuery);
+  const { data, isLoading, isError } = useFetchLoopingStrategyById(
+    strategyId,
+    'Long',
+    triggerQuery,
+  );
 
   if (isError) {
     return <div>Error</div>;

@@ -109,77 +109,11 @@ const LoopingStrategyColumn = (
       },
     },
     {
-      accessorKey: 'maxLeverage',
-      header: () => (
-        <div className="flex gap-1 items-center">
-          Max Leverage
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <IoIosInformationCircle className="cursor-pointer" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">Maximum leverage available for this asset</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ),
-      cell: ({ row }) => <div>{row.original.maxLeverage.toFixed(2)}x</div>,
-    },
-    {
-      accessorKey: 'roe',
-      header: ({ column }) => (
-        <div
-          className="flex gap-1 items-center w-[100px]"
-          onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}>
-          ROE
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <IoIosInformationCircle className="cursor-pointer" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">Return on Equity at max leverage</p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <CaretSortIcon className="ml-2 h-4 w-4 cursor-pointer" />
-        </div>
-      ),
-      cell: ({ row }) => (
-        <div className="lowercase bg-green-500/10 px-4 py-1 border-[1px] text-xs border-green-900 rounded-full w-fit text-green-500">
-          <p>{row.original.roe.toFixed(2)}%</p>
-        </div>
-      ),
-    },
-    {
-      accessorKey: 'liquidationBuffer',
-      header: () => (
-        <div className="flex gap-1 items-center">
-          Liq. Buffer
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <IoIosInformationCircle className="cursor-pointer" />
-              </TooltipTrigger>
-              <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">
-                  Percentage difference between current price and liquidation price
-                </p>
-              </TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
-      ),
-      cell: ({ row }) => <div>{row.original.liquidationBuffer.toFixed(2)}%</div>,
-    },
-    {
       id: 'actions',
       cell: ({ row }) => (
         <Link
           href={`/looping/${row.original.id}`}
-          className={cn(buttonVariants({ variant: 'default' }), 'w-[80%] bg-white text-black')}>
+          className={cn(buttonVariants({ variant: 'default' }), 'w-32 bg-white text-black')}>
           Create Position
         </Link>
       ),

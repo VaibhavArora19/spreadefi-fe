@@ -1,6 +1,7 @@
 import { axiosLoopingPositions } from '@/config';
 import { LOOPING_STRATEGY } from '@/constants/query';
 import {
+  PositionType,
   TCreatePositionPayload,
   TLoopingStrategy,
   TLoopingStrategyQuotePayload,
@@ -39,10 +40,16 @@ export const useFetchLoopingStrategies = () => {
   });
 };
 
-export const useFetchLoopingStrategyById = (strategyId: string, enabled?: boolean) => {
+export const useFetchLoopingStrategyById = (
+  strategyId: string,
+  positionType: PositionType,
+  enabled?: boolean,
+) => {
   const fetchPositionById = async () => {
     try {
-      const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(`/strategy/${strategyId}`);
+      const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(
+        `/strategy/${strategyId}?position=${positionType}`,
+      );
 
       return data;
     } catch (error: any) {

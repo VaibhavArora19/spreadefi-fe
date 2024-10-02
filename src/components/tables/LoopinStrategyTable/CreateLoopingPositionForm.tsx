@@ -3,6 +3,8 @@ import React, { useEffect, useMemo, useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import {
+  MarginType,
+  PositionType,
   TCreatePositionPayload,
   TLoopingStrategy,
   TLoopingStrategyQuotePayload,
@@ -60,8 +62,8 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
 
   const [amount, setAmount] = useState<number>(0);
   const [leverage, setLeverage] = useState<number>(0);
-  const [positionType, setPositionType] = useState<'long' | 'short'>('long');
-  const [marginType, setMarginType] = useState<'base' | 'quote'>('base');
+  const [positionType, setPositionType] = useState<PositionType>('Long');
+  const [marginType, setMarginType] = useState<MarginType>('Base');
   const [quoteData, setQuoteData] = useState<TQuoteData | null>(null);
 
   useEffect(() => {
@@ -169,18 +171,18 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
         <div className="flex items-center gap-2 w-full">
           <Button
             variant={'outline'}
-            onClick={() => setPositionType('long')}
+            onClick={() => setPositionType('Long')}
             className={cn(
-              positionType === 'long' && 'bg-green-500 border-0',
+              positionType === 'Long' && 'bg-green-500 border-0',
               'w-full border-gray-600',
             )}>
             Long
           </Button>
           <Button
             variant={'outline'}
-            onClick={() => setPositionType('short')}
+            onClick={() => setPositionType('Short')}
             className={cn(
-              positionType === 'short' && 'bg-red-500 border-0',
+              positionType === 'Short' && 'bg-red-500 border-0',
               'w-full border-gray-600',
             )}>
             Short
@@ -202,7 +204,7 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
                 <Select
                   defaultValue={marginType}
                   value={marginType}
-                  onValueChange={(value) => setMarginType(value as 'base' | 'quote')}>
+                  onValueChange={(value) => setMarginType(value as MarginType)}>
                   <SelectTrigger className="w-fit px-3 text-xs border border-gray-700 rounded-md outline-none">
                     <SelectValue placeholder="Margin Type" />
                   </SelectTrigger>
@@ -232,7 +234,7 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
             <Slider
               value={[leverage.toFixed(2) as unknown as number]}
               onValueChange={(val) => setLeverage(val[0])}
-              max={maxLeverage}
+              max={maxLeverage || 0}
               step={1}
               className="w-full cursor-pointer"
             />

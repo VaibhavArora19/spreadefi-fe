@@ -24,6 +24,7 @@ import { Label } from '@/components/ui/label';
 import { cn } from '@/lib/utils';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { useAccount } from 'wagmi';
+import Loader from '@/components/(ui)/Loader';
 
 interface ModifyPositionModalProps {
   onClose: () => void;
@@ -173,9 +174,12 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
     );
   };
 
+  if (isLoading) {
+    return <Loader />;
+  }
+
   return (
     <Modal className="w-10/12 md:w-[600px] p-5 space-y-4">
-      {isLoading && <div>Loading...</div>}
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-2">{renderPairInfo()}</div>
         <div className="flex items-center gap-1 relative">
@@ -228,7 +232,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
             <Slider
               value={[leverage]}
               onValueChange={(val) => setLeverage(val[0])}
-              max={positionData.Strategy.maxLeverage}
+              max={positionData.Strategy?.maxLeverage || 0}
               step={0.1}
               className="w-full cursor-pointer"
             />
