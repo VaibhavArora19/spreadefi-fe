@@ -1,25 +1,22 @@
-import React from 'react';
-import { ColumnDef } from '@tanstack/react-table';
-import { IoIosInformationCircle } from 'react-icons/io';
-import Image from 'next/image';
-import { CaretSortIcon } from '@radix-ui/react-icons';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Button, buttonVariants } from '@/components/ui/button';
-import { useDispatch } from 'react-redux';
-import { transactionPayloadActions } from '@/redux/actions';
+import { buttonVariants } from '@/components/ui/button';
 import { assetNameToImage } from '@/constants/assetInfo';
-import { CHAIN_CONFIG, chainList } from '@/constants/chainInfo';
+import { chainList } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
-import { TProtocolName } from '@/types/protocol';
-import { TLoopingStrategy } from '@/types/looping-positions';
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import { TLoopingStrategy } from '@/types/looping-strategy';
+import { TProtocolName } from '@/types/protocol';
+import { ColumnDef } from '@tanstack/react-table';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React from 'react';
+import { useDispatch } from 'react-redux';
 
 const LoopingStrategyColumn = (
   setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
   data: TLoopingStrategy[],
 ): ColumnDef<TLoopingStrategy>[] => {
   const dispatch = useDispatch();
+  const router = useRouter();
 
   return [
     {
@@ -54,23 +51,15 @@ const LoopingStrategyColumn = (
       cell: ({ row }) => {
         const chainInfo = chainList.find((chain) => chain.shortName === row.original.chain);
         return (
-          <div className="flex -space-x-1 ">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  <Image
-                    className="hover:scale-110"
-                    src={chainInfo?.logo || ''}
-                    height={25}
-                    width={25}
-                    alt={row.original.chain}
-                  />
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="bg-[#1e1e1e] text-white">{row.original.chain}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="flex items-center gap-1">
+            <Image
+              className="hover:scale-110"
+              src={chainInfo?.logo || ''}
+              height={25}
+              width={25}
+              alt={row.original.chain}
+            />
+            <div>{chainInfo?.shortName}</div>
           </div>
         );
       },
@@ -81,29 +70,43 @@ const LoopingStrategyColumn = (
       cell: ({ row }) => {
         const protocolImage = protocolNameToImage(row.original.market as TProtocolName);
         return (
-          <div className="flex -space-x-1">
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger>
-                  {protocolImage ? (
-                    <Image
-                      className="hover:scale-110"
-                      src={protocolImage}
-                      height={25}
-                      width={25}
-                      alt={row.original.market}
-                    />
-                  ) : (
-                    <div className="w-[25px] h-[25px] bg-gray-300 rounded-full flex items-center justify-center">
-                      {row.original.market.charAt(0)}
-                    </div>
-                  )}
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p className="bg-[#1e1e1e] text-white">{row.original.market}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
+          <div className="flex items-center gap-1">
+            {protocolImage ? (
+              <Image
+                className="hover:scale-110"
+                src={protocolImage}
+                height={25}
+                width={25}
+                alt={row.original.market}
+              />
+            ) : (
+              <div className="w-[25px] h-[25px] bg-gray-300 rounded-full flex items-center justify-center">
+                {row.original.market.charAt(0)}
+              </div>
+            )}
+
+            <div>{row.original.market}</div>
+          </div>
+        );
+      },
+    },
+    {
+      accessorKey: 'swapMarket',
+      header: 'Swap Market',
+      cell: ({ row }) => {
+        const image = protocolNameToImage(row.original.swapMarket as TProtocolName);
+        return (
+          <div className="flex items-center gap-1">
+            {image && (
+              <Image
+                className="hover:scale-110"
+                src={image}
+                height={25}
+                width={25}
+                alt={row.original.swapMarket}
+              />
+            )}
+            <div>{row.original.swapMarket}</div>
           </div>
         );
       },
@@ -111,11 +114,15 @@ const LoopingStrategyColumn = (
     {
       id: 'actions',
       cell: ({ row }) => (
-        <Link
-          href={`/looping/${row.original.id}`}
-          className={cn(buttonVariants({ variant: 'default' }), 'w-32 bg-white text-black')}>
+        <div
+          // href={`/looping/${row.original.id}`}
+          onClick={() => router.push(`/looping/${row.original.id}`)}
+          className={cn(
+            buttonVariants({ variant: 'default' }),
+            'w-32 ml-auto bg-white text-black',
+          )}>
           Create Position
-        </Link>
+        </div>
       ),
     },
   ];

@@ -1,15 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
-  ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  useReactTable,
-  getPaginationRowModel,
-  SortingState,
-  getSortedRowModel,
-} from '@tanstack/react-table';
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import {
   Table,
   TableBody,
@@ -18,26 +15,28 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import Image from 'next/image';
-import { Button } from '@/components/ui/button';
-import { FaEdit } from 'react-icons/fa';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import ModifyLeverageModal from './ModifyPositionModal';
-import ClosePositionModal from './ClosePositionModal';
-import IncreaseDecreaseModal from './IncreaseDecreaseModal';
-import { TUserLoopingPosition } from '@/types/looping-positions';
-import { IoIosArrowBack, IoIosArrowForward, IoIosInformationCircle } from 'react-icons/io';
-import { CaretSortIcon } from '@radix-ui/react-icons';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { chainList } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
+import { TUserLoopingPosition } from '@/types/looping-strategy';
 import { TProtocolName } from '@/types/protocol';
+import { CaretSortIcon } from '@radix-ui/react-icons';
+import {
+  ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  SortingState,
+  useReactTable,
+} from '@tanstack/react-table';
+import Image from 'next/image';
+import React, { useState } from 'react';
+import { FaEdit } from 'react-icons/fa';
+import { IoIosArrowBack, IoIosArrowForward, IoIosInformationCircle } from 'react-icons/io';
+import ClosePositionModal from './ClosePositionModal';
+import ModifyLeverageModal from './ModifyPositionModal';
 
 interface LoopingPositionTableProps {
   data: TUserLoopingPosition[];
@@ -45,9 +44,6 @@ interface LoopingPositionTableProps {
 
 const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [showModifyLeverageModal, setShowModifyLeverageModal] = useState(false);
-  const [showClosePositionModal, setShowClosePositionModal] = useState(false);
-  const [showIncreaseDecreaseModal, setShowIncreaseDecreaseModal] = useState(false);
   const [activeModal, setActiveModal] = useState<{
     type: 'modify' | 'close' | null;
     position: TUserLoopingPosition | null;

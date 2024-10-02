@@ -1,21 +1,17 @@
-import React, { useState } from 'react';
 import Modal from '@/components/(ui)/Modal';
-import { IoClose } from 'react-icons/io5';
-import Image from 'next/image';
-import { GearIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
+import { assetNameToImage } from '@/constants/assetInfo';
 import {
   useExecuteTransaction,
   useFetchUserCreatedPositionById,
   useModifyLoopingPosition,
   useUpdateLoopingPositionEntry,
 } from '@/server/api/looping-strategies';
-import {
-  TUserLoopingPosition,
-  MarginType,
-  TModifyPositionPayload,
-} from '@/types/looping-positions';
-import { assetNameToImage } from '@/constants/assetInfo';
+import { MarginType, TModifyPositionPayload, TUserLoopingPosition } from '@/types/looping-strategy';
+import { GearIcon } from '@radix-ui/react-icons';
+import Image from 'next/image';
+import { useState } from 'react';
+import { IoClose } from 'react-icons/io5';
 import { useAccount } from 'wagmi';
 
 interface ClosePositionModalProps {
@@ -39,7 +35,7 @@ const ClosePositionModal = ({ onClose, onSubmit, position }: ClosePositionModalP
 
   const getTokenByMarginType = (pair: string, marginType: MarginType): string => {
     const [baseToken, quoteToken] = pair.split('/');
-    return marginType === 'base' ? baseToken : quoteToken;
+    return marginType === 'Base' ? baseToken : quoteToken;
   };
 
   const handleClosePosition = async () => {

@@ -1,34 +1,31 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
+import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
+import { Button } from '@/components/ui/button';
+import { Table } from '@/components/ui/table';
+import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
+import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
+import { walletActions } from '@/redux/features/wallet-slice';
+import { useWalletStore } from '@/redux/hooks';
+import { useExecuteTransactions } from '@/server/api/transactions';
 import {
   ColumnFiltersState,
   SortingState,
   VisibilityState,
   getCoreRowModel,
   getFilteredRowModel,
-  getSortedRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { Table } from '@/components/ui/table';
-import ChainFilterDropdown from '../LendingBorrowingTable/ChainFilterDropdown';
-import ProtocolFilterDropdown from '../LendingBorrowingTable/ProtocolFilterDropdown';
+import React, { useState } from 'react';
+import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
+import { useDispatch } from 'react-redux';
+import { useAccount } from 'wagmi';
 import LendingBorrowingHeader from '../LendingBorrowingTable/LendingBorrowingHeader';
 import LendingBorrowingTableBody from '../LendingBorrowingTable/LendingBorrowingTableBody';
-import TableControls from '../LendingBorrowingTable/TableControls';
-import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
-import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
-import { useAccount } from 'wagmi';
-import { useExecuteTransactions } from '@/server/api/transactions';
-import { useDispatch } from 'react-redux';
-import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
-import { walletActions } from '@/redux/features/wallet-slice';
-import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
-import { useWalletStore } from '@/redux/hooks';
 import LoopingStrategyColumn from './LoopingStrategyColumn';
-import { Button } from '@/components/ui/button';
-import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 
 interface LoopingStrategyTableProps {
   loopingTableData: any[];
@@ -92,21 +89,6 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
 
   return (
     <div className="w-full">
-      <div className="flex items-center py-4">
-        <TableControls table={table} type="looping" />
-        <div className="flex gap-4 items-center">
-          <ChainFilterDropdown
-            chainFilters={chainFilters}
-            setChainFilters={setChainFilters}
-            uniqueChains={uniqueChains}
-          />
-          <ProtocolFilterDropdown
-            protocolFilters={protocolFilters}
-            setProtocolFilters={setProtocolFilters}
-            uniqueProtocols={uniqueProtocols}
-          />
-        </div>
-      </div>
       <div className="rounded-md mt-4">
         <Table>
           <LendingBorrowingHeader table={table} />

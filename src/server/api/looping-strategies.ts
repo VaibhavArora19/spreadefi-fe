@@ -10,7 +10,7 @@ import {
   TUpdatePositionEntryPayload,
   TUserLoopingPosition,
   TUserLoopingPositionResponse,
-} from '@/types/looping-positions';
+} from '@/types/looping-strategy';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { decodeAbiParameters, parseAbiParameters, parseEther } from 'viem';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';

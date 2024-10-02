@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import Loader from '@/components/(ui)/Loader';
 import Modal from '@/components/(ui)/Modal';
-import { IoClose } from 'react-icons/io5';
-import Image from 'next/image';
-import { Slider } from '@/components/ui/slider';
-import { ArrowRightIcon, GearIcon } from '@radix-ui/react-icons';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Slider } from '@/components/ui/slider';
+import { assetNameToImage } from '@/constants/assetInfo';
+import { cn } from '@/lib/utils';
 import {
   useExecuteTransaction,
   useFetchUserCreatedPositionById,
@@ -12,19 +13,17 @@ import {
   useUpdateLoopingPositionEntry,
 } from '@/server/api/looping-strategies';
 import {
-  TUserLoopingPosition,
-  PositionType,
   MarginType,
+  ModifyType,
   TModifyPositionPayload,
   TModifyPositionResponse,
-  ModifyType,
-} from '@/types/looping-positions';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { cn } from '@/lib/utils';
-import { assetNameToImage } from '@/constants/assetInfo';
+  TUserLoopingPosition,
+} from '@/types/looping-strategy';
+import { ArrowRightIcon, GearIcon } from '@radix-ui/react-icons';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+import { IoClose } from 'react-icons/io5';
 import { useAccount } from 'wagmi';
-import Loader from '@/components/(ui)/Loader';
 
 interface ModifyPositionModalProps {
   onClose: () => void;
@@ -63,7 +62,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
 
   const getTokenByMarginType = (pair: string, marginType: MarginType): string => {
     const [baseToken, quoteToken] = pair.split('/');
-    return marginType === 'base' ? baseToken : quoteToken;
+    return marginType === 'Base' ? baseToken : quoteToken;
   };
 
   const fetchLatestQuote = async () => {

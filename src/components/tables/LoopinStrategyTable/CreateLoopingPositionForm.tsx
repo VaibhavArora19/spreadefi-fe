@@ -1,27 +1,7 @@
 'use client';
-import React, { useEffect, useMemo, useState } from 'react';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import {
-  MarginType,
-  PositionType,
-  TCreatePositionPayload,
-  TLoopingStrategy,
-  TLoopingStrategyQuotePayload,
-  TQuoteData,
-} from '@/types/looping-positions';
-import { assetNameToImage } from '@/constants/assetInfo';
-import { chainList } from '@/constants/chainInfo';
-import { Slider } from '@/components/ui/slider';
-import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import {
-  useCreateLoopingPosition,
-  useExecuteStrategyTransaction,
-  useGetLoopingStrategyQuote,
-} from '@/server/api/looping-strategies';
-import { useAccount } from 'wagmi';
-import { cn } from '@/lib/utils';
+import { Label } from '@/components/ui/label';
 import {
   Select,
   SelectContent,
@@ -29,23 +9,62 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Slider } from '@/components/ui/slider';
+import { assetNameToImage } from '@/constants/assetInfo';
+import { chainList } from '@/constants/chainInfo';
+import { cn } from '@/lib/utils';
+import { useLoopingStrategyStore } from '@/redux/hooks';
+import {
+  useCreateLoopingPosition,
+  useExecuteStrategyTransaction,
+  useFetchLoopingStrategyById,
+  useGetLoopingStrategyQuote,
+} from '@/server/api/looping-strategies';
+import {
+  MarginType,
+  PositionType,
+  TCreatePositionPayload,
+  TLoopingStrategy,
+  TLoopingStrategyQuotePayload,
+  TQuoteData,
+} from '@/types/looping-strategy';
+import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useAccount } from 'wagmi';
 
 interface CreateLoopingPositionFormProps {
-  data: TLoopingStrategy;
+  // data: TLoopingStrategy;
 }
 
-const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ data }) => {
+const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({}) => {
+  const router = useRouter();
+  const { strategyHref } = useLoopingStrategyStore();
+
+  const [amount, setAmount] = useState<number>(0);
+  const [leverage, setLeverage] = useState<number>(0);
+  const [positionType, setPositionType] = useState<PositionType>('Long');
+  const [marginType, setMarginType] = useState<MarginType>('Base');
+  const [quoteData, setQuoteData] = useState<TQuoteData | null>(null);
+
+  const { data, isLoading, isError, refetch } = useFetchLoopingStrategyById(
+    strategyHref,
+    positionType,
+    true,
+  );
+
   const {
-    pair,
-    id: strategyId,
-    chain,
-    market,
-    currentPrice,
-    liquidationPrice,
-    liquidationBuffer,
-    roe,
-    maxLeverage,
-  } = data;
+    pair = '',
+    id: strategyId = '',
+    chain = '',
+    market = '',
+    currentPrice = 0,
+    liquidationPrice = 0,
+    liquidationBuffer = 0,
+    roe = 0,
+    maxLeverage = 0,
+  } = data ?? {};
 
   const { address: userWalletAddress } = useAccount();
   const [baseAsset, quoteAsset] = useMemo(() => pair.split('/'), [pair]);
@@ -59,12 +78,6 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
   const { mutateAsync: createPosition, isPending: isCreatingPosition } = useCreateLoopingPosition();
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
     useExecuteStrategyTransaction();
-
-  const [amount, setAmount] = useState<number>(0);
-  const [leverage, setLeverage] = useState<number>(0);
-  const [positionType, setPositionType] = useState<PositionType>('Long');
-  const [marginType, setMarginType] = useState<MarginType>('Base');
-  const [quoteData, setQuoteData] = useState<TQuoteData | null>(null);
 
   useEffect(() => {
     handlePrepareTransaction();
@@ -127,9 +140,32 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
     }
   };
 
+  // const { data, isLoading, isError } = useFetchLoopingStrategyById(
+  //   strategyHref,
+  //   'Long',
+  //   triggerQuery,
+  // );
+
+  useEffect(() => {
+    refetch();
+  }, [strategyHref, positionType]);
+
+  if (isError) {
+    return <div>Error</div>;
+  }
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <div className="space-y-4 mx-auto max-w-3xl">
-      <div className="text-white text-lg font-semibold">Create new position for {pair}</div>
+      <div className="flex items-center gap-3">
+        <div onClick={() => router.push('/')} className="cursor-pointer">
+          <ArrowLeftIcon className="size-4" />
+        </div>
+        <div className="text-white text-lg font-semibold">Create new position for {pair}</div>
+      </div>
 
       <div className="bg-[#1E1E1E] w-full rounded-xl p-6 gap-5 flex-col flex items-start justify-normal">
         <div className="flex items-center gap-3 w-full">
@@ -260,7 +296,7 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({ d
             value={quoteData?.entryPrice.toFixed(2) || currentPrice.toFixed(2)}
           />
           <InfoItem label="Leverage" value={`${leverage}x`} />
-          <InfoItem label="ROE %" value={`${roe}%`} />
+          <InfoItem label="ROE %" value={`${roe.toFixed(2)}%`} />
           <InfoItem label="YoY Return" value="0.197858 %" />
         </InfoSection>
       </div>
@@ -301,7 +337,7 @@ interface InfoItemProps {
 const InfoItem: React.FC<InfoItemProps> = ({ label, value }) => (
   <div className="flex items-end justify-between">
     <div className="text-sm text-gray-400">{label}</div>
-    <div className="text-gray-50 font-medium">{value}</div>
+    <div className={cn(Number(value) < 0 && 'text-red-500', ' font-medium')}>{value}</div>
   </div>
 );
 
