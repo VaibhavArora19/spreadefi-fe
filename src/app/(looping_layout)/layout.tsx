@@ -4,13 +4,11 @@ import { useAppDispatch } from '@/redux/hooks';
 import { usePathname } from 'next/navigation';
 import React, { useEffect } from 'react';
 
-interface CreateLoopingPositionLayoutProps {
+interface LoopingLayoutProps {
   children: React.ReactNode;
 }
 
-export default function CreateLoopingPositionLayout({
-  children,
-}: CreateLoopingPositionLayoutProps) {
+export default function LoopingLayout({ children }: LoopingLayoutProps) {
   const dispatch = useAppDispatch();
   const path = usePathname();
   const strategyHref = path.split('/')[2];

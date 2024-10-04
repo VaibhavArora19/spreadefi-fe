@@ -232,7 +232,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
               value={[leverage]}
               onValueChange={(val) => setLeverage(val[0])}
               max={positionData.Strategy?.maxLeverage || 0}
-              step={0.1}
+              step={0.05}
               className="w-full cursor-pointer"
             />
           </div>

@@ -7,11 +7,13 @@ import {
   TLoopingStrategyQuotePayload,
   TModifyPositionPayload,
   TModifyPositionResponse,
+  TQuoteData,
   TUpdatePositionEntryPayload,
   TUserLoopingPosition,
   TUserLoopingPositionResponse,
 } from '@/types/looping-strategy';
 import { useMutation, useQuery } from '@tanstack/react-query';
+import { toast } from 'sonner';
 import { decodeAbiParameters, parseAbiParameters, parseEther } from 'viem';
 import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 
@@ -21,10 +23,12 @@ interface ExecuteTransactionPayload {
   value?: string;
 }
 
-export const useFetchLoopingStrategies = () => {
+export const useFetchLoopingStrategies = (leveragd?: boolean) => {
+  const params = leveragd ? `?leveraged=true` : '';
+
   const fetchPositions = async () => {
     try {
-      const { data } = await axiosLoopingPositions.get<TLoopingStrategy[]>('/strategy');
+      const { data } = await axiosLoopingPositions.get<TLoopingStrategy[]>(`/strategy${params}`);
 
       return data;
     } catch (error: any) {
@@ -33,33 +37,74 @@ export const useFetchLoopingStrategies = () => {
   };
 
   return useQuery({
-    queryKey: [LOOPING_STRATEGY.FETCH],
+    queryKey: [LOOPING_STRATEGY.FETCH, leveragd],
     queryFn: fetchPositions,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
   });
 };
 
-export const useFetchLoopingStrategyById = (
-  strategyId: string,
-  positionType: PositionType,
-  enabled?: boolean,
-) => {
-  const fetchPositionById = async () => {
-    try {
-      const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(
-        `/strategy/${strategyId}?position=${positionType}`,
-      );
+// export const useFetchLoopingStrategyById = (
+//   strategyId: string,
+//   positionType?: PositionType,
+//   enabled?: boolean,
+// ) => {
+//   const fetchPositionById = async () => {
+//     try {
+//       const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(
+//         `/strategy/${strategyId}?position=${positionType}`,
+//       );
 
+//       return data;
+//     } catch (error: any) {
+//       console.error('error: ', error);
+//     }
+//   };
+
+//   return useQuery({
+//     queryKey: [LOOPING_STRATEGY.FETCH_BY_ID],
+//     queryFn: fetchPositionById,
+//     staleTime: Infinity,
+//     refetchOnWindowFocus: false,
+//     enabled,
+//   });
+// };
+
+export const useFetchLoopingStrategyById = ({
+  strategyId,
+  positionType,
+  leverage,
+  enabled = true,
+}: {
+  strategyId: string;
+  positionType?: PositionType;
+  leverage?: number;
+  enabled?: boolean;
+}) => {
+  const params = new URLSearchParams();
+
+  if (positionType) {
+    params.append('position', positionType);
+  }
+
+  if (leverage) {
+    params.append('leverage', leverage.toString());
+  }
+
+  const fetchStrategy = async () => {
+    try {
+      const url = `/strategy/${strategyId}${params.toString() ? `?${params.toString()}` : ''}`;
+      const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(url);
       return data;
     } catch (error: any) {
       console.error('error: ', error);
+      throw error;
     }
   };
 
   return useQuery({
-    queryKey: [LOOPING_STRATEGY.FETCH_BY_ID],
-    queryFn: fetchPositionById,
+    queryKey: [LOOPING_STRATEGY.FETCH_BY_ID, strategyId, positionType, leverage],
+    queryFn: fetchStrategy,
     staleTime: Infinity,
     refetchOnWindowFocus: false,
     enabled,
@@ -69,12 +114,11 @@ export const useFetchLoopingStrategyById = (
 export const useGetLoopingStrategyQuote = (strategyId: string) => {
   const fetchQuote = async (payload: TLoopingStrategyQuotePayload) => {
     try {
-      const { data } = await axiosLoopingPositions.post<TLoopingStrategy>(
+      const { data } = await axiosLoopingPositions.post<TQuoteData>(
         `/strategy/${strategyId}/quote`,
         payload,
       );
 
-      console.log('hellowowow', data);
       return data;
     } catch (error: any) {
       console.error('error: ', error);
@@ -234,9 +278,11 @@ export const useExecuteStrategyTransaction = () => {
   return useMutation({
     mutationFn: executeTx,
     onSuccess: (data) => {
+      toast.success('Transaction executed successfully');
       console.log('Transaction executed successfully:', data);
     },
     onError: (error) => {
+      toast.error('Error executing transaction');
       console.error('Error executing transaction:', error);
     },
   });
@@ -277,9 +323,11 @@ export const useExecuteTransaction = () => {
   return useMutation({
     mutationFn: executeTx,
     onSuccess: (data) => {
+      toast.success('Transaction executed successfully');
       console.log('Transaction executed successfully:', data);
     },
     onError: (error) => {
+      toast.error('Error executing transaction');
       console.error('Error executing transaction:', error);
     },
   });

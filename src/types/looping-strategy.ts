@@ -29,7 +29,7 @@ export type TLoopingStrategy = {
 export type TLoopingStrategyQuotePayload = {
   marginType: MarginType;
   marginAmount: number;
-  positionType: PositionType;
+  positionType?: PositionType;
   leverage: number;
   userAddress: string;
 };
@@ -40,7 +40,7 @@ export interface TCreatePositionPayload {
   proxyAddress: string;
   strategyId: string;
   marginType: MarginType;
-  positionType: PositionType;
+  positionType?: PositionType;
   marginAmount: number;
   leverage: number;
   entryPrice: number;

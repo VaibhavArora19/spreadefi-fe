@@ -328,7 +328,6 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
         <ModifyLeverageModal
           position={activeModal.position}
           onSubmit={() => {
-            console.log('Modify Leverage', activeModal.position);
             setActiveModal({ type: null, position: null });
           }}
           onClose={() => setActiveModal({ type: null, position: null })}
@@ -340,7 +339,6 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
           position={activeModal.position}
           onClose={() => setActiveModal({ type: null, position: null })}
           onSubmit={() => {
-            console.log('Close Position', activeModal.position);
             setActiveModal({ type: null, position: null });
           }}
         />

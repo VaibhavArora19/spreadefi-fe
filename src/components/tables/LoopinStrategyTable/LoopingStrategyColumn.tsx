@@ -115,7 +115,6 @@ const LoopingStrategyColumn = (
       id: 'actions',
       cell: ({ row }) => (
         <div
-          // href={`/looping/${row.original.id}`}
           onClick={() => router.push(`/looping/${row.original.id}`)}
           className={cn(
             buttonVariants({ variant: 'default' }),
@@ -125,6 +124,20 @@ const LoopingStrategyColumn = (
         </div>
       ),
     },
+    // {
+    //   id: 'actions',
+    //   cell: ({ row }) => (
+    //     <div
+    //       // href={`/looping/${row.original.id}`}
+    //       onClick={() => router.push(`/looping/${row.original.id}`)}
+    //       className={cn(
+    //         buttonVariants({ variant: 'default' }),
+    //         'w-32 ml-auto bg-white text-black',
+    //       )}>
+    //       Create Position
+    //     </div>
+    //   ),
+    // },
   ];
 };
 

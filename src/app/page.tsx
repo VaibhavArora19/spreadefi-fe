@@ -1,24 +1,25 @@
 'use client';
 
 import DashboardInfoCard from '@/components/(ui)/DashboardInfoCard';
+import LeveragedStaking from '@/components/portfolio/looping-position/LeveragedStaking';
 import LendingBorrowingTable from '@/components/tables/LendingBorrowingTable/LendingBorrowingTable';
+import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useFetchAssets } from '@/server/api/asset';
 import { useFetchWalletPortfolio } from '@/server/api/balance';
+import { useFetchLoopingStrategies } from '@/server/api/looping-strategies';
+import { useState } from 'react';
 import { formatUnits } from 'viem';
 import { useAccount } from 'wagmi';
-import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
-import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs';
-import { useState } from 'react';
-import { useFetchAssetByProtocolType, useFetchAssets } from '@/server/api/asset';
-import { useFetchLoopingStrategies } from '@/server/api/looping-strategies';
 
 const Home = () => {
   const { address } = useAccount();
-  // const { data: portfolio } = useFetchWalletPortfolio(address as string);
   const { data: portfolio } = useFetchWalletPortfolio(address);
   const { data, isLoading, isError, error } = useFetchAssets();
-  const { data: loopingData } = useFetchLoopingStrategies();
 
   const [tab, setTab] = useState<string>('lendBorrow');
+  const { data: loopingData } = useFetchLoopingStrategies();
+  const { data: leveragedStakingData } = useFetchLoopingStrategies(true);
 
   return (
     <div>
@@ -48,17 +49,20 @@ const Home = () => {
         />
       </div>
 
-      <Tabs onValueChange={setTab} value={tab} className="w-[520px] dark mb-2">
-        <TabsList className="grid w-full grid-cols-3 bg-black">
+      <Tabs onValueChange={setTab} value={tab} className="w-fit dark mb-2">
+        <TabsList className="grid w-full grid-cols-4 bg-black">
           <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
           <TabsTrigger value="vault">Yield vaults</TabsTrigger>
           <TabsTrigger value="loopingStrategy">Looping Strategy</TabsTrigger>
+          <TabsTrigger value="leveragedStaking">Leveraged Staking</TabsTrigger>
         </TabsList>
       </Tabs>
 
-      {tab === 'loopingStrategy' ? (
-        <LoopingStrategyTable loopingTableData={loopingData || []} />
-      ) : (
+      {tab === 'loopingStrategy' && <LoopingStrategyTable loopingTableData={loopingData || []} />}
+      {tab === 'leveragedStaking' && (
+        <LeveragedStaking leveragedStakingData={leveragedStakingData || []} />
+      )}
+      {tab === 'lendBorrow' && (
         <LendingBorrowingTable
           data={data}
           isLoading={isLoading}

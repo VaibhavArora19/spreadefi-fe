@@ -9,6 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { chainList } from '@/constants/chainInfo';
@@ -17,6 +18,7 @@ import { useLoopingStrategyStore } from '@/redux/hooks';
 import {
   useCreateLoopingPosition,
   useExecuteStrategyTransaction,
+  useExecuteTransaction,
   useFetchLoopingStrategyById,
   useGetLoopingStrategyQuote,
 } from '@/server/api/looping-strategies';
@@ -24,35 +26,36 @@ import {
   MarginType,
   PositionType,
   TCreatePositionPayload,
-  TLoopingStrategy,
   TLoopingStrategyQuotePayload,
   TQuoteData,
 } from '@/types/looping-strategy';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
+import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
 
-interface CreateLoopingPositionFormProps {
-  // data: TLoopingStrategy;
-}
-
-const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({}) => {
+const CreateLoopingPositionForm: React.FC = () => {
   const router = useRouter();
   const { strategyHref } = useLoopingStrategyStore();
+  const { address: userWalletAddress } = useAccount();
 
-  const [amount, setAmount] = useState<number>(0);
-  const [leverage, setLeverage] = useState<number>(0);
+  const [marginAmount, setMarginAmount] = useState<number>(0);
+  const [leverage, setLeverage] = useState<number>(1.2);
   const [positionType, setPositionType] = useState<PositionType>('Long');
   const [marginType, setMarginType] = useState<MarginType>('Base');
   const [quoteData, setQuoteData] = useState<TQuoteData | null>(null);
 
-  const { data, isLoading, isError, refetch } = useFetchLoopingStrategyById(
-    strategyHref,
+  const {
+    data: strategyData,
+    isLoading,
+    isError,
+  } = useFetchLoopingStrategyById({
+    strategyId: strategyHref as string,
     positionType,
-    true,
-  );
+    leverage,
+  });
 
   const {
     pair = '',
@@ -64,9 +67,14 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
     liquidationBuffer = 0,
     roe = 0,
     maxLeverage = 0,
-  } = data ?? {};
+    apr = 0,
+    apy = 0,
+    liquidationThreshold,
+    borrowingRate,
+    lendingRate,
+    interestRate,
+  } = strategyData ?? {};
 
-  const { address: userWalletAddress } = useAccount();
   const [baseAsset, quoteAsset] = useMemo(() => pair.split('/'), [pair]);
   const chainInfo = useMemo(
     () => chainList.find((chainEntry) => chainEntry.shortName === chain),
@@ -76,28 +84,31 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
   const { mutateAsync: calculateQuote, isPending: isCalculatingQuote } =
     useGetLoopingStrategyQuote(strategyId);
   const { mutateAsync: createPosition, isPending: isCreatingPosition } = useCreateLoopingPosition();
-  const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
+  const { mutateAsync: executeStrategyTransaction, isPending: isExecutingStrategyTransaction } =
     useExecuteStrategyTransaction();
-
-  useEffect(() => {
-    handlePrepareTransaction();
-  }, [amount, leverage, positionType, marginType]);
+  const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
+    useExecuteTransaction();
 
   const handlePrepareTransaction = () => {
-    if (!userWalletAddress || amount === 0 || leverage === 0) return;
+    if (!userWalletAddress) {
+      return toast.error('Please connect your wallet first');
+    }
+    if (marginAmount === 0 || leverage === 0) {
+      return toast.error('Please enter margin and leverage to get latest quote details');
+    }
 
     const payload: TLoopingStrategyQuotePayload = {
       marginType,
-      marginAmount: amount,
+      marginAmount: marginAmount,
       positionType,
       leverage,
       userAddress: userWalletAddress,
     };
 
     calculateQuote(payload, {
-      onSuccess: (data: TLoopingStrategy | undefined) => {
+      onSuccess: (data: TQuoteData | undefined) => {
         if (data) {
-          setQuoteData(data as unknown as TQuoteData);
+          setQuoteData(data);
         }
       },
     });
@@ -114,7 +125,7 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
         });
       }
 
-      const txResult = await executeTransaction({
+      const txResult = await executeStrategyTransaction({
         to: quoteData.txs.tx.to,
         data: quoteData.txs.tx.data,
       });
@@ -129,7 +140,7 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
         strategyId,
         marginType,
         positionType,
-        marginAmount: amount,
+        marginAmount: marginAmount,
         leverage,
         entryPrice: quoteData.entryPrice,
       };
@@ -140,35 +151,100 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
     }
   };
 
-  // const { data, isLoading, isError } = useFetchLoopingStrategyById(
-  //   strategyHref,
-  //   'Long',
-  //   triggerQuery,
-  // );
-
-  useEffect(() => {
-    refetch();
-  }, [strategyHref, positionType]);
-
   if (isError) {
-    return <div>Error</div>;
-  }
-
-  if (isLoading) {
-    return <div>Loading...</div>;
+    return <div>Error loading strategy data</div>;
   }
 
   return (
     <div className="space-y-4 mx-auto max-w-3xl">
-      <div className="flex items-center gap-3">
-        <div onClick={() => router.push('/')} className="cursor-pointer">
-          <ArrowLeftIcon className="size-4" />
-        </div>
-        <div className="text-white text-lg font-semibold">Create new position for {pair}</div>
+      <LoopingPositionHeader pair={pair} />
+      <StrategyInfo
+        pair={pair}
+        chain={chain}
+        market={market}
+        chainInfo={chainInfo}
+        positionType={positionType}
+        setPositionType={setPositionType}
+      />
+      <div className="bg-[#1E1E1E] col-span-full w-full rounded-xl p-6 flex items-start flex-col gap-4">
+        <PositionDetails
+          marginAmount={marginAmount}
+          setMarginAmount={setMarginAmount}
+          marginType={marginType}
+          setMarginType={setMarginType}
+          leverage={leverage}
+          setLeverage={setLeverage}
+          maxLeverage={maxLeverage!}
+          pair={pair}
+          currentPrice={currentPrice}
+          isLoading={isLoading}
+        />
+        <LiquidationInfo
+          liquidationPrice={liquidationPrice}
+          liquidationBuffer={liquidationBuffer}
+          liquidationThreshold={liquidationThreshold!}
+          currentPrice={currentPrice}
+          isLoading={isLoading}
+        />
       </div>
+      <FinalQuote
+        quoteData={quoteData}
+        leverage={leverage}
+        apr={apr}
+        apy={apy}
+        roe={roe}
+        borrowingRate={borrowingRate}
+        lendingRate={lendingRate}
+        interestRate={interestRate}
+        isLoading={isLoading}
+      />
+      <ActionButtons
+        handlePrepareTransaction={handlePrepareTransaction}
+        handleCreatePosition={handleCreatePosition}
+        isCalculatingQuote={isCalculatingQuote}
+        isCreatingPosition={isCreatingPosition}
+        isExecutingTransaction={isExecutingStrategyTransaction || isExecutingTransaction}
+        quoteData={quoteData}
+      />
+    </div>
+  );
+};
 
-      <div className="bg-[#1E1E1E] w-full rounded-xl p-6 gap-5 flex-col flex items-start justify-normal">
-        <div className="flex items-center gap-3 w-full">
+export const LoopingPositionHeader: React.FC<{ pair: string }> = ({ pair }) => {
+  const router = useRouter();
+  return (
+    <div className="flex items-center gap-3">
+      <div onClick={() => router.push('/')} className="cursor-pointer">
+        <ArrowLeftIcon className="size-4" />
+      </div>
+      <div className="text-white text-lg font-semibold">Create new position for {pair}</div>
+    </div>
+  );
+};
+
+export const StrategyInfo: React.FC<{
+  pair: string;
+  chain: string;
+  market: string;
+  chainInfo: any;
+  positionType: PositionType;
+  setPositionType: (type: PositionType) => void;
+  hideChangePositionType?: boolean;
+}> = ({
+  pair,
+  chain,
+  market,
+  chainInfo,
+  positionType,
+  setPositionType,
+  hideChangePositionType,
+}) => {
+  const [baseAsset, quoteAsset] = pair.split('/');
+
+  return (
+    <div className="bg-[#1E1E1E] w-full rounded-xl p-6 gap-5 flex-col flex items-start justify-normal">
+      <div className="flex items-center gap-3 w-full">
+        {baseAsset && quoteAsset && (
           <div className="flex items-center -space-x-1.5">
             <Image
               src={assetNameToImage(baseAsset)}
@@ -185,25 +261,26 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
               className="rounded-full"
             />
           </div>
-          <div className="space-y-1">
-            <p>
-              {pair} on {market}
-            </p>
-            <div className="flex items-center gap-1">
-              <p className="text-sm text-gray-400">{chain}</p>
-              {chainInfo?.logo && (
-                <Image
-                  className="hover:scale-110"
-                  src={chainInfo.logo}
-                  height={25}
-                  width={25}
-                  alt={chain}
-                />
-              )}
-            </div>
+        )}
+        <div className="space-y-1">
+          <p>
+            {pair} on {market}
+          </p>
+          <div className="flex items-center gap-1">
+            <p className="text-sm text-gray-400">{chain}</p>
+            {chainInfo?.logo && (
+              <Image
+                className="hover:scale-110"
+                src={chainInfo.logo}
+                height={25}
+                width={25}
+                alt={chain}
+              />
+            )}
           </div>
         </div>
-
+      </div>
+      {!hideChangePositionType && (
         <div className="flex items-center gap-2 w-full">
           <Button
             variant={'outline'}
@@ -224,96 +301,227 @@ const CreateLoopingPositionForm: React.FC<CreateLoopingPositionFormProps> = ({})
             Short
           </Button>
         </div>
+      )}
+    </div>
+  );
+};
 
-        <div className="w-full space-y-5">
-          <div className="space-y-1.5">
-            <Label className="font-normal text-gray-400 text-sm">Amount</Label>
-            <div className="relative">
-              <div className="flex items-stretch w-full gap-2">
-                <Input
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.valueAsNumber)}
-                  type="number"
-                  placeholder="0.00"
-                  className="w-full text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-3 pl-12"
-                />
-                <Select
-                  defaultValue={marginType}
-                  value={marginType}
-                  onValueChange={(value) => setMarginType(value as MarginType)}>
-                  <SelectTrigger className="w-fit px-3 text-xs border border-gray-700 rounded-md outline-none">
-                    <SelectValue placeholder="Margin Type" />
-                  </SelectTrigger>
-                  <SelectContent className="text-xs">
-                    {pair.split('/').map((asset, idx) => (
-                      <SelectItem key={asset} value={idx === 0 ? 'base' : 'quote'}>
-                        {asset}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button
-                size="sm"
-                className="absolute left-2 top-1 w-fit p-1.5 h-auto text-xs hover:text-gray-400">
-                Max
-              </Button>
-            </div>
-          </div>
-
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="font-normal text-gray-400 text-sm">Leverage</Label>
-              <div className="text-sm">{leverage.toFixed(2)}x</div>
-            </div>
-            <Slider
-              value={[leverage.toFixed(2) as unknown as number]}
-              onValueChange={(val) => setLeverage(val[0])}
-              max={maxLeverage || 0}
-              step={1}
-              className="w-full cursor-pointer"
+export const PositionDetails: React.FC<{
+  marginAmount: number;
+  setMarginAmount: (amount: number) => void;
+  marginType: MarginType;
+  setMarginType: (type: MarginType) => void;
+  leverage: number;
+  setLeverage: (leverage: number) => void;
+  maxLeverage: number;
+  pair: string;
+  currentPrice: number;
+  isLoading: boolean;
+}> = ({
+  marginAmount,
+  setMarginAmount,
+  marginType,
+  setMarginType,
+  leverage,
+  setLeverage,
+  maxLeverage,
+  pair,
+  currentPrice,
+  isLoading,
+}) => {
+  return (
+    <div className="w-full space-y-5">
+      <div className="space-y-1.5">
+        <Label className="font-normal text-gray-400 text-sm">Amount</Label>
+        <div className="relative">
+          <div className="flex items-stretch w-full gap-2">
+            <Input
+              value={marginAmount}
+              onChange={(e) => setMarginAmount(e.target.valueAsNumber)}
+              type="number"
+              placeholder="0.00"
+              className="w-full text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-3 pl-12"
             />
+            <Select
+              value={marginType}
+              onValueChange={(value) => setMarginType(value as MarginType)}>
+              <SelectTrigger className="w-fit px-3 text-xs border border-gray-700 rounded-md outline-none">
+                <SelectValue placeholder="Margin Type" />
+              </SelectTrigger>
+              <SelectContent className="text-xs">
+                {pair.split('/').map((asset, idx) => (
+                  <SelectItem key={asset} value={idx === 0 ? 'Base' : 'Quote'}>
+                    {asset}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-
-          <div className="w-full">
-            <InfoItem label="Mark Price" value={currentPrice.toFixed(2)} />
-          </div>
+          <Button
+            size="sm"
+            className="absolute left-2 top-1 w-fit p-1.5 h-auto text-xs hover:text-gray-400">
+            Max
+          </Button>
         </div>
-
-        <InfoSection title="Liquidation Info">
-          <InfoItem label="Liquidation Price" value={liquidationPrice.toFixed(2)} />
-          <InfoItem label="Current Price" value={currentPrice.toFixed(2)} />
-          <InfoItem label="Liquidation Buffer" value={`${liquidationBuffer.toFixed(2)}%`} />
-        </InfoSection>
       </div>
+      <div className="space-y-3">
+        <div className="flex items-center justify-between">
+          <Label className="font-normal text-gray-400 text-sm">Leverage</Label>
+          <div className="text-sm">{leverage.toFixed(2)}x</div>
+        </div>
+        <Slider
+          min={1}
+          value={[leverage]}
+          onValueChange={(val) => setLeverage(val[0])}
+          max={maxLeverage || 0}
+          step={0.05}
+          className="w-full cursor-pointer"
+        />
+      </div>
+      <InfoItem label="Mark Price" value={currentPrice.toFixed(2)} isLoading={isLoading} />
+    </div>
+  );
+};
 
-      <div className="bg-[#1E1E1E] col-span-full w-full rounded-xl p-6 flex items-start flex-col gap-4">
-        <InfoSection title="Final Quote">
-          {/* <InfoItem label="Value" value="3 ETH" /> */}
+export const LiquidationInfo: React.FC<{
+  liquidationPrice: number;
+  liquidationBuffer: number;
+  liquidationThreshold?: number;
+  currentPrice: number;
+  isLoading: boolean;
+}> = ({ liquidationPrice, liquidationBuffer, liquidationThreshold, currentPrice, isLoading }) => {
+  return (
+    <InfoSection title="Liquidation Info">
+      <InfoItem label="Mark Price" value={currentPrice.toFixed(4)} isLoading={isLoading} />
+      <InfoItem
+        label="Liquidation Price"
+        value={liquidationPrice.toFixed(4)}
+        isLoading={isLoading}
+      />
+      {liquidationThreshold && (
+        <InfoItem
+          label="Liquidation Threshold"
+          value={liquidationThreshold.toFixed(4)}
+          isLoading={isLoading}
+        />
+      )}
+      <InfoItem
+        label="Liquidation Buffer"
+        value={liquidationBuffer.toFixed(4)}
+        unit="%"
+        highlightValue
+        isLoading={isLoading}
+      />
+    </InfoSection>
+  );
+};
+
+export const FinalQuote: React.FC<{
+  quoteData: TQuoteData | null;
+  leverage: number;
+  apr: number;
+  apy: number;
+  roe: number;
+  borrowingRate?: number;
+  lendingRate?: number;
+  interestRate?: number;
+  isLoading: boolean;
+}> = ({
+  quoteData,
+  leverage,
+  apr,
+  apy,
+  roe,
+  borrowingRate,
+  lendingRate,
+  interestRate,
+  isLoading,
+}) => {
+  return (
+    <div className="bg-[#1E1E1E] col-span-full w-full rounded-xl p-6 flex items-start flex-col gap-4">
+      <InfoSection title="Final Quote">
+        <InfoItem
+          label="Entry Price"
+          value={quoteData?.entryPrice.toFixed(4) || '-'}
+          isLoading={isLoading}
+        />
+        {borrowingRate && (
+          <InfoItem label="Borrowing Rate" value={borrowingRate.toFixed(4)} isLoading={isLoading} />
+        )}
+        {lendingRate && (
+          <InfoItem label="Lending Rate" value={lendingRate.toFixed(4)} isLoading={isLoading} />
+        )}
+        <InfoItem label="Leverage" value={leverage} unit="x" isLoading={isLoading} />
+        <InfoItem
+          label="APR %"
+          value={apr.toFixed(2)}
+          unit="%"
+          isLoading={isLoading}
+          highlightValue
+        />
+        <InfoItem
+          label="APY %"
+          value={apy.toFixed(2)}
+          unit="%"
+          isLoading={isLoading}
+          highlightValue
+        />
+        <InfoItem
+          label="ROE %"
+          value={roe.toFixed(2)}
+          unit="%"
+          isLoading={isLoading}
+          highlightValue
+        />
+        {interestRate && (
           <InfoItem
-            label="Entry Price"
-            value={quoteData?.entryPrice.toFixed(2) || currentPrice.toFixed(2)}
+            label="Interest Rate"
+            value={interestRate.toFixed(4)}
+            unit="%"
+            highlightValue
+            isLoading={isLoading}
           />
-          <InfoItem label="Leverage" value={`${leverage}x`} />
-          <InfoItem label="ROE %" value={`${roe.toFixed(2)}%`} />
-          <InfoItem label="YoY Return" value="0.197858 %" />
-        </InfoSection>
-      </div>
+        )}
+      </InfoSection>
+    </div>
+  );
+};
 
+export const ActionButtons: React.FC<{
+  handlePrepareTransaction: () => void;
+  handleCreatePosition: () => void;
+  isCalculatingQuote: boolean;
+  isCreatingPosition: boolean;
+  isExecutingTransaction: boolean;
+  quoteData: TQuoteData | null;
+}> = ({
+  handlePrepareTransaction,
+  handleCreatePosition,
+  isCalculatingQuote,
+  isCreatingPosition,
+  isExecutingTransaction,
+  quoteData,
+}) => {
+  return (
+    <>
+      <Button
+        disabled={isCalculatingQuote || isCreatingPosition || isExecutingTransaction}
+        onClick={handlePrepareTransaction}
+        className="w-full border-gray-600 text-gray-400"
+        variant={'outline'}>
+        {isCalculatingQuote ? 'Preparing Transaction...' : 'Get Position Quote'}
+      </Button>
       <Button
         disabled={isCalculatingQuote || !quoteData || isCreatingPosition || isExecutingTransaction}
         onClick={handleCreatePosition}
         className="text-black bg-white w-full">
-        {isCalculatingQuote
-          ? 'Preparing Transaction...'
-          : isExecutingTransaction
+        {isExecutingTransaction
           ? 'Executing Transaction...'
           : isCreatingPosition
           ? 'Creating Position...'
           : 'Create Position'}
       </Button>
-    </div>
+    </>
   );
 };
 
@@ -322,7 +530,7 @@ interface InfoSectionProps {
   children: React.ReactNode;
 }
 
-const InfoSection: React.FC<InfoSectionProps> = ({ title, children }) => (
+export const InfoSection: React.FC<InfoSectionProps> = ({ title, children }) => (
   <div className="space-y-5 w-full flex flex-col">
     <div className="font-semibold pb-3 border-b border-gray-600">{title}</div>
     <div className="space-y-2">{children}</div>
@@ -332,13 +540,41 @@ const InfoSection: React.FC<InfoSectionProps> = ({ title, children }) => (
 interface InfoItemProps {
   label: string;
   value: string | number;
+  isLoading: boolean;
+  unit?: string;
+  highlightValue?: boolean;
 }
 
-const InfoItem: React.FC<InfoItemProps> = ({ label, value }) => (
-  <div className="flex items-end justify-between">
-    <div className="text-sm text-gray-400">{label}</div>
-    <div className={cn(Number(value) < 0 && 'text-red-500', ' font-medium')}>{value}</div>
-  </div>
-);
+export const InfoItem: React.FC<InfoItemProps> = ({
+  label,
+  value,
+  unit,
+  isLoading,
+  highlightValue,
+}) => {
+  const getValueColor = (val: string | number) => {
+    if (highlightValue) {
+      const numValue = typeof val === 'string' ? parseFloat(val) : val;
+      if (isNaN(numValue)) return 'text-white'; // Default color for non-numeric values
+      return numValue < 0 ? 'text-red-500' : 'text-green-500';
+    }
+    return 'text-gray-300';
+  };
+
+  return (
+    <div className="flex items-end justify-between">
+      <div className="text-sm text-gray-400">{label}</div>
+      {isLoading ? (
+        <div>
+          <Skeleton className="h-5 w-14 rounded bg-gray-700" />
+        </div>
+      ) : (
+        <div className={cn(getValueColor(value), 'font-medium')}>
+          {value} {unit && unit}
+        </div>
+      )}
+    </div>
+  );
+};
 
 export default CreateLoopingPositionForm;
