@@ -41,6 +41,10 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainName: 'Blast',
     chainImageUrl: '/assets/icons/chains/blast.png',
   },
+  '1088': {
+    chainName: 'Metis',
+    chainImageUrl: '/assets/icons/chains/metis.png',
+  },
 };
 
 export const chainList = [
@@ -103,5 +107,11 @@ export const chainList = [
     chainName: 'Blast Mainnet',
     shortName: 'Blast',
     logo: '/assets/icons/chains/blast.png',
+  },
+  {
+    chainId: 1088,
+    chainName: 'Metis Andromeda',
+    shortName: 'Metis',
+    logo: '/assets/icons/chains/metis.png',
   },
 ];

@@ -24,6 +24,10 @@ export enum TAssetName {
   ARB = 'arb',
   WEETH = 'weeth',
   USDB = 'usdb',
+  METIS = 'metis',
+  MUSDC = 'm.usdc',
+  MUSDT = 'm.usdt',
+  MDAI = 'm.dai',
 }
 
 export type TBalance = {

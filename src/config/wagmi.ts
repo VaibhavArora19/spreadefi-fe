@@ -12,6 +12,7 @@ import {
   avalanche,
   scroll,
   blast,
+  metis,
 } from 'wagmi/chains';
 
 export const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_ID;
@@ -37,6 +38,7 @@ const chains = [
   avalanche,
   scroll,
   blast,
+  metis,
 ] as const;
 export const config = defaultWagmiConfig({
   chains,

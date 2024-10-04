@@ -107,8 +107,8 @@ const SupplyAssetItem: React.FC<SupplyAssetItemProps> = ({ asset, itemType, bala
         </p>
         <p className="flex-[0.25]">
           {itemType === 'borrow'
-            ? asset.assetBorrowApy.toFixed(2)
-            : asset.assetSupplyApy.toFixed(2)}
+            ? asset.assetBorrowApy?.toFixed(2)
+            : asset.assetSupplyApy?.toFixed(2)}
           %
         </p>
         <div className="flex gap-4 flex-[0.25]">
