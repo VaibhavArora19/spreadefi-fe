@@ -63,6 +63,14 @@ export const assetNameToImage = (
       return '/assets/icons/tokens/weeth.png';
     case TAssetName.USDB:
       return '/assets/icons/tokens/usdb.png';
+    case TAssetName.METIS:
+      return '/assets/icons/tokens/metis.png';
+    case TAssetName.MUSDC:
+      return '/assets/icons/tokens/usdc.png';
+    case TAssetName.MUSDT:
+      return '/assets/icons/tokens/usdt.png';
+    case TAssetName.MDAI:
+      return '/assets/icons/tokens/dai.png';
     default:
       return '/assets/icons/tokens/yearn-v3.png';
   }

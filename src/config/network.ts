@@ -14,7 +14,6 @@ export const networkConfig = {
       poolAddress: '0x8F44Fd754285aa6A2b8B9B97739B79746e0475a7',
     },
   },
-
   '10': {
     rpc: process.env.NEXT_PUBLIC_OP_RPC,
     Aave: {
@@ -49,6 +48,12 @@ export const networkConfig = {
     rpc: process.env.NEXT_PUBLIC_BLAST_RPC,
     Zerolend: {
       poolAddress: '0xa70B0F3C2470AbBE104BdB3F3aaa9C7C54BEA7A8',
+    },
+  },
+  '1088': {
+    rpc: process.env.NEXT_PUBLIC_METIS_RPC,
+    Aave: {
+      poolAddress: '0x90df02551bB792286e8D4f13E0e357b4Bf1D6a57',
     },
   },
 };
