@@ -37,6 +37,10 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainName: 'Scroll',
     chainImageUrl: '/assets/icons/chains/scroll.png',
   },
+  '81457': {
+    chainName: 'Blast',
+    chainImageUrl: '/assets/icons/chains/blast.png',
+  },
 };
 
 export const chainList = [
@@ -93,5 +97,11 @@ export const chainList = [
     chainName: 'Scroll Mainnet',
     shortName: 'Scroll',
     logo: '/assets/icons/chains/scroll.png',
+  },
+  {
+    chainId: 81457,
+    chainName: 'Blast Mainnet',
+    shortName: 'Blast',
+    logo: '/assets/icons/chains/blast.png',
   },
 ];

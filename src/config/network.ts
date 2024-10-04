@@ -45,4 +45,10 @@ export const networkConfig = {
       poolAddress: '0x11fCfe756c05AD438e312a7fd934381537D3cFfe',
     },
   },
+  '81457': {
+    rpc: process.env.NEXT_PUBLIC_BLAST_RPC,
+    Zerolend: {
+      poolAddress: '0xa70B0F3C2470AbBE104BdB3F3aaa9C7C54BEA7A8',
+    },
+  },
 };
