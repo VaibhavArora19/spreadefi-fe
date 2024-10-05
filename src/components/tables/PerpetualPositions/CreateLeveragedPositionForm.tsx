@@ -1,4 +1,5 @@
 'use client';
+import { Skeleton } from '@/components/ui/skeleton';
 import { chainList } from '@/constants/chainInfo';
 import { useLoopingStrategyStore } from '@/redux/hooks';
 import {
@@ -25,7 +26,7 @@ import {
   LoopingPositionHeader,
   PositionDetails,
   StrategyInfo,
-} from './CreateLoopingPositionForm';
+} from './CreatePerpetualPositionForm';
 
 const CreateLeveragedPositionForm: React.FC = () => {
   const { strategyHref } = useLoopingStrategyStore();
@@ -145,16 +146,27 @@ const CreateLeveragedPositionForm: React.FC = () => {
 
   return (
     <div className="space-y-4 mx-auto max-w-3xl">
-      <LoopingPositionHeader pair={pair} />
-      <StrategyInfo
-        pair={pair}
-        chain={chain}
-        market={market}
-        chainInfo={chainInfo}
-        positionType={positionType}
-        setPositionType={setPositionType}
-        hideChangePositionType
-      />
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-3/6 bg-[#2c2c2c] rounded-xl" />
+          <Skeleton className="h-24 w-full bg-[#2c2c2c] rounded-xl" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <LoopingPositionHeader pair={pair} />
+
+          <StrategyInfo
+            pair={pair}
+            chain={chain}
+            market={market}
+            chainInfo={chainInfo}
+            positionType={positionType}
+            setPositionType={setPositionType}
+            hideChangePositionType
+          />
+        </div>
+      )}
+
       <div className="bg-[#1E1E1E] col-span-full w-full rounded-xl p-6 flex items-start flex-col gap-4">
         <PositionDetails
           marginAmount={marginAmount}

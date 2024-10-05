@@ -3,7 +3,7 @@
 import DashboardInfoCard from '@/components/(ui)/DashboardInfoCard';
 import LeveragedStaking from '@/components/portfolio/looping-position/LeveragedStaking';
 import LendingBorrowingTable from '@/components/tables/LendingBorrowingTable/LendingBorrowingTable';
-import LoopingStrategyTable from '@/components/tables/LoopinStrategyTable/LoopingStrategyTable';
+import PerpetualPositionsTable from '@/components/tables/PerpetualPositions/PerpetualPositionsTable';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useFetchAssets } from '@/server/api/asset';
 import { useFetchWalletPortfolio } from '@/server/api/balance';
@@ -18,7 +18,7 @@ const Home = () => {
   const { data, isLoading, isError, error } = useFetchAssets();
 
   const [tab, setTab] = useState<string>('lendBorrow');
-  const { data: loopingData } = useFetchLoopingStrategies();
+  const { data: perpetualPositionsData } = useFetchLoopingStrategies();
   const { data: leveragedStakingData } = useFetchLoopingStrategies(true);
 
   return (
@@ -50,15 +50,26 @@ const Home = () => {
       </div>
 
       <Tabs onValueChange={setTab} value={tab} className="w-fit dark mb-2">
-        <TabsList className="grid w-full grid-cols-4 bg-black">
-          <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
-          <TabsTrigger value="vault">Yield vaults</TabsTrigger>
-          <TabsTrigger value="loopingStrategy">Looping Strategy</TabsTrigger>
-          <TabsTrigger value="leveragedStaking">Leveraged Staking</TabsTrigger>
+        {/* <TabsList className="md:w-full w-full bg-black max-w-xs overflow-x-auto"> */}
+        <TabsList className="flex md:max-w-full max-w-[310px] w-max justify-start overflow-auto bg-black">
+          <TabsTrigger className="min-w-fit" value="lendBorrow">
+            Lend & Borrow
+          </TabsTrigger>
+          <TabsTrigger className="min-w-fit" value="vault">
+            Yield vaults
+          </TabsTrigger>
+          <TabsTrigger className="min-w-fit" value="leveragedStaking">
+            Leveraged Staking
+          </TabsTrigger>
+          <TabsTrigger className="min-w-fit" value="perpetualPositions">
+            Perpetual Positions
+          </TabsTrigger>
         </TabsList>
       </Tabs>
 
-      {tab === 'loopingStrategy' && <LoopingStrategyTable loopingTableData={loopingData || []} />}
+      {tab === 'perpetualPositions' && (
+        <PerpetualPositionsTable perpetualPositionsData={perpetualPositionsData || []} />
+      )}
       {tab === 'leveragedStaking' && (
         <LeveragedStaking leveragedStakingData={leveragedStakingData || []} />
       )}

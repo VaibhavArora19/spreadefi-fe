@@ -44,32 +44,6 @@ export const useFetchLoopingStrategies = (leveragd?: boolean) => {
   });
 };
 
-// export const useFetchLoopingStrategyById = (
-//   strategyId: string,
-//   positionType?: PositionType,
-//   enabled?: boolean,
-// ) => {
-//   const fetchPositionById = async () => {
-//     try {
-//       const { data } = await axiosLoopingPositions.get<TLoopingStrategy>(
-//         `/strategy/${strategyId}?position=${positionType}`,
-//       );
-
-//       return data;
-//     } catch (error: any) {
-//       console.error('error: ', error);
-//     }
-//   };
-
-//   return useQuery({
-//     queryKey: [LOOPING_STRATEGY.FETCH_BY_ID],
-//     queryFn: fetchPositionById,
-//     staleTime: Infinity,
-//     refetchOnWindowFocus: false,
-//     enabled,
-//   });
-// };
-
 export const useFetchLoopingStrategyById = ({
   strategyId,
   positionType,

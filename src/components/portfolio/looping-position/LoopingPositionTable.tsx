@@ -273,6 +273,15 @@ const LoopingPositionTable: React.FC<LoopingPositionTableProps> = ({ data }) => 
     },
   });
 
+  if (!data.length) {
+    return (
+      <div className="flex flex-col items-start justify-center w-full md:w-[95%] mx-auto">
+        <h1 className="font-semibold text-gray-200">No positions found</h1>
+        <p className="text-sm text-gray-300">You {`don't`} have any positions yet.</p>
+      </div>
+    );
+  }
+
   return (
     <>
       <Table className="w-full md:w-[95%] mx-auto">

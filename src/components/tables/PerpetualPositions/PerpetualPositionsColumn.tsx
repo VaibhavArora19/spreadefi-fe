@@ -8,13 +8,9 @@ import { TProtocolName } from '@/types/protocol';
 import { ColumnDef } from '@tanstack/react-table';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
 import { useDispatch } from 'react-redux';
 
-const LoopingStrategyColumn = (
-  setShowSupplyModal: React.Dispatch<React.SetStateAction<boolean>>,
-  data: TLoopingStrategy[],
-): ColumnDef<TLoopingStrategy>[] => {
+const PerpetualPositionsColumn = (data: TLoopingStrategy[]): ColumnDef<TLoopingStrategy>[] => {
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -115,7 +111,7 @@ const LoopingStrategyColumn = (
       id: 'actions',
       cell: ({ row }) => (
         <div
-          onClick={() => router.push(`/looping/${row.original.id}`)}
+          onClick={() => router.push(`/perpetual/${row.original.id}`)}
           className={cn(
             buttonVariants({ variant: 'default' }),
             'w-32 ml-auto bg-white text-black',
@@ -124,21 +120,7 @@ const LoopingStrategyColumn = (
         </div>
       ),
     },
-    // {
-    //   id: 'actions',
-    //   cell: ({ row }) => (
-    //     <div
-    //       // href={`/looping/${row.original.id}`}
-    //       onClick={() => router.push(`/looping/${row.original.id}`)}
-    //       className={cn(
-    //         buttonVariants({ variant: 'default' }),
-    //         'w-32 ml-auto bg-white text-black',
-    //       )}>
-    //       Create Position
-    //     </div>
-    //   ),
-    // },
   ];
 };
 
-export default LoopingStrategyColumn;
+export default PerpetualPositionsColumn;

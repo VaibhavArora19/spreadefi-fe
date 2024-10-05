@@ -1,11 +1,9 @@
 'use client';
 
-import LeverageSupplyModal from '@/components/popups/LoopingStrategy/LeverageSupplyModal';
 import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
 import { Button } from '@/components/ui/button';
 import { Table } from '@/components/ui/table';
 import { useFilterDataAssetTable } from '@/hooks/useFilterDataAssetTable';
-import { tokensActions, transactionPayloadActions, transactionsActions } from '@/redux/actions';
 import { walletActions } from '@/redux/features/wallet-slice';
 import { useWalletStore } from '@/redux/hooks';
 import { useExecuteTransactions } from '@/server/api/transactions';
@@ -25,13 +23,15 @@ import { useDispatch } from 'react-redux';
 import { useAccount } from 'wagmi';
 import LendingBorrowingHeader from '../LendingBorrowingTable/LendingBorrowingHeader';
 import LendingBorrowingTableBody from '../LendingBorrowingTable/LendingBorrowingTableBody';
-import LoopingStrategyColumn from './LoopingStrategyColumn';
+import PerpetualPositionsColumn from './PerpetualPositionsColumn';
 
-interface LoopingStrategyTableProps {
-  loopingTableData: any[];
+interface PerpetualPositionsTableProps {
+  perpetualPositionsData: any[];
 }
 
-const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTableData }) => {
+const PerpetualPositionsTable: React.FC<PerpetualPositionsTableProps> = ({
+  perpetualPositionsData,
+}) => {
   const [sorting, setSorting] = useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
@@ -45,17 +45,9 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
   const dispatch = useDispatch();
   const { isConnected } = useWalletStore();
 
-  const {
-    chainFilters,
-    setChainFilters,
-    protocolFilters,
-    setProtocolFilters,
-    uniqueChains,
-    uniqueProtocols,
-    filteredData,
-  } = useFilterDataAssetTable({ assetData: loopingTableData });
+  const { filteredData } = useFilterDataAssetTable({ assetData: perpetualPositionsData });
 
-  const columns = LoopingStrategyColumn(setShowSupplyModal, filteredData);
+  const columns = PerpetualPositionsColumn(filteredData);
 
   const table = useReactTable({
     data: filteredData,
@@ -95,7 +87,7 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
           <LendingBorrowingTableBody table={table} />
         </Table>
       </div>
-      {!!loopingTableData.length && (
+      {!!perpetualPositionsData.length && (
         <div className="flex items-center justify-center py-4">
           <div className="flex items-center gap-3">
             <Button
@@ -116,20 +108,10 @@ const LoopingStrategyTable: React.FC<LoopingStrategyTableProps> = ({ loopingTabl
           </div>
         </div>
       )}
-      {showSupplyModal && (
-        <LeverageSupplyModal
-          onClose={() => {
-            dispatch(transactionPayloadActions.resetState());
-            dispatch(transactionsActions.resetState());
-            dispatch(tokensActions.resetState());
-            setShowSupplyModal(false);
-          }}
-          onSubmit={handleLeverageSubmit}
-        />
-      )}
+
       {!isConnected && <ConnectWallet />}
     </div>
   );
 };
 
-export default LoopingStrategyTable;
+export default PerpetualPositionsTable;

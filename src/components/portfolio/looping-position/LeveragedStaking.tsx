@@ -1,6 +1,6 @@
 'use client';
 
-import { InfoItem } from '@/components/tables/LoopinStrategyTable/CreateLoopingPositionForm';
+import { InfoItem } from '@/components/tables/PerpetualPositions/CreatePerpetualPositionForm';
 import { buttonVariants } from '@/components/ui/button';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { chainList } from '@/constants/chainInfo';
@@ -18,7 +18,7 @@ interface LeveragedStakingProps {
 
 const LeveragedStaking: React.FC<LeveragedStakingProps> = ({ leveragedStakingData }) => {
   return (
-    <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pt-5">
+    <div className="grid gap-x-10 gap-y-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pt-5">
       {leveragedStakingData.map((strategy) => (
         <LeveragedStakingCard key={strategy.id} {...strategy} />
       ))}
@@ -49,7 +49,7 @@ const LeveragedStakingCard = ({
 
   return (
     <div className="flex flex-col bg-[#1c1c1c] border border-[#373839] shadow-inner shadow-gray-900 text-gray-100 p-6 rounded-lg space-y-4">
-      <div className="flex items-center justify-between w-full gap-1">
+      <div className="flex md:flex-row flex-col items-start md:items-center justify-between w-full gap-3">
         <div className="flex items-center gap-1">
           <Image
             src={assetNameToImage(baseAsset)}
@@ -89,12 +89,16 @@ const LeveragedStakingCard = ({
 
       <div className="space-y-1">
         <InfoItem label="Position Type" value={positionType || 'N/A'} />
-        <InfoItem label="Leverage" value={`${maxLeverage?.toFixed(2)}x`} />
-        {!!roe && <InfoItem label="ROE" value={`${(roe * 100).toFixed(2)}%`} />}
-        <InfoItem label="Current Price" value={currentPrice?.toFixed(2) || 'N/A'} />
-        <InfoItem label="Liquidation Price" value={liquidationPrice?.toFixed(2) || 'N/A'} />
-        <InfoItem label="Liquidation Buffer" value={`${liquidationBuffer?.toFixed(2)}%`} />
-        <InfoItem label="Status" value={activeStatus ? 'Active' : 'Inactive'} />
+        <InfoItem label="Leverage" value={maxLeverage?.toFixed(2) || 0} unit="x" />
+        {!!roe && <InfoItem label="ROE" value={roe.toFixed(2)} unit="%" highlightValue />}
+        <InfoItem label="Current Price" value={currentPrice?.toFixed(2) || '-'} />
+        <InfoItem label="Liquidation Price" value={liquidationPrice?.toFixed(2) || '-'} />
+        <InfoItem
+          label="Liquidation Buffer"
+          value={liquidationBuffer?.toFixed(2) || 0}
+          unit="%"
+          highlightValue
+        />
       </div>
       <Link
         href={`/leveraged/${id}`}
@@ -104,15 +108,6 @@ const LeveragedStakingCard = ({
         )}>
         Create Position
       </Link>
-      {/* <Link
-        href={`/looping/${id}`}
-        // onClick={() => router.push(`/looping/${row.original.id}`)}
-        className={cn(
-          buttonVariants({ variant: 'default' }),
-          'w-full ml-auto bg-white text-black',
-        )}>
-        Create Position
-      </Link> */}
     </div>
   );
 };

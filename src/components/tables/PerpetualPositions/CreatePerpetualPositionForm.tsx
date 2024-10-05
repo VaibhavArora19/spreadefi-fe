@@ -36,7 +36,7 @@ import React, { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
 
-const CreateLoopingPositionForm: React.FC = () => {
+const CreatePerpetualPositionForm: React.FC = () => {
   const router = useRouter();
   const { strategyHref } = useLoopingStrategyStore();
   const { address: userWalletAddress } = useAccount();
@@ -157,15 +157,27 @@ const CreateLoopingPositionForm: React.FC = () => {
 
   return (
     <div className="space-y-4 mx-auto max-w-3xl">
-      <LoopingPositionHeader pair={pair} />
-      <StrategyInfo
-        pair={pair}
-        chain={chain}
-        market={market}
-        chainInfo={chainInfo}
-        positionType={positionType}
-        setPositionType={setPositionType}
-      />
+      {isLoading ? (
+        <div className="space-y-4">
+          <Skeleton className="h-10 w-3/6 bg-[#2c2c2c] rounded-xl" />
+          <Skeleton className="h-24 w-full bg-[#2c2c2c] rounded-xl" />
+        </div>
+      ) : (
+        <div className="space-y-4">
+          <LoopingPositionHeader pair={pair} />
+
+          <StrategyInfo
+            pair={pair}
+            chain={chain}
+            market={market}
+            chainInfo={chainInfo}
+            positionType={positionType}
+            setPositionType={setPositionType}
+            hideChangePositionType
+          />
+        </div>
+      )}
+
       <div className="bg-[#1E1E1E] col-span-full w-full rounded-xl p-6 flex items-start flex-col gap-4">
         <PositionDetails
           marginAmount={marginAmount}
@@ -540,7 +552,7 @@ export const InfoSection: React.FC<InfoSectionProps> = ({ title, children }) => 
 interface InfoItemProps {
   label: string;
   value: string | number;
-  isLoading: boolean;
+  isLoading?: boolean;
   unit?: string;
   highlightValue?: boolean;
 }
@@ -555,7 +567,7 @@ export const InfoItem: React.FC<InfoItemProps> = ({
   const getValueColor = (val: string | number) => {
     if (highlightValue) {
       const numValue = typeof val === 'string' ? parseFloat(val) : val;
-      if (isNaN(numValue)) return 'text-white'; // Default color for non-numeric values
+      if (isNaN(numValue)) return 'text-white';
       return numValue < 0 ? 'text-red-500' : 'text-green-500';
     }
     return 'text-gray-300';
@@ -566,7 +578,7 @@ export const InfoItem: React.FC<InfoItemProps> = ({
       <div className="text-sm text-gray-400">{label}</div>
       {isLoading ? (
         <div>
-          <Skeleton className="h-5 w-14 rounded bg-gray-700" />
+          <Skeleton className="h-5 w-14 rounded bg-[#2c2c2c]" />
         </div>
       ) : (
         <div className={cn(getValueColor(value), 'font-medium')}>
@@ -577,4 +589,4 @@ export const InfoItem: React.FC<InfoItemProps> = ({
   );
 };
 
-export default CreateLoopingPositionForm;
+export default CreatePerpetualPositionForm;
