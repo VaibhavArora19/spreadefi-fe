@@ -2,6 +2,7 @@
 
 import { InfoItem } from '@/components/tables/PerpetualPositions/CreatePerpetualPositionForm';
 import { buttonVariants } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { chainList } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
@@ -18,7 +19,7 @@ interface LeveragedStakingProps {
 
 const LeveragedStaking: React.FC<LeveragedStakingProps> = ({ leveragedStakingData }) => {
   return (
-    <div className="grid gap-x-10 gap-y-10 grid-cols-1 md:grid-cols-2 lg:grid-cols-2 pt-5">
+    <div className="grid gap-8 grid-cols-1 md:grid-cols-3 lg:grid-cols-3 pt-5">
       {leveragedStakingData.map((strategy) => (
         <LeveragedStakingCard key={strategy.id} {...strategy} />
       ))}
@@ -69,20 +70,34 @@ const LeveragedStakingCard = ({
         </div>
 
         <div className="flex items-center gap-3 text-[#707070]">
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                {marketImage ? (
+                  <Image src={marketImage} height={25} width={25} alt={market as string} />
+                ) : (
+                  <div className="w-[25px] h-[25px] bg-gray-300 rounded-full flex items-center justify-center">
+                    {market?.charAt(0)}
+                  </div>
+                )}
+              </TooltipTrigger>
+              <TooltipContent>
+                <p className="text-sm text-gray-400">{market}</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+          {/* <div className="text-gray-100">on</div> */}
           <div className="flex items-center gap-1">
-            {marketImage ? (
-              <Image src={marketImage} height={25} width={25} alt={market as string} />
-            ) : (
-              <div className="w-[25px] h-[25px] bg-gray-300 rounded-full flex items-center justify-center">
-                {market?.charAt(0)}
-              </div>
-            )}
-            <p className="text-sm text-gray-400">{market}</p>
-          </div>
-          <div className="text-gray-100">on</div>
-          <div className="flex items-center gap-1">
-            <Image src={chainInfo?.logo || ''} height={25} width={25} alt={chain as string} />
-            <p className="text-sm text-gray-400">{chain}</p>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger>
+                  <Image src={chainInfo?.logo || ''} height={25} width={25} alt={chain as string} />
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p className="text-sm text-gray-400">{chain}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </div>
         </div>
       </div>
@@ -92,19 +107,12 @@ const LeveragedStakingCard = ({
         <InfoItem label="Leverage" value={maxLeverage?.toFixed(2) || 0} unit="x" />
         {!!roe && <InfoItem label="ROE" value={roe.toFixed(2)} unit="%" highlightValue />}
         <InfoItem label="Current Price" value={currentPrice?.toFixed(2) || '-'} />
-        <InfoItem label="Liquidation Price" value={liquidationPrice?.toFixed(2) || '-'} />
-        <InfoItem
-          label="Liquidation Buffer"
-          value={liquidationBuffer?.toFixed(2) || 0}
-          unit="%"
-          highlightValue
-        />
       </div>
       <Link
         href={`/leveraged/${id}`}
         className={cn(
-          buttonVariants({ variant: 'default' }),
-          'w-full ml-auto bg-white text-black',
+          buttonVariants({ variant: 'outline' }),
+          'w-full ml-auto text-gray-100 border-gray-400',
         )}>
         Create Position
       </Link>
