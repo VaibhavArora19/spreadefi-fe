@@ -56,4 +56,10 @@ export const networkConfig = {
       poolAddress: '0x90df02551bB792286e8D4f13E0e357b4Bf1D6a57',
     },
   },
+  '5000': {
+    rpc: process.env.NEXT_PUBLIC_MANTLE_RPC,
+    Aave: {
+      poolAddress: '0xCFa5aE7c2CE8Fadc6426C1ff872cA45378Fb7cF3',
+    },
+  },
 };

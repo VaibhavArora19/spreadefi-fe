@@ -28,6 +28,10 @@ export enum TAssetName {
   MUSDC = 'm.usdc',
   MUSDT = 'm.usdt',
   MDAI = 'm.dai',
+  WMNT = 'wmnt',
+  METH = 'meth',
+  USDE = 'usde',
+  FBTC = 'fbtc',
 }
 
 export type TBalance = {
