@@ -45,6 +45,10 @@ export const CHAIN_CONFIG: TChainConfig = {
     chainName: 'Metis',
     chainImageUrl: '/assets/icons/chains/metis.png',
   },
+  '5000': {
+    chainName: 'Mantle',
+    chainImageUrl: '/assets/icons/chains/mantle.png',
+  },
 };
 
 export const chainList = [
@@ -113,5 +117,11 @@ export const chainList = [
     chainName: 'Metis Andromeda',
     shortName: 'Metis',
     logo: '/assets/icons/chains/metis.png',
+  },
+  {
+    chainId: 5000,
+    chainName: 'Mantle Mainnet',
+    shortName: 'Mantle',
+    logo: '/assets/icons/chains/mantle.png',
   },
 ];
