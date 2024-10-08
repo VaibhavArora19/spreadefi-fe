@@ -76,10 +76,11 @@ export type TUserLoopingPosition = {
   liquidationPrice: number;
   pnl: number;
   status: Status;
+  Strategy: TLoopingStrategy;
 };
 
 export type TUserLoopingPositionResponse = TUserLoopingPosition & {
-  Strategy: TLoopingStrategy;
+  // Strategy: TLoopingStrategy;
   collateralAmount: number;
   debtAmount: number;
   collateralValueUSD: number;
@@ -110,6 +111,7 @@ export type TModifyPositionResponse = {
   newLiquidationPrice?: number;
   newLiquidationBuffer?: number;
   totalMarginAmount?: number;
+  roe?: number;
 };
 
 export type TUpdatePositionEntryPayload = {

@@ -1,8 +1,10 @@
 import Loader from '@/components/(ui)/Loader';
 import Modal from '@/components/(ui)/Modal';
+import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { cn } from '@/lib/utils';
@@ -19,10 +21,13 @@ import {
   TModifyPositionResponse,
   TUserLoopingPosition,
 } from '@/types/looping-strategy';
-import { ArrowRightIcon, GearIcon } from '@radix-ui/react-icons';
+import { ArrowRightIcon } from '@radix-ui/react-icons';
+import { debounce } from 'lodash';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
+import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
 
 interface ModifyPositionModalProps {
@@ -32,42 +37,31 @@ interface ModifyPositionModalProps {
 }
 
 const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModalProps) => {
+  const [modifyType, setModifyType] = useState<ModifyType>('add');
+  const [leverage, setLeverage] = useState(position.leverage);
+  const [marginAmount, setMarginAmount] = useState<string>('');
+  const [quoteData, setQuoteData] = useState<TModifyPositionResponse | null>(null);
+
   const { address: userWalletAddress } = useAccount();
-  const { data: positionData, isLoading, error } = useFetchUserCreatedPositionById(position.id);
-  const { mutateAsync: modifyPosition } = useModifyLoopingPosition(position.id);
+  const {
+    data: positionData,
+    isLoading: isFetchingPositionDetails,
+    error,
+  } = useFetchUserCreatedPositionById(position.id);
+  const { mutateAsync: modifyPosition, isPending: isFetchingLatestQuote } =
+    useModifyLoopingPosition(position.id);
   const { mutateAsync: updatePositionInDb, isPending: isUpdatingPositionInDb } =
     useUpdateLoopingPositionEntry(position.id);
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
     useExecuteTransaction();
 
-  const [modifyType, setModifyType] = useState<ModifyType>('add');
+  const fetchLatestQuote = useCallback(async () => {
+    const marginAmountValue = marginAmount ? parseFloat(marginAmount) : 0;
 
-  const [leverage, setLeverage] = useState(position.leverage);
-  const [orderSize, setOrderSize] = useState(0);
-  const [quoteData, setQuoteData] = useState<TModifyPositionResponse | null>(null);
+    if (marginAmountValue === 0) return;
 
-  useEffect(() => {
-    if (positionData) {
-      // setPositionType(positionData.positionType.toLowerCase() as PositionType);
-      setLeverage(positionData.leverage);
-      // setOrderSize(positionData.marginAmount);
-    }
-  }, [positionData]);
-
-  if (!positionData) return null;
-
-  const handleModifyTypeChange = (type: ModifyType) => {
-    setModifyType(type);
-  };
-
-  const getTokenByMarginType = (pair: string, marginType: MarginType): string => {
-    const [baseToken, quoteToken] = pair.split('/');
-    return marginType === 'Base' ? baseToken : quoteToken;
-  };
-
-  const fetchLatestQuote = async () => {
     const payload: TModifyPositionPayload = {
-      marginAmount: orderSize,
+      marginAmount: marginAmountValue || position.marginAmount,
       modifyType: modifyType,
       leverage: leverage,
     };
@@ -79,11 +73,38 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
       }
     } catch (error) {
       console.error('Error fetching quote:', error);
+      toast.error('Error fetching quote');
     }
+  }, [marginAmount, modifyType, leverage, modifyPosition, position.marginAmount]);
+
+  // debounce the fetchLatestQuote function
+  const debouncedFetchQuote = useCallback(
+    debounce(() => {
+      fetchLatestQuote();
+    }, 500),
+    [fetchLatestQuote],
+  );
+
+  const handleModifyTypeChange = (type: ModifyType) => {
+    setModifyType(type);
+  };
+
+  const handleMarginAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // allow empty string, numbers, and numbers with a single decimal point
+    if (value === '' || /^\d*\.?\d*$/.test(value)) {
+      setMarginAmount(value);
+    }
+  };
+
+  const handleLeverageChange = (value: number[]) => {
+    setLeverage(value[0]);
   };
 
   const handleModifyPosition = async () => {
     if (!quoteData || !userWalletAddress) return;
+
+    const marginAmountValue = marginAmount ? parseFloat(marginAmount) : 0;
 
     try {
       if (quoteData.txs.approveTx) {
@@ -100,15 +121,36 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
 
       await updatePositionInDb({
         modifyType: modifyType,
-        totalMarginAmount: orderSize,
+        totalMarginAmount: marginAmountValue,
         leverage: leverage,
         newEntryPrice: quoteData.newEntryPrice!,
         newLiquidationPrice: quoteData.newLiquidationPrice!,
       });
+
+      onSubmit();
     } catch (error) {
-      console.error('Error creating position:', error);
+      console.error('Error modifying position:', error);
+      toast.error('Failed to modify position');
     }
   };
+
+  const getTokenByMarginType = (pair: string, marginType: MarginType): string => {
+    const [baseToken, quoteToken] = pair.split('/');
+    return marginType === 'Base' ? baseToken : quoteToken;
+  };
+
+  useEffect(() => {
+    debouncedFetchQuote();
+    return () => debouncedFetchQuote.cancel();
+  }, [leverage, marginAmount, modifyType, debouncedFetchQuote]);
+
+  useEffect(() => {
+    if (positionData) {
+      setLeverage(positionData.leverage);
+    }
+  }, [positionData]);
+
+  if (!positionData) return <Loader />;
 
   const renderPairInfo = () => {
     const [baseToken, quoteToken] = positionData.Strategy.pair.split('/');
@@ -138,42 +180,56 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
   const renderPositionInfo = () => {
     const marginToken = getTokenByMarginType(positionData.Strategy.pair, positionData.marginType);
     return (
-      <div className="space-y-3 border-b border-gray-600 pb-3">
-        <InfoItem
-          label="Margin"
-          value={`${positionData.marginAmount.toFixed(2)} ${marginToken}`}
-          newValue={quoteData ? `${quoteData.totalMarginAmount?.toFixed(2)} ${marginToken}` : '-'}
-        />
-        {/* <InfoItem
-          label="Size"
-          value={`${(100 / positionData.leverage).toFixed(2)}%`}
-          newValue={quoteData ? `${(100 / leverage).toFixed(2)}%` : '-'}
-        /> */}
-        <InfoItem
-          label="Entry Price"
-          value={positionData.entryPrice.toFixed(3)}
-          newValue={quoteData ? quoteData.newEntryPrice?.toFixed(3) : '-'}
-        />
-        <InfoItem
-          label="Liquidation Price"
-          value={positionData.liquidationPrice.toFixed(2)}
-          newValue={quoteData ? quoteData.newLiquidationPrice?.toFixed(2) : '-'}
-        />
-        <InfoItem
-          label="Liquidation Buffer"
-          value={`${positionData.liquidationBuffer.toFixed(2)}%`}
-          newValue={quoteData ? `${quoteData.newLiquidationBuffer?.toFixed(2)}%` : '-'}
-        />
-        <InfoItem
-          label="ROE"
-          value={`${positionData.roe.toFixed(2)}%`}
-          newValue={`${positionData.roe.toFixed(2)}%`}
-        />
+      <div className="space-y-5 pt-3">
+        <div className="flex items-center justify-between pb-4 border-b border-gray-700">
+          <div>Current Quote</div>
+          <div>Latest Quote</div>
+        </div>
+        <div className="space-y-3 border-b border-gray-600 pb-3">
+          <InfoItem
+            isLoading={isFetchingLatestQuote}
+            unit={marginToken}
+            label="Margin"
+            value={positionData.marginAmount.toFixed(5)}
+            newValue={quoteData ? quoteData.totalMarginAmount?.toFixed(5)! : ''}
+          />
+          <InfoItem
+            isLoading={isFetchingLatestQuote}
+            label="Entry Price"
+            value={positionData.entryPrice.toFixed(4)}
+            newValue={quoteData ? quoteData.newEntryPrice?.toFixed(4)! : ''}
+          />
+          <InfoItem
+            highlightValue
+            isLoading={isFetchingLatestQuote}
+            label="Liquidation Price"
+            value={positionData.liquidationPrice.toFixed(2)}
+            newValue={quoteData ? quoteData.newLiquidationPrice?.toFixed(4)! : ''}
+          />
+          <InfoItem
+            highlightValue
+            isLoading={isFetchingLatestQuote}
+            unit="%"
+            label="Liquidation Buffer"
+            value={`${positionData.liquidationBuffer.toFixed(4)}%`}
+            newValue={quoteData ? quoteData.newLiquidationBuffer?.toFixed(4)! : ''}
+          />
+          {quoteData?.roe && (
+            <InfoItem
+              highlightValue
+              isLoading={isFetchingLatestQuote}
+              unit="%"
+              label="ROE"
+              value={positionData.roe.toFixed(4)}
+              newValue={quoteData.roe.toFixed(4)}
+            />
+          )}
+        </div>
       </div>
     );
   };
 
-  if (isLoading) {
+  if (isFetchingPositionDetails) {
     return <Loader />;
   }
 
@@ -185,9 +241,11 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
           <IoClose onClick={onClose} className="cursor-pointer text-lg" />
         </div>
       </div>
+
       <div>
         <div className="flex items-center gap-2 w-full mb-4">
           <Button
+            disabled={isFetchingLatestQuote}
             variant={'outline'}
             onClick={() => handleModifyTypeChange('add')}
             className={cn(
@@ -197,6 +255,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
             Add
           </Button>
           <Button
+            disabled={isFetchingLatestQuote}
             variant={'outline'}
             onClick={() => handleModifyTypeChange('remove')}
             className={cn(
@@ -208,78 +267,125 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
         </div>
         <div className="space-y-4 py-2">
           <div className="space-y-1.5">
-            <Label className="font-normal text-gray-400 text-sm">Order Size</Label>
+            <Label className="font-normal text-gray-400 text-sm">Amount</Label>
             <div className="relative">
               <Input
+                disabled={isFetchingLatestQuote}
                 type="number"
-                placeholder="Enter order size"
-                value={orderSize}
-                onChange={(e) => setOrderSize(parseFloat(e.target.value))}
-                className="text-lg text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-2 w-full overflow-hidden"
+                placeholder="Enter amount"
+                value={marginAmount || ''}
+                onChange={handleMarginAmountChange}
+                className="text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-2 w-full overflow-hidden"
                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
               />
               <span className="text-gray-400 absolute right-3 top-1.5">
-                {getTokenByMarginType(positionData.Strategy.pair, positionData.marginType)}
+                {getTokenByMarginType(
+                  positionData?.Strategy.pair || '',
+                  positionData?.marginType || 'Base',
+                )}
               </span>
             </div>
           </div>
+
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-400">Leverage</span>
               <span className="text-gray-300">{leverage.toFixed(2)}x</span>
             </div>
             <Slider
+              disabled={isFetchingLatestQuote}
               value={[leverage]}
-              onValueChange={(val) => setLeverage(val[0])}
-              max={positionData.Strategy?.maxLeverage || 0}
-              step={0.05}
-              className="w-full cursor-pointer"
+              onValueChange={handleLeverageChange}
+              min={1.01}
+              max={positionData?.Strategy?.maxLeverage || 10}
+              step={0.01}
+              className={cn(
+                isFetchingLatestQuote ? 'cursor-not-allowed' : 'cursor-pointer',
+                'w-full',
+              )}
             />
           </div>
-          <Button onClick={fetchLatestQuote} className="w-full">
-            Fetch Latest Quote
-          </Button>
           {renderPositionInfo()}
           <div className="flex items-center justify-between">
             <div className="text-gray-500">Current Price</div>
-            <div>{positionData.currentPrice.toFixed(3)}</div>
+            <div>{positionData?.currentPrice.toFixed(3)}</div>
           </div>
 
-          <Button
-            onClick={handleModifyPosition}
-            disabled={isUpdatingPositionInDb || isExecutingTransaction}
-            className="w-full text-black bg-white py-2 capitalize flex-[0.15]">
-            {isUpdatingPositionInDb || isExecutingTransaction ? (
-              <GearIcon className="animate-spin size-4" />
-            ) : (
-              'Modify Position'
-            )}
-          </Button>
+          {!!userWalletAddress ? (
+            <Button
+              onClick={handleModifyPosition}
+              disabled={
+                isUpdatingPositionInDb ||
+                isExecutingTransaction ||
+                isFetchingLatestQuote ||
+                !quoteData
+              }
+              className="w-full text-black bg-white py-2 capitalize flex-[0.15]">
+              {isUpdatingPositionInDb || isExecutingTransaction ? (
+                <FaSpinner className="animate-spin size-4" />
+              ) : (
+                'Modify Position'
+              )}
+            </Button>
+          ) : (
+            <ConnectWallet />
+          )}
         </div>
       </div>
     </Modal>
   );
 };
 
-const InfoItem = ({
-  label,
-  value,
-  newValue,
-}: {
+interface InfoItemProps {
   label: string;
   value: string | number;
-  newValue: string | number | undefined;
-}) => (
-  <div className="flex items-end justify-between">
-    <div className="w-6/12 flex items-end justify-between">
-      <div>
-        <div className="text-sm text-gray-400">{label}:</div>
-        <div className="text-gray-50">{value}</div>
+  newValue: string | number;
+  isLoading?: boolean;
+  unit?: string;
+  highlightValue?: boolean;
+}
+
+const InfoItem = ({ label, value, newValue, unit, isLoading, highlightValue }: InfoItemProps) => {
+  const getValueColor = (val: string | number) => {
+    if (highlightValue) {
+      const numValue = typeof val === 'string' ? parseFloat(val) : val;
+      if (isNaN(numValue)) return 'text-white';
+      return numValue < 0 ? 'text-red-500' : 'text-green-500';
+    }
+    return 'text-gray-300';
+  };
+
+  return (
+    <div className="flex items-end justify-between">
+      <div className="w-6/12 flex items-end justify-between">
+        <div>
+          <div className="text-sm text-gray-400">{label}:</div>
+          <div className="text-gray-50">
+            <span>
+              {value} {unit && unit}
+            </span>
+          </div>
+        </div>
+        <ArrowRightIcon className="size-5" />
       </div>
-      <ArrowRightIcon className="size-5" />
+
+      {isLoading ? (
+        <div>
+          <Skeleton className="h-5 w-14 rounded bg-[#2c2c2c]" />
+        </div>
+      ) : (
+        <div className={cn(getValueColor(value), 'font-medium')}>
+          {newValue ? (
+            <span>
+              {newValue} {unit && unit}
+            </span>
+          ) : (
+            '-'
+          )}
+        </div>
+      )}
     </div>
-    <div className="text-gray-50">{newValue ? newValue : '-'}</div>
-  </div>
-);
+  );
+};
 
 export default ModifyPositionModal;

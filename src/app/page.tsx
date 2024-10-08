@@ -1,7 +1,7 @@
 'use client';
 
 import DashboardInfoCard from '@/components/(ui)/DashboardInfoCard';
-import LeveragedStaking from '@/components/portfolio/looping-position/LeveragedStaking';
+import { LeveragedStaking } from '@/components/portfolio/looping-position/LeveragedStaking';
 import LendingBorrowingTable from '@/components/tables/LendingBorrowingTable/LendingBorrowingTable';
 import PerpetualPositionsTable from '@/components/tables/PerpetualPositions/PerpetualPositionsTable';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';

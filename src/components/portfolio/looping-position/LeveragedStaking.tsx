@@ -1,6 +1,6 @@
 'use client';
 
-import { InfoItem } from '@/components/tables/PerpetualPositions/CreatePerpetualPositionForm';
+import { InfoItem } from '@/components/create-new-position';
 import { buttonVariants } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { assetNameToImage } from '@/constants/assetInfo';
@@ -26,8 +26,6 @@ const LeveragedStaking: React.FC<LeveragedStakingProps> = ({ leveragedStakingDat
     </div>
   );
 };
-
-export default LeveragedStaking;
 
 const LeveragedStakingCard = ({
   id,
@@ -86,7 +84,6 @@ const LeveragedStakingCard = ({
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
-          {/* <div className="text-gray-100">on</div> */}
           <div className="flex items-center gap-1">
             <TooltipProvider>
               <Tooltip>
@@ -119,3 +116,5 @@ const LeveragedStakingCard = ({
     </div>
   );
 };
+
+export { LeveragedStaking };

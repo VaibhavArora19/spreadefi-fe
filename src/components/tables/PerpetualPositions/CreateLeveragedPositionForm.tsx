@@ -1,4 +1,13 @@
 'use client';
+import {
+  ActionButtons,
+  FinalQuote,
+  LiquidationInfo,
+  LoopingPositionHeader,
+  PairInfoSkeleton,
+  PositionDetails,
+  StrategyInfo,
+} from '@/components/create-new-position';
 import { Skeleton } from '@/components/ui/skeleton';
 import { chainList } from '@/constants/chainInfo';
 import { useLoopingStrategyStore } from '@/redux/hooks';
@@ -16,17 +25,10 @@ import {
   TLoopingStrategyQuotePayload,
   TQuoteData,
 } from '@/types/looping-strategy';
-import React, { useMemo, useState } from 'react';
+import { debounce } from 'lodash';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useAccount } from 'wagmi';
-import {
-  ActionButtons,
-  FinalQuote,
-  LiquidationInfo,
-  LoopingPositionHeader,
-  PositionDetails,
-  StrategyInfo,
-} from './CreatePerpetualPositionForm';
 
 const CreateLeveragedPositionForm: React.FC = () => {
   const { strategyHref } = useLoopingStrategyStore();
@@ -78,30 +80,33 @@ const CreateLeveragedPositionForm: React.FC = () => {
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
     useExecuteTransaction();
 
-  const handlePrepareTransaction = () => {
-    if (!userWalletAddress) {
-      return toast.error('Please connect your wallet first');
-    }
-    if (marginAmount === 0 || leverage === 0) {
-      return toast.error('Please enter margin and leverage to get latest quote details');
-    }
+  const debouncedFetchQuote = useCallback(
+    debounce(() => {
+      if (!userWalletAddress || marginAmount === 0 || leverage === 0) return;
 
-    const payload: TLoopingStrategyQuotePayload = {
-      marginType,
-      marginAmount: marginAmount,
-      positionType,
-      leverage,
-      userAddress: userWalletAddress,
-    };
+      const payload: TLoopingStrategyQuotePayload = {
+        marginType,
+        marginAmount: marginAmount,
+        positionType,
+        leverage,
+        userAddress: userWalletAddress as `0x${string}`,
+      };
 
-    calculateQuote(payload, {
-      onSuccess: (data: TQuoteData | undefined) => {
-        if (data) {
-          setQuoteData(data);
-        }
-      },
-    });
-  };
+      calculateQuote(payload, {
+        onSuccess: (data: TQuoteData | undefined) => {
+          if (data) {
+            setQuoteData(data);
+          }
+        },
+      });
+    }, 500),
+    [marginAmount, leverage, marginType, positionType, userWalletAddress, calculateQuote],
+  );
+
+  useEffect(() => {
+    debouncedFetchQuote();
+    return () => debouncedFetchQuote.cancel();
+  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote]);
 
   const handleCreatePosition = async () => {
     if (!quoteData || !userWalletAddress) return;
@@ -137,6 +142,7 @@ const CreateLeveragedPositionForm: React.FC = () => {
       await createPosition(payload);
     } catch (error) {
       console.error('Error creating position:', error);
+      toast.error('Failed to create position. Please try again.');
     }
   };
 
@@ -149,7 +155,7 @@ const CreateLeveragedPositionForm: React.FC = () => {
       {isLoading ? (
         <div className="space-y-4">
           <Skeleton className="h-10 w-3/6 bg-[#2c2c2c] rounded-xl" />
-          <Skeleton className="h-24 w-full bg-[#2c2c2c] rounded-xl" />
+          <PairInfoSkeleton />
         </div>
       ) : (
         <div className="space-y-4">
@@ -162,7 +168,6 @@ const CreateLeveragedPositionForm: React.FC = () => {
             chainInfo={chainInfo}
             positionType={positionType}
             setPositionType={setPositionType}
-            hideChangePositionType
           />
         </div>
       )}
@@ -178,7 +183,10 @@ const CreateLeveragedPositionForm: React.FC = () => {
           maxLeverage={maxLeverage!}
           pair={pair}
           currentPrice={currentPrice}
-          isLoading={isLoading}
+          isLoading={isLoading || isCalculatingQuote}
+          setPositionType={setPositionType}
+          positionType={positionType}
+          hideChangePositionType
         />
         <LiquidationInfo
           liquidationPrice={liquidationPrice}
@@ -197,10 +205,9 @@ const CreateLeveragedPositionForm: React.FC = () => {
         borrowingRate={borrowingRate}
         lendingRate={lendingRate}
         interestRate={interestRate}
-        isLoading={isLoading}
+        isLoading={isLoading || isCalculatingQuote}
       />
       <ActionButtons
-        handlePrepareTransaction={handlePrepareTransaction}
         handleCreatePosition={handleCreatePosition}
         isCalculatingQuote={isCalculatingQuote}
         isCreatingPosition={isCreatingPosition}

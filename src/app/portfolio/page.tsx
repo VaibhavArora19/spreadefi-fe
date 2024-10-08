@@ -20,9 +20,9 @@ import {
   TFormattedAssetBalance,
   TYieldAsset,
 } from '@/types/balance';
-import { ProtocolType, TProtocolName } from '@/types/protocol';
+import { ProtocolType } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { useAccount } from 'wagmi';
 
@@ -44,7 +44,7 @@ const Portfolio = () => {
 
   const { data: balances } = useFetchTokenBalance(address);
   const { data: loopingPositions } = useFetchUserCreatedPositions(
-    '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
+    '0x205edf0f225457fecfa22e5774e7a4c9177d56a8',
   );
 
   const { data: portfolio } = useFetchWalletPortfolio(address);
