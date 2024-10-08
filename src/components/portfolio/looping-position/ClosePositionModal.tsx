@@ -8,9 +8,9 @@ import {
   useUpdateLoopingPositionEntry,
 } from '@/server/api/looping-strategies';
 import { MarginType, TModifyPositionPayload, TUserLoopingPosition } from '@/types/looping-strategy';
-import { GearIcon } from '@radix-ui/react-icons';
 import Image from 'next/image';
 import { useState } from 'react';
+import { FaSpinner } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { useAccount } from 'wagmi';
 
@@ -65,7 +65,7 @@ const ClosePositionModal = ({ onClose, onSubmit, position }: ClosePositionModalP
           modifyType: 'close',
         });
 
-        onSubmit(); // Notify parent component that the position has been closed
+        onSubmit();
       }
     } catch (error) {
       console.error('Error closing position:', error);
@@ -138,7 +138,7 @@ const ClosePositionModal = ({ onClose, onSubmit, position }: ClosePositionModalP
             disabled={isClosing || isUpdatingPositionInDb || isExecutingTransaction}
             className="w-full bg-red-500 text-white py-2 capitalize flex justify-center">
             {isClosing || isUpdatingPositionInDb || isExecutingTransaction ? (
-              <GearIcon className="animate-spin size-4" />
+              <FaSpinner className="animate-spin size-4" />
             ) : (
               'Close Position'
             )}

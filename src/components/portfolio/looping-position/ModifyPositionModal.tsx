@@ -41,6 +41,8 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
   const [leverage, setLeverage] = useState(position.leverage);
   const [marginAmount, setMarginAmount] = useState<string>('');
   const [quoteData, setQuoteData] = useState<TModifyPositionResponse | null>(null);
+  const [debouncedLeverage, setDebouncedLeverage] = useState(position.leverage);
+  const [isInputModified, setIsInputModified] = useState(false);
 
   const { address: userWalletAddress } = useAccount();
   const {
@@ -56,14 +58,13 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
     useExecuteTransaction();
 
   const fetchLatestQuote = useCallback(async () => {
+    if (!isInputModified) return;
     const marginAmountValue = marginAmount ? parseFloat(marginAmount) : 0;
 
-    if (marginAmountValue === 0) return;
-
     const payload: TModifyPositionPayload = {
-      marginAmount: marginAmountValue || position.marginAmount,
+      marginAmount: marginAmountValue <= 0 ? 0 : marginAmountValue,
       modifyType: modifyType,
-      leverage: leverage,
+      leverage: debouncedLeverage,
     };
 
     try {
@@ -75,7 +76,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
       console.error('Error fetching quote:', error);
       toast.error('Error fetching quote');
     }
-  }, [marginAmount, modifyType, leverage, modifyPosition, position.marginAmount]);
+  }, [marginAmount, modifyType, debouncedLeverage, modifyPosition, position.marginAmount]);
 
   // debounce the fetchLatestQuote function
   const debouncedFetchQuote = useCallback(
@@ -87,18 +88,20 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
 
   const handleModifyTypeChange = (type: ModifyType) => {
     setModifyType(type);
+    setIsInputModified(true);
   };
 
   const handleMarginAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // allow empty string, numbers, and numbers with a single decimal point
     if (value === '' || /^\d*\.?\d*$/.test(value)) {
       setMarginAmount(value);
+      setIsInputModified(true);
     }
   };
 
   const handleLeverageChange = (value: number[]) => {
     setLeverage(value[0]);
+    setIsInputModified(true);
   };
 
   const handleModifyPosition = async () => {
@@ -107,7 +110,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
     const marginAmountValue = marginAmount ? parseFloat(marginAmount) : 0;
 
     try {
-      if (quoteData.txs.approveTx) {
+      if (quoteData.txs.approveTx && marginAmountValue > 0) {
         await executeTransaction({
           to: quoteData.txs.approveTx?.to,
           data: quoteData.txs.approveTx?.data,
@@ -121,7 +124,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
 
       await updatePositionInDb({
         modifyType: modifyType,
-        totalMarginAmount: marginAmountValue,
+        totalMarginAmount: quoteData.totalMarginAmount,
         leverage: leverage,
         newEntryPrice: quoteData.newEntryPrice!,
         newLiquidationPrice: quoteData.newLiquidationPrice!,
@@ -142,13 +145,21 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
   useEffect(() => {
     debouncedFetchQuote();
     return () => debouncedFetchQuote.cancel();
-  }, [leverage, marginAmount, modifyType, debouncedFetchQuote]);
+  }, [debouncedLeverage, marginAmount, modifyType, debouncedFetchQuote]);
 
   useEffect(() => {
     if (positionData) {
       setLeverage(positionData.leverage);
     }
   }, [positionData]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedLeverage(leverage);
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, [leverage]);
 
   if (!positionData) return <Loader />;
 
@@ -211,7 +222,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
             isLoading={isFetchingLatestQuote}
             unit="%"
             label="Liquidation Buffer"
-            value={`${positionData.liquidationBuffer.toFixed(4)}%`}
+            value={positionData.liquidationBuffer.toFixed(4)}
             newValue={quoteData ? quoteData.newLiquidationBuffer?.toFixed(4)! : ''}
           />
           {quoteData?.roe && (
@@ -297,7 +308,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
               value={[leverage]}
               onValueChange={handleLeverageChange}
               min={1.01}
-              max={positionData?.Strategy?.maxLeverage || 10}
+              max={positionData?.Strategy?.maxLeverage || 4.5}
               step={0.01}
               className={cn(
                 isFetchingLatestQuote ? 'cursor-not-allowed' : 'cursor-pointer',

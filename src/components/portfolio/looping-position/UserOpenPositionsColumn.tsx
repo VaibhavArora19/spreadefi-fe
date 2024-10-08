@@ -223,29 +223,35 @@ const UserOpenPositionsColumn = ({
           </TooltipProvider>
         </div>
       ),
-      cell: ({ row }) => <div>${row.original.liquidationPrice.toFixed(2)}</div>,
+      cell: ({ row }) => <div>{row.original.liquidationPrice.toFixed(2)}</div>,
     },
     {
       id: 'actions',
       cell: ({ row }) => (
         <div className="w-fit">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="ml-auto border-none bg-[#27272A]">
-                Edit <FaEdit className="ml-2 h-4 w-4 cursor-pointer" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuItem
-                onClick={() => setActiveModal({ type: 'modify', position: row.original })}>
-                Modify
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={() => setActiveModal({ type: 'close', position: row.original })}>
-                Close position
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
+          {row.original.status === 'Closed' ? (
+            <div className="px-4 py-1 border-[1px] text-xs rounded-full w-fit bg-cyan-500/10 border-cyan-900 text-cyan-500">
+              Position Closed
+            </div>
+          ) : (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="ml-auto border-none bg-[#27272A]">
+                  Edit <FaEdit className="ml-2 h-4 w-4 cursor-pointer" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end">
+                <DropdownMenuItem
+                  onClick={() => setActiveModal({ type: 'modify', position: row.original })}>
+                  Modify
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={() => setActiveModal({ type: 'close', position: row.original })}>
+                  Close position
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       ),
     },

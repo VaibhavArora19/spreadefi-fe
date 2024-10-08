@@ -13,10 +13,11 @@ import {
   TUserLoopingPosition,
   TUserLoopingPositionResponse,
 } from '@/types/looping-strategy';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { decodeAbiParameters, parseAbiParameters, parseEther } from 'viem';
-import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
+import { decodeAbiParameters, formatEther, parseAbiParameters, parseEther } from 'viem';
+import { useAccount, useBalance, usePublicClient, useWalletClient } from 'wagmi';
 
 interface ExecuteTransactionPayload {
   to: string;
@@ -157,6 +158,8 @@ export const useFetchUserCreatedPositionById = (positionId: string) => {
 };
 
 export const useCreateLoopingPosition = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const createPosition = async (payload: TCreatePositionPayload) => {
     try {
       const { data } = await axiosLoopingPositions.put('/positions', payload);
@@ -170,6 +173,13 @@ export const useCreateLoopingPosition = () => {
   return useMutation({
     mutationKey: [LOOPING_STRATEGY.CREATE_POSITION],
     mutationFn: createPosition,
+    onSuccess: () => {
+      toast.success('Position created successfully');
+      router.push('/portfolio');
+    },
+    onError: (error: any) => {
+      toast.error('Error creating position');
+    },
   });
 };
 
@@ -194,6 +204,8 @@ export const useModifyLoopingPosition = (positionId: string) => {
 };
 
 export const useUpdateLoopingPositionEntry = (positionId: string) => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
   const updatePositionInDb = async (payload: TUpdatePositionEntryPayload) => {
     try {
       const { data } = await axiosLoopingPositions.post(`/positions/${positionId}`, payload);
@@ -206,6 +218,11 @@ export const useUpdateLoopingPositionEntry = (positionId: string) => {
 
   return useMutation({
     mutationKey: [LOOPING_STRATEGY.UPDATE_POSITION_BY_ID],
+    onSuccess: () => {
+      toast.success('Position updated successfully');
+      queryClient.invalidateQueries({ queryKey: [LOOPING_STRATEGY.FETCH_USER_POSITIONS] });
+      router.push('/portfolio');
+    },
     mutationFn: updatePositionInDb,
   });
 };
@@ -270,22 +287,59 @@ export const useExecuteTransaction = () => {
   const account = useAccount();
   const publicClient = usePublicClient();
 
-  const executeTx = async (payload: ExecuteTransactionPayload) => {
-    if (walletClient && publicClient) {
-      const payloadData = {
-        to: payload.to as `0x${string}`,
-        data: payload.data as `0x${string}`,
-        value: payload.value ? parseEther(payload.value) : undefined,
-        account: account.address as `0x${string}`,
-      };
+  const { data: wethBalance } = useBalance({
+    address: account.address,
+    token: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f', // WETH contract address
+  });
 
-      try {
-        if (
-          payload.isWethTransaction &&
-          payload.to === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f'
-        ) {
-          toast.loading('Converting ETH to WETH');
-          // this is a WETH transaction, and needs to convert ETH to WETH first
+  const executeTx = async (payload: ExecuteTransactionPayload) => {
+    if (!walletClient || !publicClient) {
+      throw new Error('Ethereum provider not found');
+    }
+
+    const payloadData = {
+      to: payload.to as `0x${string}`,
+      data: payload.data as `0x${string}`,
+      value: payload.value ? parseEther(payload.value) : undefined,
+      account: account.address as `0x${string}`,
+    };
+
+    try {
+      if (
+        payload.isWethTransaction &&
+        payload.to === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f'
+      ) {
+        const requiredWeth = parseEther(payload.marginAmount?.toString() || '0');
+
+        if (wethBalance) {
+          const currentWethBalance = wethBalance.value;
+          if (currentWethBalance >= requiredWeth) {
+            toast.info('Sufficient WETH balance found. Skipping conversion.');
+          } else {
+            const wethNeeded = requiredWeth - currentWethBalance;
+            toast.loading(`Converting ${formatEther(wethNeeded)} ETH to WETH`);
+
+            const wethContract = {
+              address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' as `0x${string}`,
+              abi: wethABI,
+            };
+
+            const request = await publicClient.simulateContract({
+              ...wethContract,
+              functionName: 'deposit',
+              value: wethNeeded,
+            });
+
+            if (request) {
+              const ethToWethHash = await walletClient.writeContract(request.request);
+              await publicClient.waitForTransactionReceipt({ hash: ethToWethHash });
+              toast.dismiss();
+              toast.success(`Successfully converted ${formatEther(wethNeeded)} ETH to WETH`);
+            }
+          }
+        } else {
+          // fallback: proceed with full conversion if wethBalance is undefined
+          toast.loading(`Converting ${formatEther(requiredWeth)} ETH to WETH`);
           const wethContract = {
             address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' as `0x${string}`,
             abi: wethABI,
@@ -294,31 +348,29 @@ export const useExecuteTransaction = () => {
           const request = await publicClient.simulateContract({
             ...wethContract,
             functionName: 'deposit',
-            value: parseEther(payload.marginAmount?.toString() || '0'),
+            value: requiredWeth,
           });
 
           if (request) {
-            toast.dismiss();
             const ethToWethHash = await walletClient.writeContract(request.request);
             await publicClient.waitForTransactionReceipt({ hash: ethToWethHash });
-            toast.success('ETH to WETH conversion successful');
+            toast.dismiss();
+            toast.success(`Successfully converted ${formatEther(requiredWeth)} ETH to WETH`);
           }
-          toast.dismiss();
         }
-
-        // execute main transaction
-        const hash = await walletClient.sendTransaction(payloadData);
-        const receipt = await publicClient.waitForTransactionReceipt({ hash });
-
-        return {
-          receipt,
-        };
-      } catch (error) {
-        console.error('Error executing transaction:', error);
-        throw new Error('Error executing transaction', { cause: error });
       }
-    } else {
-      throw new Error('Ethereum provider not found');
+
+      // execute main transaction
+      toast.loading('Executing transaction...'); // Add a loading toast for the main transaction
+      const hash = await walletClient.sendTransaction(payloadData);
+      const receipt = await publicClient.waitForTransactionReceipt({ hash });
+      toast.dismiss();
+
+      return { receipt };
+    } catch (error) {
+      toast.dismiss();
+      console.error('Error executing transaction:', error);
+      throw new Error('Error executing transaction', { cause: error });
     }
   };
 

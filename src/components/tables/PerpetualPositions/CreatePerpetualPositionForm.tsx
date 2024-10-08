@@ -25,17 +25,16 @@ import {
   TLoopingStrategyQuotePayload,
   TQuoteData,
 } from '@/types/looping-strategy';
+import { AxiosError } from 'axios';
 import { debounce } from 'lodash';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
+import { useAccount } from 'wagmi';
 
 export default function CreatePerpetualPositionForm() {
   const { strategyHref } = useLoopingStrategyStore();
   const { address: userWalletAddress } = useAccount();
-  const { data: walletClient } = useWalletClient();
-  const account = useAccount();
-  const publicClient = usePublicClient();
+  const previousParamsRef = useRef<string>('');
 
   const [marginAmount, setMarginAmount] = useState<number>(0);
   const [leverage, setLeverage] = useState<number>(1.2);
@@ -77,12 +76,57 @@ export default function CreatePerpetualPositionForm() {
   );
 
   const { mutateAsync: calculateQuote, isPending: isCalculatingQuote } =
-    useGetLoopingStrategyQuote(strategyId);
+    useGetLoopingStrategyQuote(strategyHref);
   const { mutateAsync: createPosition, isPending: isCreatingPosition } = useCreateLoopingPosition();
   const { mutateAsync: executeStrategyTransaction, isPending: isExecutingStrategyTransaction } =
     useExecuteStrategyTransaction();
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
     useExecuteTransaction();
+
+  const fetchQuote = useCallback(async () => {
+    if (!userWalletAddress || marginAmount === 0 || leverage === 0 || !strategyId) return;
+
+    const payload: TLoopingStrategyQuotePayload = {
+      marginType,
+      marginAmount: marginAmount,
+      positionType,
+      leverage,
+      userAddress: userWalletAddress as `0x${string}`,
+    };
+
+    const paramsString = JSON.stringify(payload);
+    if (paramsString === previousParamsRef.current) return;
+    previousParamsRef.current = paramsString;
+
+    try {
+      const data = await calculateQuote(payload);
+      if (data) {
+        setQuoteData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching quote:', error);
+      if (error instanceof AxiosError && error.response) {
+        toast.error(`Failed to fetch quote: ${error.response.data.error}`);
+      } else {
+        console.log('Unknown error');
+      }
+    }
+  }, [
+    marginAmount,
+    leverage,
+    marginType,
+    positionType,
+    userWalletAddress,
+    calculateQuote,
+    strategyId,
+  ]);
+
+  const debouncedFetchQuote = useMemo(() => debounce(fetchQuote, 500), [fetchQuote]);
+
+  useEffect(() => {
+    debouncedFetchQuote();
+    return () => debouncedFetchQuote.cancel();
+  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote, strategyId]);
 
   const handleCreatePosition = async () => {
     if (!quoteData || !userWalletAddress) return;
@@ -124,47 +168,6 @@ export default function CreatePerpetualPositionForm() {
       console.error('Error creating position:', error);
     }
   };
-
-  const debouncedFetchQuote = useCallback(
-    debounce(() => {
-      if (marginAmount === 0 || leverage === 0 || !strategyId) return;
-
-      const payload: TLoopingStrategyQuotePayload = {
-        marginType,
-        marginAmount: marginAmount,
-        positionType,
-        leverage,
-        userAddress: userWalletAddress as `0x${string}`,
-      };
-
-      calculateQuote(payload, {
-        onSuccess: (data: TQuoteData | undefined) => {
-          if (data) {
-            setQuoteData(data);
-          }
-        },
-      });
-    }, 500),
-    [
-      marginAmount,
-      leverage,
-      marginType,
-      positionType,
-      userWalletAddress,
-      calculateQuote,
-      strategyId,
-    ],
-  );
-
-  useEffect(() => {
-    debouncedFetchQuote();
-    return () => debouncedFetchQuote.cancel();
-  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote, strategyId]);
-
-  useEffect(() => {
-    debouncedFetchQuote();
-    return () => debouncedFetchQuote.cancel();
-  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote]);
 
   if (isError) {
     return <div>Error loading strategy data</div>;

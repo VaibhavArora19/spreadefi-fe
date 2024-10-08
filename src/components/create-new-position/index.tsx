@@ -16,9 +16,10 @@ import { assetNameToImage } from '@/constants/assetInfo';
 import { cn } from '@/lib/utils';
 import { MarginType, PositionType, TQuoteData } from '@/types/looping-strategy';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
+import { debounce } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { Skeleton } from '../ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -130,6 +131,28 @@ const PositionDetails: React.FC<{
   isLoading,
   hideChangePositionType,
 }) => {
+  const [localLeverage, setLocalLeverage] = useState(leverage);
+
+  const debouncedSetLeverage = useCallback(
+    debounce((value: number) => {
+      setLeverage(value);
+    }, 1000),
+    [setLeverage],
+  );
+
+  const handleLeverageChange = useCallback(
+    (value: number[]) => {
+      const newLeverage = value[0];
+      setLocalLeverage(newLeverage);
+      debouncedSetLeverage(newLeverage);
+    },
+    [debouncedSetLeverage],
+  );
+
+  useEffect(() => {
+    setLocalLeverage(leverage);
+  }, [leverage]);
+
   return (
     <div className="w-full space-y-5">
       {!hideChangePositionType && (
@@ -162,6 +185,7 @@ const PositionDetails: React.FC<{
               disabled={isLoading}
               value={marginAmount}
               onChange={(e) => setMarginAmount(e.target.valueAsNumber)}
+              onWheel={(e) => (e.target as HTMLInputElement).blur()}
               type="number"
               placeholder="0.00"
               className="w-full text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-3 pl-12"
@@ -191,7 +215,7 @@ const PositionDetails: React.FC<{
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <Label className="font-normal text-gray-400 text-sm">Leverage</Label>
-          <div className="text-sm">{leverage.toFixed(2)}x</div>
+          <div className="text-sm">{localLeverage.toFixed(2)}x</div>
         </div>
 
         <TooltipProvider>
@@ -200,8 +224,8 @@ const PositionDetails: React.FC<{
               <Slider
                 disabled={isLoading || !marginAmount}
                 min={1}
-                value={[leverage]}
-                onValueChange={(val) => setLeverage(val[0])}
+                value={[localLeverage]}
+                onValueChange={handleLeverageChange}
                 max={maxLeverage || 0}
                 step={0.05}
                 className={cn(

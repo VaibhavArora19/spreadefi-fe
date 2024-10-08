@@ -1,14 +1,13 @@
-import { ColumnDef } from '@tanstack/react-table';
-import { TableItem, TLendingBorrowingTableItem } from '@/types/dataTable';
-import Image from 'next/image';
-import { assetNameToImage } from '@/constants/assetInfo';
-import { CaretSortIcon } from '@radix-ui/react-icons';
+import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { assetNameToImage } from '@/constants/assetInfo';
 import { CHAIN_CONFIG } from '@/constants/chainInfo';
 import { protocolNameToImage } from '@/constants/prorocolInfo';
-import { Button } from '@/components/ui/button';
-import { NextRouter, Router } from 'next/router';
+import { TLendingBorrowingTableItem } from '@/types/dataTable';
+import { CaretSortIcon } from '@radix-ui/react-icons';
+import { ColumnDef } from '@tanstack/react-table';
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime';
+import Image from 'next/image';
 
 const LendingBorrowingColumn = (
   router?: AppRouterInstance,
@@ -115,14 +114,14 @@ const LendingBorrowingColumn = (
                 <Image
                   className="hover:scale-110"
                   key={index}
-                  src={CHAIN_CONFIG[chain].chainImageUrl}
+                  src={CHAIN_CONFIG[chain]?.chainImageUrl}
                   height={25}
                   width={25}
-                  alt={CHAIN_CONFIG[chain].chainName}
+                  alt={CHAIN_CONFIG[chain]?.chainName}
                 />
               </TooltipTrigger>
               <TooltipContent>
-                <p className="bg-[#1e1e1e] text-white">{CHAIN_CONFIG[chain].chainName}</p>
+                <p className="bg-[#1e1e1e] text-white">{CHAIN_CONFIG[chain]?.chainName}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>

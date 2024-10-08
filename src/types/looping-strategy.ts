@@ -1,6 +1,6 @@
 export type PositionType = 'Long' | 'Short';
 export type MarginType = 'Base' | 'Quote';
-export type Status = 'Open' | 'Close';
+export type Status = 'Open' | 'Closed';
 export type ModifyType = 'add' | 'remove' | 'close';
 
 export type TLoopingStrategy = {
