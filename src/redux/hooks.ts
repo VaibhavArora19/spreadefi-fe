@@ -11,4 +11,6 @@ export const useTransactionStore = () => useAppSelector((state) => state.transac
 
 export const useTokensStore = () => useAppSelector((state) => state.tokens);
 
-export const useWalletStore = () => useAppSelector((state) => state.wallet)
+export const useWalletStore = () => useAppSelector((state) => state.wallet);
+
+export const useLoopingStrategyStore = () => useAppSelector((state) => state.lopingStrategy);

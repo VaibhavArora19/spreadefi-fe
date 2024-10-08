@@ -1,6 +1,7 @@
 'use client';
 
 import ConnectWallet from '@/components/popups/Wallet/ConnectWallet';
+import LoopingPositionTable from '@/components/portfolio/looping-position/LoopingPositionTable';
 import PortfolioCard from '@/components/portfolio/PortfolioCard';
 import PositionItem from '@/components/portfolio/PositionItem';
 import AssetsToBorrowCard from '@/components/protocolInfo/Borrow/AssetsToBorrowCard';
@@ -11,6 +12,7 @@ import SuppliesCard from '@/components/protocolInfo/Supply/SuppliesCard';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useWalletStore } from '@/redux/hooks';
 import { useFetchTokenBalance, useFetchWalletPortfolio } from '@/server/api/balance';
+import { useFetchUserCreatedPositions } from '@/server/api/looping-strategies';
 import { TAsset } from '@/types/asset';
 import {
   TAssetBalance,
@@ -18,9 +20,9 @@ import {
   TFormattedAssetBalance,
   TYieldAsset,
 } from '@/types/balance';
-import { ProtocolType, TProtocolName } from '@/types/protocol';
+import { ProtocolType } from '@/types/protocol';
 import { useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { formatUnits } from 'viem';
 import { useAccount } from 'wagmi';
 
@@ -41,6 +43,9 @@ const Portfolio = () => {
   const [yieldBalances, setYieldBalances] = useState<TFormattedAssetBalance[]>();
 
   const { data: balances } = useFetchTokenBalance(address);
+  const { data: loopingPositions } = useFetchUserCreatedPositions(
+    '0x205edf0f225457fecfa22e5774e7a4c9177d56a8',
+  );
 
   const { data: portfolio } = useFetchWalletPortfolio(address);
   const { isConnected } = useWalletStore();
@@ -226,10 +231,11 @@ const Portfolio = () => {
           <PortfolioCard portfolio={portfolio} />
 
           <div className="mt-10 mb-6">
-            <Tabs onValueChange={setTab} value={tab} className="w-[300px] dark">
-              <TabsList className="grid w-full grid-cols-2 bg-black">
+            <Tabs onValueChange={setTab} value={tab} className="w-fit dark">
+              <TabsList className="grid w-full grid-cols-3 bg-black">
                 <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
                 <TabsTrigger value="vault">Yield vaults</TabsTrigger>
+                <TabsTrigger value="loopingPositions">Looping Positions</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
@@ -278,9 +284,14 @@ const Portfolio = () => {
         </div>
       )}
 
+      {tab === 'loopingPositions' && (
+        <div className="flex flex-col gap-3">
+          <LoopingPositionTable data={loopingPositions || []} />
+        </div>
+      )}
+
       {!isConnected && <ConnectWallet />}
     </div>
   );
 };
-
 export default Portfolio;
