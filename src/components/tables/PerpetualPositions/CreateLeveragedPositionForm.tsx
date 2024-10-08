@@ -100,7 +100,15 @@ const CreateLeveragedPositionForm: React.FC = () => {
         },
       });
     }, 500),
-    [marginAmount, leverage, marginType, positionType, userWalletAddress, calculateQuote],
+    [
+      marginAmount,
+      leverage,
+      marginType,
+      positionType,
+      userWalletAddress,
+      calculateQuote,
+      strategyId,
+    ],
   );
 
   useEffect(() => {

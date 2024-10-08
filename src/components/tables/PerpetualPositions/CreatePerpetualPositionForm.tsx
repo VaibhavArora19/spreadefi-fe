@@ -127,7 +127,7 @@ export default function CreatePerpetualPositionForm() {
 
   const debouncedFetchQuote = useCallback(
     debounce(() => {
-      if (marginAmount === 0 || leverage === 0) return;
+      if (marginAmount === 0 || leverage === 0 || !strategyId) return;
 
       const payload: TLoopingStrategyQuotePayload = {
         marginType,
@@ -145,8 +145,21 @@ export default function CreatePerpetualPositionForm() {
         },
       });
     }, 500),
-    [marginAmount, leverage, marginType, positionType, userWalletAddress, calculateQuote],
+    [
+      marginAmount,
+      leverage,
+      marginType,
+      positionType,
+      userWalletAddress,
+      calculateQuote,
+      strategyId,
+    ],
   );
+
+  useEffect(() => {
+    debouncedFetchQuote();
+    return () => debouncedFetchQuote.cancel();
+  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote, strategyId]);
 
   useEffect(() => {
     debouncedFetchQuote();

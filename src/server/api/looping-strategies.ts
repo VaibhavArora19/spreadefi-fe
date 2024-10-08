@@ -88,30 +88,29 @@ export const useFetchLoopingStrategyById = ({
   });
 };
 
-export const useGetLoopingStrategyQuote = (strategyId: string) => {
+export const useGetLoopingStrategyQuote = (strategyId: string | undefined) => {
   const fetchQuote = async (payload: TLoopingStrategyQuotePayload) => {
+    if (!strategyId) {
+      throw new Error('Strategy ID is required');
+    }
     try {
       const { data } = await axiosLoopingPositions.post<TQuoteData>(
         `/strategy/${strategyId}/quote`,
         payload,
       );
-
       return data;
     } catch (error: any) {
       console.error('error: ', error);
+      throw error;
     }
   };
 
-  function onSuccess(data: any) {}
-
-  function onError(error: any) {}
-
   return useMutation({
-    mutationKey: [LOOPING_STRATEGY.FETCH_QUOTE_BY_ID],
+    mutationKey: [LOOPING_STRATEGY.FETCH_QUOTE_BY_ID, strategyId],
     mutationFn: fetchQuote,
-    onSuccess,
-    onError,
-    retry: 0,
+    onError: (error: any) => {
+      console.error('Error fetching quote:', error);
+    },
   });
 };
 

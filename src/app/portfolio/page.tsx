@@ -219,7 +219,7 @@ const Portfolio = () => {
                   remaining={remaining}
                   balances={portfolio.chainBalance[chain]}
                 />
-              </div>{' '}
+              </div>
             </div>
           ) : (
             <p>loading</p>
@@ -227,7 +227,6 @@ const Portfolio = () => {
         </div>
       ) : (
         <div className="w-[95%] mx-auto">
-          {/* Portfolio dabba */}
           <PortfolioCard portfolio={portfolio} />
 
           <div className="mt-10 mb-6">
@@ -235,58 +234,54 @@ const Portfolio = () => {
               <TabsList className="grid w-full grid-cols-3 bg-black">
                 <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
                 <TabsTrigger value="vault">Yield vaults</TabsTrigger>
-                <TabsTrigger value="loopingPositions">Looping Positions</TabsTrigger>
+                <TabsTrigger value="loopingPositions">Open Positions</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
 
-          {/* Add collapsible from shadcn */}
+          {tab === 'lendBorrow' && lendingBalances && portfolio && (
+            <div className="flex flex-col gap-3">
+              {lendingBalances.map((balance: TFormattedAssetBalance, index: number) => (
+                <PositionItem
+                  key={index}
+                  chain={balance.chainId}
+                  protocolName={balance.protocol}
+                  apy={12}
+                  collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
+                  debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
+                  positionName={balance.protocol}
+                  ratio={12}
+                  type="lendBorrow"
+                  assets={balance.assets}
+                />
+              ))}
+            </div>
+          )}
 
-          {tab === 'lendBorrow'
-            ? lendingBalances &&
-              portfolio && (
-                <div className="flex flex-col gap-3">
-                  {lendingBalances.map((balance: TFormattedAssetBalance, index: number) => (
-                    <PositionItem
-                      key={index}
-                      chain={balance.chainId}
-                      protocolName={balance.protocol}
-                      apy={12}
-                      collateral={getCollateralAnddebt(balance.protocol, balance.chainId, 0)}
-                      debt={getCollateralAnddebt(balance.protocol, balance.chainId, 1)}
-                      positionName={balance.protocol}
-                      ratio={12}
-                      type="lendBorrow"
-                      assets={balance.assets}
-                    />
-                  ))}
-                </div>
-              )
-            : yieldBalances &&
-              portfolio && (
-                <div className="flex flex-col gap-3">
-                  {yieldBalances.map((balance: TFormattedAssetBalance, index: number) => (
-                    <PositionItem
-                      key={index}
-                      apy={12}
-                      collateral={getTotalCollateralForVault(index) || '-'}
-                      debt={'-'}
-                      positionName={balance.protocol}
-                      ratio={0}
-                      protocolName={balance.protocol}
-                      chain={balance.chainId}
-                      type={'vault'}
-                      assets={balance.assets}
-                    />
-                  ))}
-                </div>
-              )}
-        </div>
-      )}
+          {tab === 'vault' && yieldBalances && portfolio && (
+            <div className="flex flex-col gap-3">
+              {yieldBalances.map((balance: TFormattedAssetBalance, index: number) => (
+                <PositionItem
+                  key={index}
+                  apy={12}
+                  collateral={getTotalCollateralForVault(index) || '-'}
+                  debt={'-'}
+                  positionName={balance.protocol}
+                  ratio={0}
+                  protocolName={balance.protocol}
+                  chain={balance.chainId}
+                  type={'vault'}
+                  assets={balance.assets}
+                />
+              ))}
+            </div>
+          )}
 
-      {tab === 'loopingPositions' && (
-        <div className="flex flex-col gap-3">
-          <LoopingPositionTable data={loopingPositions || []} />
+          {tab === 'loopingPositions' && (
+            <div className="flex flex-col gap-3">
+              <LoopingPositionTable data={loopingPositions || []} />
+            </div>
+          )}
         </div>
       )}
 

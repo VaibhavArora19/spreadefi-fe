@@ -50,7 +50,6 @@ const Home = () => {
       </div>
 
       <Tabs onValueChange={setTab} value={tab} className="w-fit dark mb-2">
-        {/* <TabsList className="md:w-full w-full bg-black max-w-xs overflow-x-auto"> */}
         <TabsList className="flex md:max-w-full max-w-[310px] w-max justify-start overflow-auto bg-black">
           <TabsTrigger className="min-w-fit" value="lendBorrow">
             Lend & Borrow
@@ -73,7 +72,7 @@ const Home = () => {
       {tab === 'leveragedStaking' && (
         <LeveragedStaking leveragedStakingData={leveragedStakingData || []} />
       )}
-      {tab === 'lendBorrow' && (
+      {(tab === 'lendBorrow' || tab === 'vault') && (
         <LendingBorrowingTable
           data={data}
           isLoading={isLoading}
