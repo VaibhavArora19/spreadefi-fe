@@ -71,8 +71,8 @@ export const assetNameToImage = (
       return '/assets/icons/tokens/usdt.png';
     case TAssetName.MDAI:
       return '/assets/icons/tokens/dai.png';
-    case TAssetName.MNT:
-      return '/assets/icons/tokens/mnt.png';
+    case TAssetName.WMNT:
+      return '/assets/icons/tokens/mantle.png';
     case TAssetName.METH:
       return '/assets/icons/tokens/meth.png';
     case TAssetName.USDE:
