@@ -27,7 +27,7 @@ import { formatUnits } from 'viem';
 import { useAccount } from 'wagmi';
 
 const Portfolio = () => {
-  const { address } = useAccount();
+  const { address: userWalletAddress } = useAccount();
   const searchParams = useSearchParams();
   const protocol = searchParams.get('protocol');
   const chain = searchParams.get('chain');
@@ -42,12 +42,12 @@ const Portfolio = () => {
   const [lendingBalances, setLendingBalances] = useState<TFormattedAssetBalance[]>();
   const [yieldBalances, setYieldBalances] = useState<TFormattedAssetBalance[]>();
 
-  const { data: balances } = useFetchTokenBalance(address);
+  const { data: balances } = useFetchTokenBalance(userWalletAddress);
   const { data: loopingPositions } = useFetchUserCreatedPositions(
-    '0x205edf0f225457fecfa22e5774e7a4c9177d56a8',
+    userWalletAddress as `0x${string}`,
   );
 
-  const { data: portfolio } = useFetchWalletPortfolio(address);
+  const { data: portfolio } = useFetchWalletPortfolio(userWalletAddress);
   const { isConnected } = useWalletStore();
 
   useEffect(() => {
@@ -234,7 +234,7 @@ const Portfolio = () => {
               <TabsList className="grid w-full grid-cols-3 bg-black">
                 <TabsTrigger value="lendBorrow">Lend & Borrow</TabsTrigger>
                 <TabsTrigger value="vault">Yield vaults</TabsTrigger>
-                <TabsTrigger value="loopingPositions">Open Positions</TabsTrigger>
+                <TabsTrigger value="loopingPositions">Leveraged Positions</TabsTrigger>
               </TabsList>
             </Tabs>
           </div>
