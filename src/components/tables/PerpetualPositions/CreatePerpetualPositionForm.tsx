@@ -27,11 +27,15 @@ import {
 } from '@/types/looping-strategy';
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { useAccount } from 'wagmi';
+import { toast } from 'sonner';
+import { useAccount, usePublicClient, useWalletClient } from 'wagmi';
 
 export default function CreatePerpetualPositionForm() {
   const { strategyHref } = useLoopingStrategyStore();
   const { address: userWalletAddress } = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const account = useAccount();
+  const publicClient = usePublicClient();
 
   const [marginAmount, setMarginAmount] = useState<number>(0);
   const [leverage, setLeverage] = useState<number>(1.2);
@@ -88,6 +92,9 @@ export default function CreatePerpetualPositionForm() {
         await executeTransaction({
           to: quoteData.txs.approveTx?.to,
           data: quoteData.txs.approveTx?.data,
+          isWethTransaction:
+            quoteData.txs.approveTx.to === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
+          marginAmount: marginAmount,
         });
       }
 
@@ -113,6 +120,7 @@ export default function CreatePerpetualPositionForm() {
 
       await createPosition(payload);
     } catch (error) {
+      toast.error('Error creating position');
       console.error('Error creating position:', error);
     }
   };

@@ -1,4 +1,5 @@
 import { axiosLoopingPositions } from '@/config';
+import { wethABI } from '@/constants/abi/wethABI';
 import { LOOPING_STRATEGY } from '@/constants/query';
 import {
   PositionType,
@@ -21,6 +22,8 @@ interface ExecuteTransactionPayload {
   to: string;
   data: string;
   value?: string;
+  isWethTransaction?: boolean;
+  marginAmount?: number;
 }
 
 export const useFetchLoopingStrategies = (leveragd?: boolean) => {
@@ -278,8 +281,34 @@ export const useExecuteTransaction = () => {
       };
 
       try {
-        const hash = await walletClient.sendTransaction(payloadData);
+        if (
+          payload.isWethTransaction &&
+          payload.to === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f'
+        ) {
+          toast.loading('Converting ETH to WETH');
+          // this is a WETH transaction, and needs to convert ETH to WETH first
+          const wethContract = {
+            address: '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f' as `0x${string}`,
+            abi: wethABI,
+          };
 
+          const request = await publicClient.simulateContract({
+            ...wethContract,
+            functionName: 'deposit',
+            value: parseEther(payload.marginAmount?.toString() || '0'),
+          });
+
+          if (request) {
+            toast.dismiss();
+            const ethToWethHash = await walletClient.writeContract(request.request);
+            await publicClient.waitForTransactionReceipt({ hash: ethToWethHash });
+            toast.success('ETH to WETH conversion successful');
+          }
+          toast.dismiss();
+        }
+
+        // execute main transaction
+        const hash = await walletClient.sendTransaction(payloadData);
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
         return {

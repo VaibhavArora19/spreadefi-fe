@@ -116,6 +116,9 @@ const CreateLeveragedPositionForm: React.FC = () => {
         await executeTransaction({
           to: quoteData.txs.approveTx?.to,
           data: quoteData.txs.approveTx?.data,
+          isWethTransaction:
+            quoteData.txs.approveTx.to === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
+          marginAmount: marginAmount,
         });
       }
 
