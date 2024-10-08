@@ -32,6 +32,8 @@ export const protocolNameToImage = (name: TProtocolName) => {
       return '/assets/icons/protocols/stargate.png';
     case TProtocolName.BENQI:
       return '/assets/icons/protocols/benqi.png';
+    case TProtocolName.LENDLE:
+      return '/assets/icons/protocols/lendle.png';
     default:
       return '';
   }

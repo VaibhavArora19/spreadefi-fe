@@ -10,6 +10,7 @@ import {
   polygon,
   scroll,
   metis,
+  mantle,
 } from 'viem/chains';
 import { ChainId, createConfig, EVM } from '@lifi/sdk';
 import { Chain, createWalletClient, getAddress, http } from 'viem';
@@ -28,6 +29,7 @@ export const lifiConfig = async (currentChain: number) => {
     scroll,
     blast,
     metis,
+    mantle,
   ];
 
   const { client, account } = await walletClient(chains.find((chain) => chain.id === currentChain));
@@ -46,6 +48,7 @@ export const lifiConfig = async (currentChain: number) => {
       [ChainId.SCL]: [process.env.NEXT_PUBLIC_SCROLL_RPC as string],
       [ChainId.BLS]: [process.env.NEXT_PUBLIC_BLAST_RPC as string],
       [ChainId.MAM]: [process.env.NEXT_PUBLIC_METIS_RPC as string],
+      [ChainId.MNT]: [process.env.NEXT_PUBLIC_MANTLE_RPC as string],
     },
     providers: [
       EVM({
