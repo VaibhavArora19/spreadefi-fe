@@ -1,12 +1,10 @@
+import { CHAIN_CONFIG } from '@/constants/chainInfo';
+import { protocolNameToImage } from '@/constants/prorocolInfo';
+import { TFormattedAsset } from '@/types/balance';
+import { TProtocolName } from '@/types/protocol';
 import { MdKeyboardArrowDown } from 'react-icons/md';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '../../ui/collapsible';
 import { PositionCard } from '../PositionCard';
-import { TokenDetails } from '../TokenDetails';
-import { CHAIN_CONFIG } from '@/constants/chainInfo';
-import { protocolNameToImage } from '@/constants/prorocolInfo';
-import { TProtocolName } from '@/types/protocol';
-import { TAsset } from '@/types/asset';
-import { TFormattedAsset } from '@/types/balance';
 
 type LoopingPositionItemProps = {
   positionName: string;
@@ -49,7 +47,7 @@ const LoopingPositionItem: React.FC<LoopingPositionItemProps> = ({
       </CollapsibleTrigger>
       <CollapsibleContent>
         <div className="flex flex-col gap-2">
-          <TokenDetails
+          {/* <TokenDetails
             actionType={type}
             tokens={
               assets?.filter(
@@ -72,7 +70,7 @@ const LoopingPositionItem: React.FC<LoopingPositionItemProps> = ({
               }
               type="Borrowed"
             />
-          ) : null}
+          ) : null} */}
         </div>
       </CollapsibleContent>
     </Collapsible>
