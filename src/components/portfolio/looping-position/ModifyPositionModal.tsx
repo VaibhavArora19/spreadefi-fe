@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Slider } from '@/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { cn } from '@/lib/utils';
 import {
@@ -50,8 +51,11 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
     isLoading: isFetchingPositionDetails,
     error,
   } = useFetchUserCreatedPositionById(position.id);
-  const { mutateAsync: modifyPosition, isPending: isFetchingLatestQuote } =
-    useModifyLoopingPosition(position.id);
+  const {
+    mutateAsync: modifyPosition,
+    isPending: isFetchingLatestQuote,
+    isError: isErrorFetchingLatestQuote,
+  } = useModifyLoopingPosition(position.id);
   const { mutateAsync: updatePositionInDb, isPending: isUpdatingPositionInDb } =
     useUpdateLoopingPositionEntry(position.id);
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
@@ -59,6 +63,11 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
 
   const fetchLatestQuote = useCallback(async () => {
     if (!isInputModified) return;
+    if (modifyType === 'remove' && parseFloat(marginAmount) > position?.marginAmount)
+      return toast.error('Amount cannot be greater than current margin amount');
+    if (modifyType === 'add' && parseFloat(marginAmount) <= 0)
+      return toast.error('Amount cannot be zero');
+
     const marginAmountValue = marginAmount ? parseFloat(marginAmount) : 0;
 
     const payload: TModifyPositionPayload = {
@@ -85,6 +94,13 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
     }, 500),
     [fetchLatestQuote],
   );
+
+  useEffect(() => {
+    if (modifyType === 'remove') {
+      setLeverage(position.leverage);
+    }
+    setQuoteData(null);
+  }, [isErrorFetchingLatestQuote, leverage, marginAmount, modifyType]);
 
   const handleModifyTypeChange = (type: ModifyType) => {
     setModifyType(type);
@@ -285,6 +301,7 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
                 type="number"
                 placeholder="Enter amount"
                 value={marginAmount || ''}
+                // max={modifyType === 'remove' ? position.marginAmount : Infinity}
                 onChange={handleMarginAmountChange}
                 className="text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-2 w-full overflow-hidden"
                 onWheel={(e) => (e.target as HTMLInputElement).blur()}
@@ -303,18 +320,36 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
               <span className="text-sm text-gray-400">Leverage</span>
               <span className="text-gray-300">{leverage.toFixed(2)}x</span>
             </div>
-            <Slider
-              disabled={isFetchingLatestQuote}
-              value={[leverage]}
-              onValueChange={handleLeverageChange}
-              min={1.01}
-              max={positionData?.Strategy?.maxLeverage || 4.5}
-              step={0.01}
-              className={cn(
-                isFetchingLatestQuote ? 'cursor-not-allowed' : 'cursor-pointer',
-                'w-full',
-              )}
-            />
+
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className="w-full">
+                  <Slider
+                    disabled={isFetchingLatestQuote || !marginAmount}
+                    value={[leverage]}
+                    onValueChange={handleLeverageChange}
+                    min={modifyType === 'remove' ? 1 : position.leverage}
+                    max={
+                      modifyType === 'remove'
+                        ? position.leverage
+                        : positionData?.Strategy?.maxLeverage || 4.5
+                    }
+                    step={0.01}
+                    className={cn(
+                      isFetchingLatestQuote ? 'cursor-not-allowed' : 'cursor-pointer',
+                      'w-full',
+                    )}
+                  />
+                </TooltipTrigger>
+                {!marginAmount && (
+                  <TooltipContent side="bottom">
+                    <p className="text-sm text-gray-300">
+                      Enter margin amount first to modify leverage
+                    </p>
+                  </TooltipContent>
+                )}
+              </Tooltip>
+            </TooltipProvider>
           </div>
           {renderPositionInfo()}
           <div className="flex items-center justify-between">
