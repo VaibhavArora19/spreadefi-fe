@@ -165,6 +165,8 @@ const Portfolio = () => {
       protocolKey = 'seamlessBalances';
     } else if (protocolName === 'Zerolend') {
       protocolKey = 'zerolendBalances';
+    } else if (protocolName === 'Lendle') {
+      protocolKey = 'lendleBalances';
     } else {
       return `Protocol ${protocolName} not found.`;
     }
