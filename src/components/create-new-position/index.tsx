@@ -12,9 +12,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
+import { LINEA_CHAIN_ID } from '@/constants';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { cn } from '@/lib/utils';
-import { MarginType, PositionType, TQuoteData } from '@/types/looping-strategy';
+import { MarginType, PositionType, TLifiQuoteData, TQuoteData } from '@/types/looping-strategy';
 import { ArrowLeftIcon } from '@radix-ui/react-icons';
 import { debounce } from 'lodash';
 import Image from 'next/image';
@@ -283,7 +284,7 @@ const LiquidationInfo: React.FC<{
 };
 
 const FinalQuote: React.FC<{
-  quoteData: TQuoteData | null;
+  quoteData: TQuoteData | TLifiQuoteData | null;
   leverage: number;
   apr: number;
   apy: number;
@@ -303,14 +304,25 @@ const FinalQuote: React.FC<{
   interestRate,
   isLoading,
 }) => {
+  const { chainId } = useAccount();
+
+  let entryPrice;
+
+  if (chainId === LINEA_CHAIN_ID) {
+    const lineaQuoteData = quoteData as TQuoteData;
+    entryPrice = lineaQuoteData?.entryPrice;
+  }
+
   return (
     <div className="bg-[#1E1E1E] col-span-full w-full rounded-xl p-6 flex items-start flex-col gap-4">
       <InfoSection title="Final Quote">
-        <InfoItem
-          label="Entry Price"
-          value={quoteData?.entryPrice.toFixed(4) || '-'}
-          isLoading={isLoading}
-        />
+        {!!entryPrice && (
+          <InfoItem
+            label="Entry Price"
+            value={entryPrice ? entryPrice.toFixed(4) : '-'}
+            isLoading={isLoading}
+          />
+        )}
         {borrowingRate && (
           <InfoItem label="Borrowing Rate" value={borrowingRate.toFixed(4)} isLoading={isLoading} />
         )}
@@ -352,7 +364,6 @@ const FinalQuote: React.FC<{
     </div>
   );
 };
-
 const ActionButtons: React.FC<{
   handleCreatePosition: () => void;
   isCreatingPosition: boolean;

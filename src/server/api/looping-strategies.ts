@@ -4,7 +4,9 @@ import { LOOPING_STRATEGY } from '@/constants/query';
 import {
   PositionType,
   TCreatePositionPayload,
+  TLifiQuoteData,
   TLoopingStrategy,
+  TLoopingStrategyLiFiQuotePayload,
   TLoopingStrategyQuotePayload,
   TModifyPositionPayload,
   TModifyPositionResponse,
@@ -109,6 +111,32 @@ export const useGetLoopingStrategyQuote = (strategyId: string | undefined) => {
   return useMutation({
     mutationKey: [LOOPING_STRATEGY.FETCH_QUOTE_BY_ID, strategyId],
     mutationFn: fetchQuote,
+    onError: (error: any) => {
+      console.error('Error fetching quote:', error);
+    },
+  });
+};
+
+export const useGetLoopingStrategyLifiQuote = (strategyId: string | undefined) => {
+  const fetchLiFiQuote = async (payload: TLoopingStrategyLiFiQuotePayload) => {
+    if (!strategyId) {
+      throw new Error('Strategy ID is required');
+    }
+    try {
+      const { data } = await axiosLoopingPositions.post<TLifiQuoteData>(
+        `/strategy/${strategyId}/crosschain/quote`,
+        payload,
+      );
+      return data;
+    } catch (error: any) {
+      console.error('error: ', error);
+      throw error;
+    }
+  };
+
+  return useMutation({
+    mutationKey: [LOOPING_STRATEGY.FETCH_LIFI_QUOTE_BY_ID, strategyId],
+    mutationFn: fetchLiFiQuote,
     onError: (error: any) => {
       console.error('Error fetching quote:', error);
     },
@@ -361,7 +389,7 @@ export const useExecuteTransaction = () => {
       }
 
       // execute main transaction
-      toast.loading('Executing transaction...'); // Add a loading toast for the main transaction
+      toast.loading('Executing transaction...');
       const hash = await walletClient.sendTransaction(payloadData);
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       toast.dismiss();
