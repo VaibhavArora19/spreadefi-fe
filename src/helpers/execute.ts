@@ -1,13 +1,13 @@
-import { Action } from '@/types/strategy';
-import { ethers } from 'ethers';
-import { SquidRoute, TTransactionResponse } from '@/types/transaction';
-import { sleep } from './sleep';
-import { squidConfig } from '@/config/squid';
-import { isBytesLike } from 'ethers/lib/utils';
-import { TransactionResponse } from '@0xsquid/sdk/dist/types';
-import axios from 'axios';
 import { lifiConfig } from '@/config/lifi';
+import { squidConfig } from '@/config/squid';
+import { Action } from '@/types/strategy';
+import { SquidRoute, TTransactionResponse } from '@/types/transaction';
+import { TransactionResponse } from '@0xsquid/sdk/dist/types';
 import { executeRoute, Route } from '@lifi/sdk';
+import axios from 'axios';
+import { ethers } from 'ethers';
+import { isBytesLike } from 'ethers/lib/utils';
+import { sleep } from './sleep';
 
 export const executeSquidTransaction = async (
   signer: ethers.providers.JsonRpcSigner,
@@ -46,10 +46,33 @@ export const executePortalsTransaction = async (
   }
 };
 
-export const executeLifiTransaction = async (chainId: number, route: Route) => {
+export const executeLifiTransaction = async (
+  chainId: number,
+  route: Route,
+  onTxHashGenerated?: (txHash: string) => void,
+) => {
   await lifiConfig(chainId);
 
-  const executedRoute = await executeRoute(route);
+  let isTxHashGenerated = false;
+
+  await executeRoute(route, {
+    updateRouteHook(route) {
+      if (isTxHashGenerated || !onTxHashGenerated) return;
+
+      const txHashSourceChain = route.steps[0].execution?.process[1]?.txHash;
+
+      if (txHashSourceChain) {
+        isTxHashGenerated = true;
+        onTxHashGenerated(txHashSourceChain); // Call the callback function
+      }
+    },
+    async acceptExchangeRateUpdateHook({ toToken, oldToAmount, newToAmount }) {
+      console.log(
+        `Exchange rate updated, with old toAmount: ${oldToAmount} and new toAmount: ${newToAmount}`,
+      );
+      return true;
+    },
+  });
 };
 
 export const executeTransaction = async (
