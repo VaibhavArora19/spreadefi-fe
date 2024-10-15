@@ -85,22 +85,17 @@ const LifiModal: React.FC<LifiModalProps> = ({
         </div>
       </div>
 
-      <p className="text-xs text-[#707070] mb-1 ml-1">Amount</p>
-      <div className="bg-[#1E1E1E] rounded-xl  flex items-start overflow-hidden justify-between">
-        <div>
-          <div>From amount:</div>
-          <div>
-            {route?.fromAmount && route.fromToken.decimals
-              ? Number(formatUnits(BigInt(route.fromAmount), route.fromToken.decimals)).toFixed(5)
-              : '-'}
-          </div>
-        </div>
-        <div className="flex items-center gap-4 text-xs p-4">
+      <div className="flex items-center justify-between gap-4 text-xs p-4 w-full bg-[#1E1E1E] rounded-xl ">
+        <div className="space-y-2">
+          <div>Select Chain</div>
           <ChainsSelector
             setChain={(chain) => changeHandler('chain', chain.chainId.toString())}
             type={Action.DEPOSIT}
           />
+        </div>
 
+        <div className="space-y-2">
+          <div>Select Token</div>
           <TokenSelector
             setToken={(token) =>
               changeHandler('token', {
@@ -112,11 +107,21 @@ const LifiModal: React.FC<LifiModalProps> = ({
           />
         </div>
       </div>
+      {!!route?.fromAmount && (
+        <div className="bg-[#1E1E1E] mt-5 rounded-xl flex items-start overflow-hidden justify-between p-4">
+          <div className="text-sm">You pay:</div>
+          <div>
+            {route?.fromAmount && route.fromToken.decimals
+              ? Number(formatUnits(BigInt(route.fromAmount), route.fromToken.decimals)).toFixed(5)
+              : '-'}
+          </div>
+        </div>
+      )}
 
       <div className="pt-4">
         <InfoItem
           label="Entry Price"
-          value={entryPrice ? Number(entryPrice).toFixed(5) : '-'}
+          value={!!Number(entryPrice) ? Number(entryPrice).toFixed(5) : '-'}
           isLoading={isFetchingLifiQuote}
         />
       </div>
