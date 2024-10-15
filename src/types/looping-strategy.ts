@@ -1,3 +1,5 @@
+import { Route } from '@lifi/sdk';
+
 export type PositionType = 'Long' | 'Short';
 export type MarginType = 'Base' | 'Quote';
 export type Status = 'Open' | 'Closed';
@@ -31,7 +33,13 @@ export type TLoopingStrategyQuotePayload = {
   marginAmount: number;
   positionType?: PositionType;
   leverage: number;
-  userAddress: string;
+  userAddress: `0x${string}`;
+};
+
+export type TLoopingStrategyLiFiQuotePayload = TLoopingStrategyQuotePayload & {
+  fromChain: string;
+  toChain: string;
+  fromToken: string;
 };
 
 export interface TCreatePositionPayload {
@@ -46,6 +54,15 @@ export interface TCreatePositionPayload {
   entryPrice: number;
 }
 
+export type TCreateLiFiPositionPayload = Omit<
+  TCreatePositionPayload,
+  'tokenId' | 'proxyAddress'
+> & {
+  fromChain: number;
+  toChain: number;
+  txHash: string;
+};
+
 export type TQuoteData = {
   entryPrice: number;
   txs: {
@@ -58,6 +75,11 @@ export type TQuoteData = {
       data: string;
     };
   };
+};
+
+export type TLifiQuoteData = {
+  quote: TQuoteData;
+  lifiRoute: Route;
 };
 
 export type TUserLoopingPosition = {

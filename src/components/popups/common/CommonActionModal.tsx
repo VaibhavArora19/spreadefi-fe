@@ -1,22 +1,21 @@
-import Image from 'next/image';
 import Modal from '../../(ui)/Modal';
 import { Button } from '../../ui/button';
 
-import { IoClose } from 'react-icons/io5';
-import TransactionOverview from './TransactionOverview';
-import TokenSelector from './TokenSelector';
-import ChainsSelector from './ChainsSelector';
-import { useAppDispatch, useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
-import { tokensActions, transactionPayloadActions } from '@/redux/actions';
-import { TTransactionPayload } from '@/types/transaction';
-import { Action } from '@/types/strategy';
-import { useAccount, useCall } from 'wagmi';
-import { useTransactionsBuilder } from '@/server/api/transactions';
-import { useCallback, useEffect, useState } from 'react';
-import { ethers } from 'ethers';
 import { Switch } from '@/components/ui/switch';
-import Slippage from './Slippage';
+import { tokensActions, transactionPayloadActions } from '@/redux/actions';
+import { useAppDispatch, useTransactionPayloadStore, useTransactionStore } from '@/redux/hooks';
+import { useTransactionsBuilder } from '@/server/api/transactions';
+import { Action } from '@/types/strategy';
+import { TTransactionPayload } from '@/types/transaction';
+import { ethers } from 'ethers';
+import { useCallback, useEffect, useState } from 'react';
 import { IoMdSettings } from 'react-icons/io';
+import { IoClose } from 'react-icons/io5';
+import { useAccount } from 'wagmi';
+import ChainsSelector from './ChainsSelector';
+import Slippage from './Slippage';
+import TokenSelector from './TokenSelector';
+import TransactionOverview from './TransactionOverview';
 
 type CommonActionModalProps = {
   type: Action.SUPPLY | Action.WITHDRAW | Action.REPAY | Action.BORROW | Action.DEPOSIT;

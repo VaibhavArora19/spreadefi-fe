@@ -3,8 +3,11 @@ import { wethABI } from '@/constants/abi/wethABI';
 import { LOOPING_STRATEGY } from '@/constants/query';
 import {
   PositionType,
+  TCreateLiFiPositionPayload,
   TCreatePositionPayload,
+  TLifiQuoteData,
   TLoopingStrategy,
+  TLoopingStrategyLiFiQuotePayload,
   TLoopingStrategyQuotePayload,
   TModifyPositionPayload,
   TModifyPositionResponse,
@@ -115,6 +118,32 @@ export const useGetLoopingStrategyQuote = (strategyId: string | undefined) => {
   });
 };
 
+export const useGetLoopingStrategyLifiQuote = (strategyId: string | undefined) => {
+  const fetchLiFiQuote = async (payload: TLoopingStrategyLiFiQuotePayload) => {
+    if (!strategyId) {
+      throw new Error('Strategy ID is required');
+    }
+    try {
+      const { data } = await axiosLoopingPositions.post<TLifiQuoteData>(
+        `/strategy/${strategyId}/crosschain/quote`,
+        payload,
+      );
+      return data;
+    } catch (error: any) {
+      console.error('error: ', error);
+      throw error;
+    }
+  };
+
+  return useMutation({
+    mutationKey: [LOOPING_STRATEGY.FETCH_LIFI_QUOTE_BY_ID, strategyId],
+    mutationFn: fetchLiFiQuote,
+    onError: (error: any) => {
+      console.error('Error fetching quote:', error);
+    },
+  });
+};
+
 export const useFetchUserCreatedPositions = (address: string) => {
   const fetchUserPositions = async () => {
     try {
@@ -183,6 +212,31 @@ export const useCreateLoopingPosition = () => {
   });
 };
 
+export const useCreateLiFiLoopingPosition = () => {
+  const router = useRouter();
+  const createLiFiPosition = async (payload: TCreateLiFiPositionPayload) => {
+    try {
+      const { data } = await axiosLoopingPositions.put('/positions/cross-chain', payload);
+
+      return data;
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
+  };
+
+  return useMutation({
+    mutationKey: [LOOPING_STRATEGY.CREATE_LIFI_POSITION],
+    mutationFn: createLiFiPosition,
+    onSuccess: () => {
+      toast.success('Position created successfully');
+      router.push('/portfolio');
+    },
+    onError: (error: any) => {
+      toast.error('Error creating position');
+    },
+  });
+};
+
 export const useModifyLoopingPosition = (positionId: string) => {
   const modifyPosition = async (payload: TModifyPositionPayload) => {
     try {
@@ -227,7 +281,7 @@ export const useUpdateLoopingPositionEntry = (positionId: string) => {
   });
 };
 
-// create position
+// create position transaction
 export const useExecuteStrategyTransaction = () => {
   const { data: walletClient } = useWalletClient();
   const account = useAccount();
@@ -361,7 +415,7 @@ export const useExecuteTransaction = () => {
       }
 
       // execute main transaction
-      toast.loading('Executing transaction...'); // Add a loading toast for the main transaction
+      toast.loading('Executing transaction...');
       const hash = await walletClient.sendTransaction(payloadData);
       const receipt = await publicClient.waitForTransactionReceipt({ hash });
       toast.dismiss();

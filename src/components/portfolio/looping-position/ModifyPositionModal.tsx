@@ -29,7 +29,8 @@ import { useCallback, useEffect, useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
 import { toast } from 'sonner';
-import { useAccount } from 'wagmi';
+import { linea } from 'viem/chains';
+import { useAccount, useSwitchChain } from 'wagmi';
 
 interface ModifyPositionModalProps {
   onClose: () => void;
@@ -38,6 +39,8 @@ interface ModifyPositionModalProps {
 }
 
 const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModalProps) => {
+  const { address: userWalletAddress, chainId } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const [modifyType, setModifyType] = useState<ModifyType>('add');
   const [leverage, setLeverage] = useState(position.leverage);
   const [marginAmount, setMarginAmount] = useState<string>('');
@@ -45,7 +48,6 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
   const [debouncedLeverage, setDebouncedLeverage] = useState(position.leverage);
   const [isInputModified, setIsInputModified] = useState(false);
 
-  const { address: userWalletAddress } = useAccount();
   const {
     data: positionData,
     isLoading: isFetchingPositionDetails,
@@ -359,7 +361,14 @@ const ModifyPositionModal = ({ onClose, onSubmit, position }: ModifyPositionModa
 
           {!!userWalletAddress ? (
             <Button
-              onClick={handleModifyPosition}
+              onClick={async () => {
+                if (chainId !== linea.id) {
+                  await switchChainAsync({ chainId: linea.id });
+                  handleModifyPosition();
+                } else {
+                  handleModifyPosition();
+                }
+              }}
               disabled={
                 isUpdatingPositionInDb ||
                 isExecutingTransaction ||

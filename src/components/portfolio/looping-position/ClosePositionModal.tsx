@@ -12,7 +12,8 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { FaSpinner } from 'react-icons/fa';
 import { IoClose } from 'react-icons/io5';
-import { useAccount } from 'wagmi';
+import { linea } from 'viem/chains';
+import { useAccount, useSwitchChain } from 'wagmi';
 
 interface ClosePositionModalProps {
   onClose: () => void;
@@ -21,7 +22,8 @@ interface ClosePositionModalProps {
 }
 
 const ClosePositionModal = ({ onClose, onSubmit, position }: ClosePositionModalProps) => {
-  const { address: userWalletAddress } = useAccount();
+  const { address: userWalletAddress, chainId } = useAccount();
+  const { switchChainAsync } = useSwitchChain();
   const { data: positionData, isLoading, error } = useFetchUserCreatedPositionById(position.id);
   const { mutateAsync: modifyPosition } = useModifyLoopingPosition(position.id);
   const { mutateAsync: updatePositionInDb, isPending: isUpdatingPositionInDb } =
@@ -134,7 +136,14 @@ const ClosePositionModal = ({ onClose, onSubmit, position }: ClosePositionModalP
           </div>
 
           <Button
-            onClick={handleClosePosition}
+            onClick={async () => {
+              if (chainId !== linea.id) {
+                await switchChainAsync({ chainId: linea.id });
+                handleClosePosition();
+              } else {
+                handleClosePosition();
+              }
+            }}
             disabled={isClosing || isUpdatingPositionInDb || isExecutingTransaction}
             className="w-full bg-red-500 text-white py-2 capitalize flex justify-center">
             {isClosing || isUpdatingPositionInDb || isExecutingTransaction ? (

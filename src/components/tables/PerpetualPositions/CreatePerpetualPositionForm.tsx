@@ -8,20 +8,28 @@ import {
   PositionDetails,
   StrategyInfo,
 } from '@/components/create-new-position';
+import LifiModal from '@/components/popups/lifi/LifiModal';
+import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { chainList } from '@/constants/chainInfo';
+import { executeLifiTransaction } from '@/helpers/execute';
 import { useLoopingStrategyStore } from '@/redux/hooks';
 import {
+  useCreateLiFiLoopingPosition,
   useCreateLoopingPosition,
   useExecuteStrategyTransaction,
   useExecuteTransaction,
   useFetchLoopingStrategyById,
+  useGetLoopingStrategyLifiQuote,
   useGetLoopingStrategyQuote,
 } from '@/server/api/looping-strategies';
 import {
   MarginType,
   PositionType,
+  TCreateLiFiPositionPayload,
   TCreatePositionPayload,
+  TLifiQuoteData,
+  TLoopingStrategyLiFiQuotePayload,
   TLoopingStrategyQuotePayload,
   TQuoteData,
 } from '@/types/looping-strategy';
@@ -29,18 +37,24 @@ import { AxiosError } from 'axios';
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
-import { useAccount } from 'wagmi';
+import { linea } from 'viem/chains';
+import { useAccount, usePublicClient } from 'wagmi';
 
 export default function CreatePerpetualPositionForm() {
+  const publicClient = usePublicClient();
   const { strategyHref } = useLoopingStrategyStore();
-  const { address: userWalletAddress } = useAccount();
+  const { address: userWalletAddress, chainId } = useAccount();
   const previousParamsRef = useRef<string>('');
-
   const [marginAmount, setMarginAmount] = useState<number>(0);
   const [leverage, setLeverage] = useState<number>(1.2);
   const [positionType, setPositionType] = useState<PositionType>('Long');
   const [marginType, setMarginType] = useState<MarginType>('Base');
   const [quoteData, setQuoteData] = useState<TQuoteData | null>(null);
+  const [lifiQuoteData, setLiFiQuoteData] = useState<TLifiQuoteData | null>(null);
+  const [showLifiModal, setShowLifiModal] = useState(false);
+  const [selectedChain, setSelectedChain] = useState<number | null>(null);
+  const [selectedToken, setSelectedToken] = useState<string | null>(null);
+  const [isLiFiPending, setIsLifiPening] = useState<boolean>(false);
 
   const {
     data: strategyData,
@@ -77,7 +91,11 @@ export default function CreatePerpetualPositionForm() {
 
   const { mutateAsync: calculateQuote, isPending: isCalculatingQuote } =
     useGetLoopingStrategyQuote(strategyHref);
+  const { mutateAsync: calculateLiFiQuote, isPending: isCalculatingLiFiQuote } =
+    useGetLoopingStrategyLifiQuote(strategyHref);
   const { mutateAsync: createPosition, isPending: isCreatingPosition } = useCreateLoopingPosition();
+  const { mutateAsync: createLiFiPosition, isPending: isCreatingLiFiPosition } =
+    useCreateLiFiLoopingPosition();
   const { mutateAsync: executeStrategyTransaction, isPending: isExecutingStrategyTransaction } =
     useExecuteStrategyTransaction();
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
@@ -121,31 +139,111 @@ export default function CreatePerpetualPositionForm() {
     strategyId,
   ]);
 
+  const fetchLiFiQuote = useCallback(async () => {
+    if (!userWalletAddress || marginAmount === 0 || leverage === 0 || !strategyId) return;
+
+    if (!selectedChain || !selectedToken) {
+      return;
+    }
+
+    const payload: TLoopingStrategyLiFiQuotePayload = {
+      fromChain: selectedChain.toString(),
+      toChain: linea.id.toString(),
+      fromToken: selectedToken,
+      marginType,
+      marginAmount,
+      positionType,
+      leverage,
+      userAddress: userWalletAddress,
+    };
+
+    const paramsString = JSON.stringify(payload);
+    if (paramsString === previousParamsRef.current) return;
+    previousParamsRef.current = paramsString;
+
+    try {
+      const data = await calculateLiFiQuote(payload);
+      if (data) {
+        setLiFiQuoteData(data);
+      }
+    } catch (error) {
+      console.error('Error fetching LiFi quote:', error);
+      if (error instanceof AxiosError && error.response) {
+        toast.error(`Failed to fetch LiFi quote: ${error.response.data.error}`);
+      } else {
+        console.log('Unknown error');
+      }
+    }
+  }, [
+    marginAmount,
+    leverage,
+    marginType,
+    positionType,
+    userWalletAddress,
+    calculateLiFiQuote,
+    strategyId,
+    selectedChain,
+    selectedToken,
+  ]);
+
   const debouncedFetchQuote = useMemo(() => debounce(fetchQuote, 500), [fetchQuote]);
+  const debouncedFetchLiFiQuote = useMemo(() => debounce(fetchLiFiQuote, 500), [fetchLiFiQuote]);
 
   useEffect(() => {
-    debouncedFetchQuote();
-    return () => debouncedFetchQuote.cancel();
-  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote, strategyId]);
+    if (chainId === linea.id) {
+      debouncedFetchQuote();
+      return () => debouncedFetchQuote.cancel();
+    }
+  }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote, strategyId, chainId]);
+
+  useEffect(() => {
+    if (chainId !== linea.id && selectedChain && selectedToken) {
+      debouncedFetchLiFiQuote();
+      return () => debouncedFetchLiFiQuote.cancel();
+    }
+  }, [
+    marginAmount,
+    leverage,
+    marginType,
+    positionType,
+    debouncedFetchLiFiQuote,
+    strategyId,
+    selectedChain,
+    selectedToken,
+    chainId,
+  ]);
 
   const handleCreatePosition = async () => {
     if (!quoteData || !userWalletAddress) return;
 
     try {
+      let approveTxHash;
+
       if (quoteData.txs.approveTx) {
-        await executeTransaction({
+        const approveTxResult = await executeTransaction({
           to: quoteData.txs.approveTx?.to,
           data: quoteData.txs.approveTx?.data,
           isWethTransaction:
             quoteData.txs.approveTx.to === '0xe5D7C2a44FfDDf6b295A15c148167daaAf5Cf34f',
           marginAmount: marginAmount,
         });
+        approveTxHash = approveTxResult.receipt.transactionHash;
+
+        // wait for the approve transaction to be confirmed
+        await publicClient?.waitForTransactionReceipt({ hash: approveTxHash });
+        toast.success('Approval transaction confirmed');
       }
 
       const txResult = await executeStrategyTransaction({
         to: quoteData.txs.tx.to,
         data: quoteData.txs.tx.data,
       });
+
+      // wait for the main transaction to be confirmed
+      const receipt = await publicClient?.waitForTransactionReceipt({
+        hash: txResult.receipt.transactionHash,
+      });
+      toast.success('Main transaction confirmed');
 
       const tokenId = Number(txResult.tokenId);
       const proxyAddress = txResult.proxyAddress;
@@ -162,11 +260,60 @@ export default function CreatePerpetualPositionForm() {
         entryPrice: quoteData.entryPrice,
       };
 
-      await createPosition(payload);
+      if (receipt?.status === 'success') {
+        // update the db with the new position
+        await createPosition(payload);
+        toast.success('Position created successfully');
+      }
     } catch (error) {
       toast.error('Error creating position');
       console.error('Error creating position:', error);
     }
+  };
+
+  const handleLifiSubmit = async () => {
+    if (!userWalletAddress) return;
+    if (!lifiQuoteData?.lifiRoute) return;
+
+    if (!selectedChain || !selectedToken) {
+      toast.error('Please select a chain and token');
+      return;
+    }
+    try {
+      setIsLifiPening(true);
+      await executeLifiTransaction(
+        selectedChain,
+        lifiQuoteData.lifiRoute,
+        async (txHash: string) => {
+          const payload: TCreateLiFiPositionPayload = {
+            userAddress: userWalletAddress,
+            strategyId,
+            marginType,
+            positionType,
+            marginAmount: marginAmount,
+            leverage,
+            entryPrice: lifiQuoteData?.quote.entryPrice,
+            txHash,
+            fromChain: selectedChain,
+            toChain: linea.id,
+          };
+
+          await createLiFiPosition(payload);
+          setIsLifiPening(false);
+        },
+      );
+    } catch (error) {
+      setIsLifiPening(false);
+      toast.error('Error executing Lifi transaction');
+      console.error('Error executing Lifi transaction:', error);
+    }
+  };
+
+  const handleCloseLifiModal = () => {
+    setSelectedToken(null);
+    setLiFiQuoteData(null);
+    setSelectedChain(null);
+    setShowLifiModal(false);
   };
 
   if (isError) {
@@ -183,7 +330,6 @@ export default function CreatePerpetualPositionForm() {
       ) : (
         <div className="space-y-4">
           <LoopingPositionHeader pair={pair} />
-
           <StrategyInfo
             pair={pair}
             chain={chain}
@@ -206,7 +352,7 @@ export default function CreatePerpetualPositionForm() {
           maxLeverage={maxLeverage!}
           pair={pair}
           currentPrice={currentPrice}
-          isLoading={isLoading || isCalculatingQuote}
+          isLoading={isLoading || isCalculatingQuote || isCalculatingLiFiQuote}
           positionType={positionType}
           setPositionType={setPositionType}
         />
@@ -219,7 +365,7 @@ export default function CreatePerpetualPositionForm() {
         />
       </div>
       <FinalQuote
-        quoteData={quoteData}
+        quoteData={chainId === linea.id ? quoteData : lifiQuoteData}
         leverage={leverage}
         apr={apr}
         apy={apy}
@@ -227,15 +373,38 @@ export default function CreatePerpetualPositionForm() {
         borrowingRate={borrowingRate}
         lendingRate={lendingRate}
         interestRate={interestRate}
-        isLoading={isLoading || isCalculatingQuote}
+        isLoading={isLoading || isCalculatingQuote || isCalculatingLiFiQuote}
       />
-      <ActionButtons
-        handleCreatePosition={handleCreatePosition}
-        isCalculatingQuote={isCalculatingQuote}
-        isCreatingPosition={isCreatingPosition}
-        isExecutingTransaction={isExecutingStrategyTransaction || isExecutingTransaction}
-        quoteData={quoteData}
-      />
+      {chainId === linea.id ? (
+        <ActionButtons
+          handleCreatePosition={handleCreatePosition}
+          isCalculatingQuote={isCalculatingQuote}
+          isCreatingPosition={isCreatingPosition}
+          isExecutingTransaction={isExecutingStrategyTransaction || isExecutingTransaction}
+          quoteData={quoteData}
+        />
+      ) : (
+        <Button
+          disabled={isCalculatingLiFiQuote || !marginAmount}
+          onClick={() => setShowLifiModal(true)}
+          className="text-black bg-white w-full">
+          Create Position Using LiFi
+        </Button>
+      )}
+      {showLifiModal && (
+        <LifiModal
+          selectedChain={selectedChain}
+          selectedToken={selectedToken}
+          route={lifiQuoteData?.lifiRoute || null}
+          onChainChange={setSelectedChain}
+          onTokenChange={setSelectedToken}
+          onClose={handleCloseLifiModal}
+          onSubmit={handleLifiSubmit}
+          entryPrice={lifiQuoteData?.quote.entryPrice.toString() || '-'}
+          isFetchingLifiQuote={isCalculatingLiFiQuote}
+          isLoading={isCreatingLiFiPosition || isLiFiPending}
+        />
+      )}
     </div>
   );
 }
