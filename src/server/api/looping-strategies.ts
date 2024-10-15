@@ -3,6 +3,7 @@ import { wethABI } from '@/constants/abi/wethABI';
 import { LOOPING_STRATEGY } from '@/constants/query';
 import {
   PositionType,
+  TCreateLiFiPositionPayload,
   TCreatePositionPayload,
   TLifiQuoteData,
   TLoopingStrategy,
@@ -211,6 +212,31 @@ export const useCreateLoopingPosition = () => {
   });
 };
 
+export const useCreateLiFiLoopingPosition = () => {
+  const router = useRouter();
+  const createLiFiPosition = async (payload: TCreateLiFiPositionPayload) => {
+    try {
+      const { data } = await axiosLoopingPositions.put('/positions/cross-chain', payload);
+
+      return data;
+    } catch (error: any) {
+      console.error('error: ', error);
+    }
+  };
+
+  return useMutation({
+    mutationKey: [LOOPING_STRATEGY.CREATE_LIFI_POSITION],
+    mutationFn: createLiFiPosition,
+    onSuccess: () => {
+      toast.success('Position created successfully');
+      router.push('/portfolio');
+    },
+    onError: (error: any) => {
+      toast.error('Error creating position');
+    },
+  });
+};
+
 export const useModifyLoopingPosition = (positionId: string) => {
   const modifyPosition = async (payload: TModifyPositionPayload) => {
     try {
@@ -255,7 +281,7 @@ export const useUpdateLoopingPositionEntry = (positionId: string) => {
   });
 };
 
-// create position
+// create position transaction
 export const useExecuteStrategyTransaction = () => {
   const { data: walletClient } = useWalletClient();
   const account = useAccount();

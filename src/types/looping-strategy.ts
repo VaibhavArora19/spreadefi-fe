@@ -54,6 +54,15 @@ export interface TCreatePositionPayload {
   entryPrice: number;
 }
 
+export type TCreateLiFiPositionPayload = Omit<
+  TCreatePositionPayload,
+  'tokenId' | 'proxyAddress'
+> & {
+  fromChain: number;
+  toChain: number;
+  txHash: string;
+};
+
 export type TQuoteData = {
   entryPrice: number;
   txs: {

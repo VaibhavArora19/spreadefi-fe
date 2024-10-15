@@ -11,11 +11,11 @@ import {
 import LifiModal from '@/components/popups/lifi/LifiModal';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { LINEA_CHAIN_ID } from '@/constants';
 import { chainList } from '@/constants/chainInfo';
 import { executeLifiTransaction } from '@/helpers/execute';
 import { useLoopingStrategyStore } from '@/redux/hooks';
 import {
+  useCreateLiFiLoopingPosition,
   useCreateLoopingPosition,
   useExecuteStrategyTransaction,
   useExecuteTransaction,
@@ -26,17 +26,18 @@ import {
 import {
   MarginType,
   PositionType,
+  TCreateLiFiPositionPayload,
   TCreatePositionPayload,
   TLifiQuoteData,
   TLoopingStrategyLiFiQuotePayload,
   TLoopingStrategyQuotePayload,
   TQuoteData,
 } from '@/types/looping-strategy';
-import { Route } from '@lifi/sdk';
 import { AxiosError } from 'axios';
 import { debounce } from 'lodash';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { linea } from 'viem/chains';
 import { useAccount, usePublicClient } from 'wagmi';
 
 export default function CreatePerpetualPositionForm() {
@@ -53,7 +54,7 @@ export default function CreatePerpetualPositionForm() {
   const [showLifiModal, setShowLifiModal] = useState(false);
   const [selectedChain, setSelectedChain] = useState<number | null>(null);
   const [selectedToken, setSelectedToken] = useState<string | null>(null);
-  const [lifiRoute, setLifiRoute] = useState<Route | null>(null);
+  const [isLiFiPending, setIsLifiPening] = useState<boolean>(false);
 
   const {
     data: strategyData,
@@ -93,6 +94,8 @@ export default function CreatePerpetualPositionForm() {
   const { mutateAsync: calculateLiFiQuote, isPending: isCalculatingLiFiQuote } =
     useGetLoopingStrategyLifiQuote(strategyHref);
   const { mutateAsync: createPosition, isPending: isCreatingPosition } = useCreateLoopingPosition();
+  const { mutateAsync: createLiFiPosition, isPending: isCreatingLiFiPosition } =
+    useCreateLiFiLoopingPosition();
   const { mutateAsync: executeStrategyTransaction, isPending: isExecutingStrategyTransaction } =
     useExecuteStrategyTransaction();
   const { mutateAsync: executeTransaction, isPending: isExecutingTransaction } =
@@ -145,7 +148,7 @@ export default function CreatePerpetualPositionForm() {
 
     const payload: TLoopingStrategyLiFiQuotePayload = {
       fromChain: selectedChain.toString(),
-      toChain: LINEA_CHAIN_ID.toString(),
+      toChain: linea.id.toString(),
       fromToken: selectedToken,
       marginType,
       marginAmount,
@@ -187,14 +190,14 @@ export default function CreatePerpetualPositionForm() {
   const debouncedFetchLiFiQuote = useMemo(() => debounce(fetchLiFiQuote, 500), [fetchLiFiQuote]);
 
   useEffect(() => {
-    if (chainId === LINEA_CHAIN_ID) {
+    if (chainId === linea.id) {
       debouncedFetchQuote();
       return () => debouncedFetchQuote.cancel();
     }
   }, [marginAmount, leverage, marginType, positionType, debouncedFetchQuote, strategyId, chainId]);
 
   useEffect(() => {
-    if (chainId !== LINEA_CHAIN_ID && selectedChain && selectedToken) {
+    if (chainId !== linea.id && selectedChain && selectedToken) {
       debouncedFetchLiFiQuote();
       return () => debouncedFetchLiFiQuote.cancel();
     }
@@ -237,7 +240,9 @@ export default function CreatePerpetualPositionForm() {
       });
 
       // wait for the main transaction to be confirmed
-      await publicClient?.waitForTransactionReceipt({ hash: txResult.receipt.transactionHash });
+      const receipt = await publicClient?.waitForTransactionReceipt({
+        hash: txResult.receipt.transactionHash,
+      });
       toast.success('Main transaction confirmed');
 
       const tokenId = Number(txResult.tokenId);
@@ -255,9 +260,11 @@ export default function CreatePerpetualPositionForm() {
         entryPrice: quoteData.entryPrice,
       };
 
-      // update the db with the new position
-      await createPosition(payload);
-      toast.success('Position created successfully');
+      if (receipt?.status === 'success') {
+        // update the db with the new position
+        await createPosition(payload);
+        toast.success('Position created successfully');
+      }
     } catch (error) {
       toast.error('Error creating position');
       console.error('Error creating position:', error);
@@ -273,15 +280,40 @@ export default function CreatePerpetualPositionForm() {
       return;
     }
     try {
-      const lifiResponse = await executeLifiTransaction(selectedChain, lifiQuoteData?.lifiRoute);
+      setIsLifiPening(true);
+      await executeLifiTransaction(
+        selectedChain,
+        lifiQuoteData.lifiRoute,
+        async (txHash: string) => {
+          const payload: TCreateLiFiPositionPayload = {
+            userAddress: userWalletAddress,
+            strategyId,
+            marginType,
+            positionType,
+            marginAmount: marginAmount,
+            leverage,
+            entryPrice: lifiQuoteData?.quote.entryPrice,
+            txHash,
+            fromChain: selectedChain,
+            toChain: linea.id,
+          };
 
-      // todo: save position to db
-      // await createPosition(payload);
-      // toast.success('Position created successfully');
+          await createLiFiPosition(payload);
+          setIsLifiPening(false);
+        },
+      );
     } catch (error) {
+      setIsLifiPening(false);
       toast.error('Error executing Lifi transaction');
       console.error('Error executing Lifi transaction:', error);
     }
+  };
+
+  const handleCloseLifiModal = () => {
+    setSelectedToken(null);
+    setLiFiQuoteData(null);
+    setSelectedChain(null);
+    setShowLifiModal(false);
   };
 
   if (isError) {
@@ -333,7 +365,7 @@ export default function CreatePerpetualPositionForm() {
         />
       </div>
       <FinalQuote
-        quoteData={chainId === LINEA_CHAIN_ID ? quoteData : lifiQuoteData}
+        quoteData={chainId === linea.id ? quoteData : lifiQuoteData}
         leverage={leverage}
         apr={apr}
         apy={apy}
@@ -343,7 +375,7 @@ export default function CreatePerpetualPositionForm() {
         interestRate={interestRate}
         isLoading={isLoading || isCalculatingQuote || isCalculatingLiFiQuote}
       />
-      {chainId === LINEA_CHAIN_ID ? (
+      {chainId === linea.id ? (
         <ActionButtons
           handleCreatePosition={handleCreatePosition}
           isCalculatingQuote={isCalculatingQuote}
@@ -361,17 +393,16 @@ export default function CreatePerpetualPositionForm() {
       )}
       {showLifiModal && (
         <LifiModal
-          onClose={() => setShowLifiModal(false)}
-          onSubmit={handleLifiSubmit}
-          marginAmount={marginAmount}
           selectedChain={selectedChain}
           selectedToken={selectedToken}
           route={lifiQuoteData?.lifiRoute || null}
           onChainChange={setSelectedChain}
           onTokenChange={setSelectedToken}
-          onRouteChange={setLifiRoute}
-          isFetchingLiFiQuote={isCalculatingLiFiQuote}
+          onClose={handleCloseLifiModal}
+          onSubmit={handleLifiSubmit}
           entryPrice={lifiQuoteData?.quote.entryPrice.toString() || '-'}
+          isFetchingLifiQuote={isCalculatingLiFiQuote}
+          isLoading={isCreatingLiFiPosition || isLiFiPending}
         />
       )}
     </div>

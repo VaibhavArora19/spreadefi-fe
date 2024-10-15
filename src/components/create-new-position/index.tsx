@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Slider } from '@/components/ui/slider';
-import { LINEA_CHAIN_ID } from '@/constants';
 import { assetNameToImage } from '@/constants/assetInfo';
 import { cn } from '@/lib/utils';
 import { MarginType, PositionType, TLifiQuoteData, TQuoteData } from '@/types/looping-strategy';
@@ -21,6 +20,7 @@ import { debounce } from 'lodash';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import React, { useCallback, useEffect, useState } from 'react';
+import { linea } from 'viem/chains';
 import { useAccount } from 'wagmi';
 import { Skeleton } from '../ui/skeleton';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
@@ -189,7 +189,7 @@ const PositionDetails: React.FC<{
               onWheel={(e) => (e.target as HTMLInputElement).blur()}
               type="number"
               placeholder="0.00"
-              className="w-full text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-3 pl-12"
+              className="w-full text-white bg-inherit border border-gray-700 rounded-md outline-none placeholder:text-gray-500 px-4 py-3 "
             />
             <Select
               value={marginType}
@@ -206,11 +206,6 @@ const PositionDetails: React.FC<{
               </SelectContent>
             </Select>
           </div>
-          <Button
-            size="sm"
-            className="absolute left-2 top-1 w-fit p-1.5 h-auto text-xs hover:text-gray-400">
-            Max
-          </Button>
         </div>
       </div>
       <div className="space-y-3">
@@ -308,7 +303,7 @@ const FinalQuote: React.FC<{
 
   let entryPrice;
 
-  if (chainId === LINEA_CHAIN_ID) {
+  if (chainId === linea.id) {
     const lineaQuoteData = quoteData as TQuoteData;
     entryPrice = lineaQuoteData?.entryPrice;
   }
